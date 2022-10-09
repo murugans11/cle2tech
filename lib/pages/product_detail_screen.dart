@@ -7,6 +7,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../constants/constants.dart';
+import '../models/feature/feature_productes.dart';
 import '../widgets/buttons.dart';
 import '../widgets/castomar_review_commends.dart';
 import '../widgets/product_greed_view_widget.dart';
@@ -17,6 +18,7 @@ import 'cart_screen.dart';
 
 
 class ProductDetailScreen extends StatefulWidget {
+  static const String routeName = "/ProductDetailScreen";
   const ProductDetailScreen({Key? key}) : super(key: key);
 
   @override
@@ -73,6 +75,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final listingProduct  = ModalRoute.of(context)!.settings.arguments as ListingProduct;
+
     return Scaffold(
       backgroundColor: secondaryColor3,
       body: SafeArea(

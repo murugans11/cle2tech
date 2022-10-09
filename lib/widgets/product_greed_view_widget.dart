@@ -54,7 +54,7 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                   ? GestureDetector(
                       onTap: () {
                          //const ProductDetailScreen().launch(context);
-                        widget.callCat;
+                        widget.callCat();
                       },
                       child: Container(
                         height: 250,
@@ -73,7 +73,7 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                   : GestureDetector(
                       onTap: () {
                         // const ProductDetailScreen().launch(context);
-                         widget.callCat;
+                         widget.callCat();
                       },
                       child: CachedNetworkImage(
                         imageUrl: widget.image.isEmpty ? '' : widget.image,
