@@ -1,18 +1,28 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/blocs/banner/bannerList_event.dart';
 import 'package:shopeein/blocs/banner/bannerList_state.dart';
 import 'package:shopeein/constants/app_theme.dart';
 import 'package:shopeein/models/feature/feature_productes.dart';
+import 'package:shopeein/pages/single_category_screen.dart';
 
 import '../blocs/banner/bannarList_bloc.dart';
 import '../blocs/category/categoryList_bloc.dart';
 import '../blocs/featureproduct/feature_product_list_bloc.dart';
+import '../constants/constants.dart';
+
 import '../utils/dio/network_call_status_enum.dart';
 import '../widgets/app_widgets.dart';
 import '../widgets/error_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
+import '../widgets/notificition_screen.dart';
+import '../widgets/product_greed_view_widget.dart';
+import '../widgets/product_greed_view_widget1.dart';
+import 'best_seller_screen.dart';
+import 'category_screen.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = "/HomePage";
@@ -20,7 +30,7 @@ class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -29,7 +39,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     context.read<CategoriesBloc>().add(const FetchCategoriesItemsEvent());
     context.read<BannerBloc>().add(const FetchBannerItemsEvent());
-    context.read<FeatureProductListBloc>().add(const FetchFeatureProductItemsEvent());
+    context
+        .read<FeatureProductListBloc>()
+        .add(const FetchFeatureProductItemsEvent());
   }
 
   @override
@@ -40,122 +52,215 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        children: [
-          const SizedBox(height: 10),
-          _createCategories(),
-          const SizedBox(height: 10),
-          _createBannerItems(),
-          const SizedBox(height: 10),
-          _showFeatureList(),
-        ],
-      ),
-    );
-  }
-
-  /*Crete Categories list*/
-  Widget _createCategories() {
-    return BlocConsumer<CategoriesBloc, CategoryState>(
-      listener: (context, state) {
-        if (state.status == NetworkCallStatusEnum.error) {
-          errorDialog(context, state.error.errMsg);
-        }
-      },
-      builder: (context, state) {
-        return Card(
-          shadowColor: Colors.grey,
-          margin: EdgeInsets.zero,
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            height: 107,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: state.categoryList.categoryGroup!.length,
-              itemBuilder: (BuildContext context, int index) {
-                return _roundCard(
-                    () => print('index $index'),
-                    state.categoryList.categoryGroup![index].title,
-                    state.categoryList.categoryGroup![index].image);
-              },
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        elevation: 0.0,
+        titleSpacing: 0.0,
+        title: MyGoogleText(
+          text: AppTheme.of(context)?.values.appName ?? '',
+          fontSize: 20,
+          fontColor: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.all(4),
+          child: GestureDetector(
+            onTap: () {
+              //const ProfileScreen().launch(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Container(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(30),
+                  ),
+                ),
+                child: Image(
+                  image: AssetImage(
+                    AppTheme.of(context)?.assets.logo1 ?? '',
+                  ),
+                  fit: BoxFit.fitHeight,
+                ),
+              ),
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _roundCard(
-    Function findSelectedCategoriesItem,
-    String? categoriesItemName,
-    String imageUrl,
-  ) {
-    return InkWell(
-      onTap: () {
-        findSelectedCategoriesItem();
-      },
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 5, 5, 10),
-        child: Column(
-          children: [
-            Container(
-              width: 75,
-              height: 75,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    image: NetworkImage(imageUrl), fit: BoxFit.cover),
-              ),
-            ),
-            Text(
-              categoriesItemName ?? '',
-              style: AppTheme.of(context)?.textStyles.kBordStyle,
-            )
-          ],
         ),
-      ),
-    );
-  }
-
-  Widget _createBannerItems() {
-    return BlocBuilder<BannerBloc, BannerState>(
-      builder: (context, state) {
-        if (state.status == NetworkCallStatusEnum.loaded) {
-          return Card(
-            shadowColor: Colors.grey,
-            margin: EdgeInsets.zero,
-            clipBehavior: Clip.antiAlias,
-            child: CarouselSlider(
-              options: CarouselOptions(
-                height: 200.0,
-                aspectRatio: 2.0,
-                enlargeCenterPage: true,
-                enableInfiniteScroll: false,
-                initialPage: 2,
-                autoPlay: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: const BoxDecoration(
+                color: secondaryColor2,
+                borderRadius: BorderRadius.all(Radius.circular(30)),
               ),
-              items: state.bannerList.categoryGroup?.map((i) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return InkWell(
-                      onTap: () {
-                        //  print('index of banner ${imgList.indexOf(i.resourcePath)}');
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: const BoxDecoration(color: Colors.amber),
-                        child: Image.network(i.resourcePath,
-                            fit: BoxFit.cover, width: 1000.0),
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
+              child: IconButton(
+                onPressed: () {
+                  //const SearchProductScreen().launch(context);
+                },
+                icon: const Icon(
+                  FeatherIcons.search,
+                  color: Colors.black,
+                ),
+              ),
             ),
-          );
-        }
-        return Container();
-      },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: const BoxDecoration(
+                color: secondaryColor2,
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  const NotificationsScreen().launch(context);
+                },
+                icon: const Icon(
+                  FeatherIcons.bell,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8.0),
+        ],
+      ),
+      body: ListView(
+        children: [
+          BlocBuilder<BannerBloc, BannerState>(
+            builder: (context, state) {
+              return HorizontalList(
+                padding: const EdgeInsets.all(10),
+                itemCount: state.bannerList.categoryGroup?.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      debugPrint(
+                          "Category Item click${state.bannerList.categoryGroup?[index].resourcePath}");
+                    },
+                    child: Container(
+                      height: 190,
+                      width: 310,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: FittedBox(
+                        child: Image(
+                          image: NetworkImage(state.bannerList
+                                  .categoryGroup?[index].resourcePath ??
+                              ''),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 15, top: 15),
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(30),
+                topLeft: Radius.circular(30),
+              ),
+            ),
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const MyGoogleText(
+                          text: 'Categories',
+                          fontSize: 16,
+                          fontColor: Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            const CategoryScreen().launch(context);
+                          },
+                          child: const MyGoogleText(
+                            text: 'Show All',
+                            fontSize: 13,
+                            fontColor: textColors,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        )
+                      ],
+                    ),
+                    BlocConsumer<CategoriesBloc, CategoryState>(
+                      listener: (context, state) {
+                        if (state.status == NetworkCallStatusEnum.error) {
+                          errorDialog(context, state.error.errMsg);
+                        }
+                      },
+                      builder: (context, state) {
+                        return HorizontalList(
+                          spacing: 20,
+                          itemCount: state.categoryList.categoryGroup!.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    const SingleCategoryScreen()
+                                        .launch(context);
+                                  },
+                                  child: Container(
+                                    height: 60,
+                                    width: 60,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(state.categoryList
+                                            .categoryGroup![index].image),
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(30)),
+                                      border: Border.all(
+                                        width: 1,
+                                        color: secondaryColor3,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                MyGoogleText(
+                                  text: state.categoryList.categoryGroup?[index]
+                                          .title ??
+                                      '',
+                                  fontSize: 13,
+                                  fontColor: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 30),
+                    _showFeatureList()
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -176,6 +281,12 @@ class _HomePageState extends State<HomePage> {
           );
         }
 
+        if (state.status == NetworkCallStatusEnum.loading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
         if (state.status == NetworkCallStatusEnum.loaded) {
           return _buildListView(state, context);
         }
@@ -192,34 +303,54 @@ class _HomePageState extends State<HomePage> {
       physics: const ClampingScrollPhysics(), // 2nd add
       itemCount: state.featureProductList.featureProduct?.length ?? 0,
       itemBuilder: (_, mainIndex) {
-        return Card(
-          elevation: 8,
-          shadowColor: AppTheme.of(context)?.colors.screenBackGroundColor,
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              headText(state.featureProductList.featureProduct?[mainIndex].title),
-              SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  width: MediaQuery.of(context).size.width,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.featureProductList
-                            .featureProduct?[mainIndex].listing?.length ??
-                        0,
-                    itemBuilder: (BuildContext context, int subIndex) {
-                      return Card(
-                        elevation: 10,
-                        shadowColor: Colors.grey,
-                        margin: EdgeInsets.zero,
-                        //margin: const EdgeInsets.only(left:0.0,right: 10.0),
-                        clipBehavior: Clip.antiAlias,
-                        child: productCard(() {}, state, mainIndex, subIndex),
-                      );
-                    },
-                  ))
-            ],
-          ),
+        List<ListingProduct>? listingProduct = [];
+        state.featureProductList.featureProduct?[mainIndex].listing
+            ?.forEach((element1) {
+          state.featureProductList.listingProduct?.forEach((element) {
+            String image =
+                element.keyDetails?.variant?[0].media?[0].resourcePath;
+            if (element.id == element1 && !image.isEmptyOrNull) {
+              listingProduct.add(element);
+              return;
+            }
+          });
+        });
+
+        return Column(
+          children: [
+            getItemTitle(
+                state.featureProductList.featureProduct?[mainIndex].title),
+            HorizontalList(
+              spacing: 20,
+              itemCount: listingProduct.length,
+              itemBuilder: (BuildContext context, int index) {
+                ListingProduct? listingProductItems = listingProduct[index];
+
+                String imageURL = '';
+                var parts = listingProductItems
+                    .keyDetails?.variant?[0].media?[0].resourcePath
+                    .split('.com');
+                if (parts != null) {
+                  var image = parts.sublist(1).join('.com').trim();
+                  imageURL =
+                      'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                }
+                // double percent=(listingProductItems.keyDetails?.variant?[0].retailPrice - listingProductItems.keyDetails?.variant?[0].sellingPrice)/listingProductItems.keyDetails?.variant?[0].retailPrice*100;
+                return ProductGreedShow1(
+                  image: imageURL,
+                  productTitle: listingProductItems.keyDetails?.productTitle,
+                  productPrice:
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice,
+                  discountPercentage: ("10%"),
+                  isSingleView: false,
+                  callCat: () {
+                    debugPrint('productTitle${listingProductItems.keyDetails?.productTitle}');
+
+                  },
+                );
+              },
+            ),
+          ],
         );
       },
     );
@@ -325,6 +456,31 @@ class _HomePageState extends State<HomePage> {
       );
     }
     return Container();
+  }
+
+  Widget getItemTitle(String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        MyGoogleText(
+          text: title,
+          fontSize: 16,
+          fontColor: Colors.black,
+          fontWeight: FontWeight.normal,
+        ),
+        TextButton(
+          onPressed: () {
+            const BestSellerScreen().launch(context);
+          },
+          child: const MyGoogleText(
+            text: 'Show All',
+            fontSize: 13,
+            fontColor: textColors,
+            fontWeight: FontWeight.normal,
+          ),
+        )
+      ],
+    );
   }
 
   Widget headText(String? title) {

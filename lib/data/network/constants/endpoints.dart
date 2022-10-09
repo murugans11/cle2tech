@@ -18,4 +18,5 @@ class Endpoints {
   static const String getFeatureProductList = "${baseUrl}featureProduct";
 
 
+
 }

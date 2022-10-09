@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shopeein/pages/categories_page.dart';
-import 'package:shopeein/pages/delivery_page.dart';
-import 'package:shopeein/pages/fan_club_page.dart';
 import 'package:shopeein/pages/initial_page.dart';
 
+import '../../pages/cart_screen.dart';
+import '../../pages/category_screen.dart';
 import '../../pages/home_page.dart';
+import '../../pages/profile_screen.dart';
 import '../../pages/search_page.dart';
+import '../../pages/splash_screen_one.dart';
 
 class Router {
 
@@ -16,7 +17,11 @@ class Router {
     switch (routeSettings.name) {
       case '/':
         return MaterialPageRoute(builder: (_) {
-          return InitialPage();
+          return const SplashScreenOne();
+        });
+        case InitialPage.routeName:
+        return MaterialPageRoute(builder: (_) {
+          return const InitialPage();
         });
 
       case HomePage.routeName:
@@ -24,24 +29,24 @@ class Router {
           return const HomePage();
         });
 
-      case FanclubPage.routeName:
+      case CartScreen.routeName:
         return MaterialPageRoute(builder: (_) {
-          return FanclubPage();
+          return const CartScreen();
         });
 
-      case CategoriesPage.routeName:
+      case CategoryScreen.routeName:
         return MaterialPageRoute(builder: (_) {
-          return CategoriesPage();
+          return const CategoryScreen();
         });
 
-      case DeliveryPage.routeName:
+      case ProfileScreen.routeName:
         return MaterialPageRoute(builder: (_) {
-          return DeliveryPage();
+          return const ProfileScreen();
         });
 
         case SearchPage.routeName:
         return MaterialPageRoute(builder: (_) {
-          return SearchPage();
+          return const SearchPage();
         });
 
       default:

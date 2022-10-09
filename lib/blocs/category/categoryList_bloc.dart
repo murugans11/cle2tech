@@ -26,14 +26,19 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoryState> {
     FetchCategoriesItemsEvent event,
     Emitter<CategoryState> emit,
   ) async {
-    emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+    if(state.categoryList.categoryGroup?.length ==0){
+      emit(state.copyWith(status: NetworkCallStatusEnum.loading));
 
-    try {
-      final CategoryList weather = await homeRepository.getCategoryGroup();
+      try {
+        final CategoryList weather = await homeRepository.getCategoryGroup();
 
-      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: weather));
-    } on CustomError catch (e) {
-      emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+        emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: weather));
+      } on CustomError catch (e) {
+        emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+      }
+    }else{
+      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: state.categoryList));
     }
+
   }
 }

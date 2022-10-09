@@ -26,17 +26,18 @@ class FeatureProductListBloc
     FeatureProductListEvent event,
     Emitter<FeatureProductListState> emit,
   ) async {
-    emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+    if(state.featureProductList.featureProduct?.length == 0){
+      emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+      try {
+        final FeatureProductList featureProductList = await homeRepository.getFeatureProtectList();
 
-    try {
-      final FeatureProductList featureProductList =
-          await homeRepository.getFeatureProtectList();
-
-      emit(state.copyWith(
-          status: NetworkCallStatusEnum.loaded,
-          featureProductLists: featureProductList));
-    } on CustomError catch (e) {
-      emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+        emit(state.copyWith(status: NetworkCallStatusEnum.loaded, featureProductLists: featureProductList));
+      } on CustomError catch (e) {
+        emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+      }
+    }else{
+      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, featureProductLists: state.featureProductList));
     }
+
   }
 }

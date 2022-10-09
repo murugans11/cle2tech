@@ -109,7 +109,9 @@ class _Colors {
 
 class _Assets {
   // splash screen assets
-  String get logo => "assets/icons/ic_appicon.png";
+  String get logo => "assets/icons/shopeein.png";
+  String get logo1 => "assets/icons/Launching_Icon_App.png";
+  String get logo2 => "assets/icons/Logo2.png";
 
   // login screen assets
 
@@ -139,7 +141,11 @@ class _Values {
 
   String get hrDelivery => "4Hr Delivery";
 
+  String get cart => "Cart";
+
   String get notifications => "Notifications";
+
+  String get profile => "Profile";
 }
 
 class AppTheme extends InheritedWidget {

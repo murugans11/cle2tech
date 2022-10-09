@@ -25,15 +25,19 @@ class BannerBloc extends Bloc<BannerEvent, BannerState> {
     FetchBannerItemsEvent event,
     Emitter<BannerState> emit,
   ) async {
-    emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+    if(state.bannerList.categoryGroup?.length == 0){
+      emit(state.copyWith(status: NetworkCallStatusEnum.loading));
 
-    try {
-      final BannerList weather = await homeRepository.getBannerList();
+      try {
+        final BannerList weather = await homeRepository.getBannerList();
 
-      emit(state.copyWith(
-          status: NetworkCallStatusEnum.loaded, categoryList: weather));
-    } on CustomError catch (e) {
-      emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+        emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: weather));
+      } on CustomError catch (e) {
+        emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+      }
+    }else{
+      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: state.bannerList));
     }
+
   }
 }
