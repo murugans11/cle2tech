@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -6,21 +8,21 @@ import 'package:shopeein/blocs/banner/bannerList_event.dart';
 import 'package:shopeein/blocs/banner/bannerList_state.dart';
 import 'package:shopeein/constants/app_theme.dart';
 import 'package:shopeein/models/feature/feature_productes.dart';
+import 'package:shopeein/pages/product_detail_screen.dart';
 import 'package:shopeein/pages/single_category_screen.dart';
 
 import '../blocs/banner/bannarList_bloc.dart';
-import '../blocs/category/categoryList_bloc.dart';
+import '../blocs/category_groupe/categoryList_bloc.dart';
 import '../blocs/featureproduct/feature_product_list_bloc.dart';
 import '../constants/constants.dart';
 
+import '../models/categoriesbyname/categorieItems.dart';
 import '../utils/dio/network_call_status_enum.dart';
 import '../widgets/app_widgets.dart';
 import '../widgets/error_dialog.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../widgets/notificition_screen.dart';
 import '../widgets/product_greed_view_widget.dart';
-import '../widgets/product_greed_view_widget1.dart';
 import 'best_seller_screen.dart';
 import 'category_screen.dart';
 
@@ -164,101 +166,110 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           Container(
-            padding: const EdgeInsets.only(left: 15, top: 15),
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(30),
-                topLeft: Radius.circular(30),
+              padding: const EdgeInsets.only(left: 15, top: 15),
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(30),
+                  topLeft: Radius.circular(30),
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const MyGoogleText(
-                          text: 'Categories',
-                          fontSize: 16,
-                          fontColor: Colors.black,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const MyGoogleText(
+                        text: 'Categories',
+                        fontSize: 16,
+                        fontColor: Colors.black,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                              context, CategoryScreen.routeName);
+                        },
+                        child: const MyGoogleText(
+                          text: 'Show All',
+                          fontSize: 13,
+                          fontColor: textColors,
                           fontWeight: FontWeight.normal,
                         ),
-                        TextButton(
-                          onPressed: () {
-                            const CategoryScreen().launch(context);
-                          },
-                          child: const MyGoogleText(
-                            text: 'Show All',
-                            fontSize: 13,
-                            fontColor: textColors,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        )
-                      ],
-                    ),
-                    BlocConsumer<CategoriesBloc, CategoryState>(
-                      listener: (context, state) {
-                        if (state.status == NetworkCallStatusEnum.error) {
-                          errorDialog(context, state.error.errMsg);
-                        }
-                      },
-                      builder: (context, state) {
-                        return HorizontalList(
-                          spacing: 20,
-                          itemCount: state.categoryList.categoryGroup!.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    const SingleCategoryScreen()
-                                        .launch(context);
-                                  },
-                                  child: Container(
-                                    height: 60,
-                                    width: 60,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: NetworkImage(state.categoryList
-                                            .categoryGroup![index].image),
-                                        fit: BoxFit.fitHeight,
-                                      ),
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(30)),
-                                      border: Border.all(
-                                        width: 1,
-                                        color: secondaryColor3,
-                                      ),
+                      )
+                    ],
+                  ),
+                  BlocConsumer<CategoriesBloc, CategoryState>(
+                    listener: (context, state) {
+                      if (state.status == NetworkCallStatusEnum.error) {
+                        errorDialog(context, state.error.errMsg);
+                      }
+                    },
+                    builder: (context, state) {
+                      return HorizontalList(
+                        spacing: 20,
+                        itemCount: state.categoryList.categoryGroup!.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  final splitNames =  state.categoryList.categoryGroup![index].path?.split('/');
+                                  List splitList = [];
+                                  splitNames?.forEach((element) {
+                                    splitList.add(element);
+                                  });
+                                  final query = splitList.last;
+                                  final category = CategoryItemDisplay(
+                                    name: query,
+                                    displayName: state.categoryList.categoryGroup![index].title,
+                                    path: 'null',
+                                    heading: false,
+                                  );
+                                  Navigator.pushNamed(
+                                      context, SingleCategoryScreen.routeName,
+                                      arguments: category);
+                                },
+                                child: Container(
+                                  height: 60,
+                                  width: 60,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: NetworkImage(state.categoryList
+                                          .categoryGroup![index].image),
+                                      fit: BoxFit.fitHeight,
+                                    ),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(30)),
+                                    border: Border.all(
+                                      width: 1,
+                                      color: secondaryColor3,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                MyGoogleText(
-                                  text: state.categoryList.categoryGroup?[index]
-                                          .title ??
-                                      '',
-                                  fontSize: 13,
-                                  fontColor: Colors.black,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                    _showFeatureList()
-                  ],
-                )
-              ],
-            ),
-          ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              MyGoogleText(
+                                text: state.categoryList.categoryGroup?[index]
+                                        .title ??
+                                    '',
+                                fontSize: 13,
+                                fontColor: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  _showFeatureList()
+                ],
+              )),
         ],
       ),
     );
@@ -281,11 +292,11 @@ class _HomePageState extends State<HomePage> {
           );
         }
 
-        if (state.status == NetworkCallStatusEnum.loading) {
+        /* if (state.status == NetworkCallStatusEnum.loading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
-        }
+        }*/
 
         if (state.status == NetworkCallStatusEnum.loaded) {
           return _buildListView(state, context);
@@ -318,8 +329,7 @@ class _HomePageState extends State<HomePage> {
 
         return Column(
           children: [
-            getItemTitle(
-                state.featureProductList.featureProduct?[mainIndex].title),
+            getItemTitle(state, mainIndex),
             HorizontalList(
               spacing: 20,
               itemCount: listingProduct.length,
@@ -335,17 +345,25 @@ class _HomePageState extends State<HomePage> {
                   imageURL =
                       'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
                 }
-                // double percent=(listingProductItems.keyDetails?.variant?[0].retailPrice - listingProductItems.keyDetails?.variant?[0].sellingPrice)/listingProductItems.keyDetails?.variant?[0].retailPrice*100;
+                final sellingPrice =
+                    listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                final retailPrice =
+                    listingProductItems.keyDetails?.variant?[0].retailPrice;
+                int percent =
+                    ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                            int.parse(retailPrice) *
+                            100)
+                        .toInt();
                 return ProductGreedShow1(
                   image: imageURL,
                   productTitle: listingProductItems.keyDetails?.productTitle,
-                  productPrice:
-                      listingProductItems.keyDetails?.variant?[0].sellingPrice,
-                  discountPercentage: ("10%"),
+                  productPrice: sellingPrice,
+                  actualPrice: retailPrice,
+                  discountPercentage: ("-$percent%"),
                   isSingleView: false,
                   callCat: () {
-                    debugPrint('productTitle${listingProductItems.keyDetails?.productTitle}');
-
+                    Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                        arguments: listingProductItems);
                   },
                 );
               },
@@ -356,109 +374,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget productCard(
-    Function callCat,
-    FeatureProductListState state,
-    int mainIndex,
-    int subIndex,
-  ) {
-    ListingProduct? listingProductItems;
-    var mainId =
-        state.featureProductList.featureProduct?[mainIndex].listing?[subIndex];
-    state.featureProductList.listingProduct?.forEach((element) {
-      if (element.id == mainId) {
-        listingProductItems = element;
-        return;
-      }
-    });
-    String imageURL = '';
-    var parts = listingProductItems
-        ?.keyDetails?.variant?[0].media?[0].resourcePath
-        .split('.com');
-    if (parts != null) {
-      var image = parts.sublist(1).join('.com').trim();
-      imageURL =
-          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
-      return InkWell(
-        onTap: () {
-          callCat;
-        },
-        child: Padding(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              CachedNetworkImage(
-                imageUrl: imageURL.isEmpty ? '' : imageURL,
-                imageBuilder: (context, imageProvider) => Container(
-                  height: MediaQuery.of(context).size.height * 0.35,
-                  width: MediaQuery.of(context).size.width * 0.65,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.fitHeight,
-                    ),
-                  ),
-                ),
-                // placeholder: (context, url) => const CircularProgressIndicator(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
-              SizedBox(
-                width: 150.0,
-                child: Text(
-                  listingProductItems?.keyDetails?.productTitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
-                  style: AppTheme.of(context)?.textStyles.kBordStyleIndexText,
-                ),
-              ),
-              RichText(
-                textAlign: TextAlign.center,
-                text: const TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: '\u{20B9}${2500}',
-                      style: TextStyle(
-                        fontSize: 12.0,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        height: 1.2,
-                      ),
-                    ),
-                    TextSpan(
-                      text: '\u{20B9}${6000}',
-                      style: TextStyle(
-                        fontSize: 9.0,
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              RichText(
-                textAlign: TextAlign.center,
-                text: const TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: '${40}% off',
-                      style: TextStyle(
-                        fontSize: 9.0,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-    return Container();
-  }
-
-  Widget getItemTitle(String title) {
+  Widget getItemTitle(FeatureProductListState state, int mainIndex) {
+    String title = state.featureProductList.featureProduct?[mainIndex].title;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -470,7 +387,23 @@ class _HomePageState extends State<HomePage> {
         ),
         TextButton(
           onPressed: () {
-            const BestSellerScreen().launch(context);
+            debugPrint(mainIndex.toString());
+            //BestSellerScreen().launch(context);
+            List<ListingProduct>? listingProduct = [];
+            state.featureProductList.featureProduct?[mainIndex].listing
+                ?.forEach((element1) {
+              state.featureProductList.listingProduct?.forEach((element) {
+                String image =
+                    element.keyDetails?.variant?[0].media?[0].resourcePath;
+                if (element.id == element1 && !image.isEmptyOrNull) {
+                  listingProduct.add(element);
+                  return;
+                }
+              });
+            });
+            Navigator.pushNamed(context, BestSellerScreen.routeName,
+                arguments:
+                    ListingItem(listingProduct: listingProduct, title: title));
           },
           child: const MyGoogleText(
             text: 'Show All',

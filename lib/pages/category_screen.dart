@@ -1,14 +1,18 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:nb_utils/nb_utils.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:shopeein/pages/single_category_screen.dart';
 
 
+import '../blocs/category_groupe/categoryList_bloc.dart';
 import '../constants/constants.dart';
+import '../models/categoriesbyname/categorieItems.dart';
 import '../widgets/category_view.dart';
 
 class CategoryScreen extends StatefulWidget {
-
   static const String routeName = "/CategoryScreen";
 
   const CategoryScreen({Key? key}) : super(key: key);
@@ -18,36 +22,11 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-
-
-  List<Map<String, dynamic>> categoryList = [
-    {
-      "image": 'images/category_image1.png',
-      "title": 'Women',
-      "count": '37 items',
-    },
-    {
-      "image": 'images/kids.png',
-      "title": 'Kid\'s',
-      "count": '27 items',
-    },
-    {
-      "image": 'images/men.png',
-      "title": 'Men',
-      "count": '49 items',
-    },
-    {
-      "image": 'images/sports.png',
-      "title": 'Sport\'s',
-      "count": '12 items',
-    },
-    {
-      "image": 'images/shoes.png',
-      "title": 'Shoes',
-      "count": '32 items',
-    },
-  ];
-
+  @override
+  void initState() {
+    super.initState();
+    //context.read<CategoriesBloc>().add(const FetchCategoriesItemsEvent());
+  }
 
   List<Color> colors = const [
     Color(0xFFFCF3D7),
@@ -60,7 +39,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //backgroundColor: primaryColor.withOpacity(0.05),
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -84,7 +62,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
             ),
           ),
         ],
-
         title: const MyGoogleText(
           text: 'Categories',
           fontColor: secondaryColor2,
@@ -92,45 +69,73 @@ class _CategoryScreenState extends State<CategoryScreen> {
           fontSize: 18,
         ),
       ),
-      body: Column(
-        //mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          Expanded(
-            child: Container(
-                padding: const EdgeInsets.all(20),
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    topLeft: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    ListView.builder(
-                      shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                      itemCount: categoryList.length,
-                        itemBuilder: (_, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
-                        child: CategoryView(
-                          name: categoryList[index]['title'],
-                          items: categoryList[index]['count'],
-                          color: colors[index],
-                          image: categoryList[index]['image'],
-                          onTabFunction: () {
-                            const SingleCategoryScreen().launch(context);
-                          },
-                        ),
-                      );
-                    })
-                  ],
-                )),
+      body: BlocBuilder<CategoriesBloc, CategoryState>(
+        builder: (context, state) {
+          var cound = state.categoryList.categoryGroup?.length ?? 0;
+          return CustomScrollView(
+            slivers: [
+              for (var i = 0; i < cound; i++) buildListView(state, context, i)
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildListView(CategoryState state, BuildContext context, int index) {
+    final random = Random();
+
+    List list = state.categoryList.categoryGroup?[index].category;
+    List<CategoryItemDisplay> category = [];
+    for (var element in list) {
+      List e1 = element;
+      for (var element1 in e1) {
+        print(element1['displayName']);
+        category.add(
+          CategoryItemDisplay(
+            name: element1['name'],
+            displayName: element1['displayName'],
+            path: element1['path'],
+            heading: element1['heading'],
           ),
-        ],
+        );
+      }
+    }
+
+    return SliverStickyHeader(
+      header: Container(
+        padding: const EdgeInsets.all(5),
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(30),
+            topLeft: Radius.circular(30),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 0.0),
+          child: CategoryView(
+            name: state.categoryList.categoryGroup?[index].title ?? '',
+            items: '10',
+            color: colors[random.nextInt(colors.length)],
+            image: state.categoryList.categoryGroup?[index].image ?? '',
+            onTabFunction: () {
+              //const SingleCategoryScreen().launch(context);
+            },
+          ),
+        ),
+      ),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, i) => ListTile(
+            onTap: () {
+              Navigator.pushNamed(context, SingleCategoryScreen.routeName, arguments: category[i]);
+            },
+            title: Text(category[i].displayName ?? ''),
+          ),
+          childCount: category.length,
+        ),
       ),
     );
   }

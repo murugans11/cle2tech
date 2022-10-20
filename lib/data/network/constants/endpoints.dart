@@ -13,10 +13,9 @@ class Endpoints {
   static const int connectionTimeout = 30000;
 
   // booking endpoints
-  static const String getCategoryGroup = "${baseUrl}categoryGroup";
   static const String getHomePageBanner = "${baseUrl}banner";
   static const String getFeatureProductList = "${baseUrl}featureProduct";
-
-
-
+  static const String getCategoryGroup = "${baseUrl}categoryGroup";
+  static const String getViewAllCategoryProductList = "${baseUrl}category";
+  static const String getCategoryProductListByName = "${baseUrl}categoryGroup";
 }

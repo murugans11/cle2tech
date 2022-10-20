@@ -4,15 +4,19 @@ import 'package:iconly/iconly.dart';
 
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:shopeein/pages/product_detail_screen.dart';
 
 import '../constants/constants.dart';
+
+import '../models/feature/feature_productes.dart';
 import '../widgets/filter_widget.dart';
-import '../widgets/product_greed_view_widget1.dart';
+import '../widgets/product_greed_view_widget.dart';
+
 import '../widgets/sort_widget.dart';
 
-
-
 class BestSellerScreen extends StatefulWidget {
+  static const String routeName = "/BestSellerScreen";
+
   const BestSellerScreen({Key? key}) : super(key: key);
 
   @override
@@ -25,6 +29,8 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final listingProductList = ModalRoute.of(context)!.settings.arguments as ListingItem;
+
     return Scaffold(
       //backgroundColor: primaryColor.withOpacity(0.05),
       appBar: AppBar(
@@ -37,14 +43,14 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
               height: 40,
               width: 40,
               decoration: const BoxDecoration(
-                color: secondaryColor3,
+                color: secondaryColor2,
                 borderRadius: BorderRadius.all(Radius.circular(30)),
               ),
               child: IconButton(
                 onPressed: () {},
                 icon: const Icon(
                   FeatherIcons.search,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -59,8 +65,8 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
             color: Colors.white,
           ),
         ),
-        title: const MyGoogleText(
-          text: 'Best Seller',
+        title: MyGoogleText(
+          text: listingProductList.title,
           fontColor: Colors.white,
           fontWeight: FontWeight.normal,
           fontSize: 18,
@@ -193,15 +199,9 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
                             mainAxisSpacing: 10.0,
                             childAspectRatio: 0.90,
                           ),
-                          itemCount: 6,
+                          itemCount: listingProductList.listingProduct.length,
                           itemBuilder: (BuildContext ctx, index) {
-                            return ProductGreedShow(
-                              image: 'images/woman.png',
-                              productTitle: 'Blazer Trousers Suit',
-                              productPrice: '33.30',
-                              discountPercentage: '-30%',
-                              isSingleView: isSingleView,
-                            );
+                            return getItem(listingProductList, index, context);
                           },
                         )
                       : GridView.builder(
@@ -214,15 +214,9 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
                             mainAxisSpacing: 10.0,
                             childAspectRatio: 0.55,
                           ),
-                          itemCount: 6,
+                          itemCount: listingProductList.listingProduct.length,
                           itemBuilder: (BuildContext ctx, index) {
-                            return ProductGreedShow(
-                              image: 'images/woman.png',
-                              productTitle: 'Blazer Trousers Suit',
-                              productPrice: '33.30',
-                              discountPercentage: '-30%',
-                              isSingleView: isSingleView,
-                            );
+                            return getItem(listingProductList, index, context);
                           },
                         ),
                 ],
@@ -231,6 +225,39 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  ProductGreedShow1 getItem(ListingItem listingProductList, int index, BuildContext context) {
+    String imageURL = '';
+    var parts = listingProductList
+        .listingProduct[index].keyDetails?.variant?[0].media?[0].resourcePath
+        .split('.com');
+    if (parts != null) {
+      var image = parts.sublist(1).join('.com').trim();
+      imageURL =
+          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+    }
+    final sellingPrice = listingProductList
+        .listingProduct[index].keyDetails?.variant?[0].sellingPrice;
+    final retailPrice = listingProductList
+        .listingProduct[index].keyDetails?.variant?[0].retailPrice;
+    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+            int.parse(retailPrice) *
+            100)
+        .toInt();
+    return ProductGreedShow1(
+      image: imageURL,
+      productTitle:
+          listingProductList.listingProduct[index].keyDetails?.productTitle,
+      productPrice: sellingPrice,
+      actualPrice: retailPrice,
+      discountPercentage: ("-$percent%"),
+      isSingleView: false,
+      callCat: () {
+        Navigator.pushNamed(context, ProductDetailScreen.routeName,
+            arguments: listingProductList.listingProduct[index]);
+      },
     );
   }
 }

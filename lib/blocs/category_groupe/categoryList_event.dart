@@ -8,5 +8,7 @@ abstract class CategoriesEvent extends Equatable {
 }
 
 class FetchCategoriesItemsEvent extends CategoriesEvent {
-  const FetchCategoriesItemsEvent();
+   const FetchCategoriesItemsEvent();
 }
+
+

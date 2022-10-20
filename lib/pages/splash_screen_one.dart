@@ -36,7 +36,7 @@ class _SplashScreenOneState extends State<SplashScreenOne> {
               child: AnimatedSplashScreen(
                 duration: 3000,
                 splash: AppTheme.of(context)?.assets.logo2 ?? '',
-                splashTransition: SplashTransition.rotationTransition,
+                splashTransition: SplashTransition.fadeTransition,
                 backgroundColor: primaryColor,
                 nextScreen: const InitialPage(),
               ),

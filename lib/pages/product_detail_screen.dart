@@ -1,3 +1,4 @@
+import 'dart:ffi';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +12,15 @@ import '../models/feature/feature_productes.dart';
 import '../widgets/buttons.dart';
 import '../widgets/castomar_review_commends.dart';
 import '../widgets/product_greed_view_widget.dart';
-import '../widgets/product_greed_view_widget1.dart';
 import '../widgets/review_bottom_sheet_1.dart';
 import '../widgets/single_product_total_review.dart';
 import 'cart_screen.dart';
-
+import 'package:string_validator/string_validator.dart';
 
 class ProductDetailScreen extends StatefulWidget {
+
   static const String routeName = "/ProductDetailScreen";
+
   const ProductDetailScreen({Key? key}) : super(key: key);
 
   @override
@@ -27,15 +29,11 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   PageController pageController = PageController(initialPage: 1);
-  final pictures = [
-    'images/woman.png',
-    'images/woman2.png',
-    'images/woman3.png'
-  ];
+
   bool isFavorite = false;
   double initialRating = 0;
   late double rating;
-  String discountPercentage = '-50%';
+
 
   String selectedSize = '';
   final sizeList = [
@@ -45,14 +43,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     'XL',
     'XXL',
   ];
-  Color selectedColor = const Color(0xFFffffff);
-  final colorList = const [
-    Color(0xFFA5C7F1),
-    Color(0xFFEC6793),
-    Color(0xFF21223E),
-    Color(0xFF15949C),
-  ];
-  int simpleIntInput = 0;
+
+  int selectedColorValue = 0;
 
   int initialValueFromText = 0;
 
@@ -75,8 +67,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final listingProduct = ModalRoute.of(context)!.settings.arguments as ListingProduct;
+    RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
-    final listingProduct  = ModalRoute.of(context)!.settings.arguments as ListingProduct;
+    /// Get the images
+    var images = [];
+    listingProduct.keyDetails?.variant?[selectedColorValue].media
+        ?.forEach((imageUrl) {
+      var image =
+          imageUrl.resourcePath.split('.com').sublist(1).join('.com').trim();
+      images.add(
+          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/612x612/filters:format(png)/$image');
+    });
+
+    final title = listingProduct.keyDetails?.productTitle;
+    final sellingPrice = listingProduct.keyDetails?.variant?[selectedColorValue].sellingPrice;
+    final retailPrice = listingProduct.keyDetails?.variant?[selectedColorValue].retailPrice;
+    final description = listingProduct.keyDetails?.description.replaceAll(exp, '');
+    List<Attributes> attributes = listingProduct.attributeGroup?[0].attributes ?? [];
+    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) / int.parse(retailPrice) * 100).toInt();
+
+    final highlights = listingProduct.keyDetails?.highlights;
+    var selectColorImage = [];
+    var selectSize = [];
+
+    listingProduct.keyDetails?.variant?.forEach((variant) {
+      var image = variant.media?[0].resourcePath
+          .split('.com')
+          .sublist(1)
+          .join('.com')
+          .trim();
+      selectColorImage.add(
+          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/212x212/filters:format(png)/$image');
+    });
 
     return Scaffold(
       backgroundColor: secondaryColor3,
@@ -89,29 +112,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: [
                 ///_______Photos____________
                 CarouselSlider.builder(
-                  itemCount: pictures.length,
+                  itemCount: images.length,
                   options: CarouselOptions(
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 5),
-                    height: 300,
-                    aspectRatio: 1,
+                    height: 400,
+                    aspectRatio: 16 / 9,
                     viewportFraction: 1,
                     initialPage: 0,
                     enableInfiniteScroll: true,
                     reverse: false,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 5),
                     autoPlayAnimationDuration:
                         const Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
                     enlargeCenterPage: true,
-                    onPageChanged: null,
+                    // onPageChanged: callbackFunction,
                     scrollDirection: Axis.horizontal,
                   ),
                   itemBuilder: (BuildContext context, int itemIndex,
                           int pageViewIndex) =>
                       Container(
-                          color: secondaryColor3,
-                          width: double.infinity,
-                          child: Image(image: AssetImage(pictures[itemIndex]))),
+                    width: MediaQuery.of(context).size.width,
+                    color: secondaryColor2,
+                    child: Image(
+                      image: NetworkImage(images[itemIndex]),
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
                 ),
 
                 ///_________Favorite & Share Button_________________________________________________________
@@ -196,6 +223,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ],
             ),
 
+            const SizedBox(height: 5),
             Container(
               padding: const EdgeInsets.only(
                   left: 20, top: 20, bottom: 20, right: 20),
@@ -210,23 +238,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const MyGoogleText(
-                    text: 'Blazer Trousers Suit',
+                  MyGoogleText(
+                    text: title,
                     fontSize: 20,
                     fontColor: Colors.black,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                   ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      const MyGoogleText(
-                        text: '\$30.00',
+                      MyGoogleText(
+                        text: '\u{20B9}$sellingPrice',
                         fontSize: 16,
-                        fontColor: Colors.black,
-                        fontWeight: FontWeight.normal,
+                        fontColor: Colors.green,
+                        fontWeight: FontWeight.bold,
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        '\$35.00',
+                        '\u{20B9}$retailPrice',
                         style: GoogleFonts.dmSans(
                           textStyle: const TextStyle(
                             fontSize: 16,
@@ -246,16 +275,115 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Radius.circular(15),
                           ),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: MyGoogleText(
-                            text: '-50%',
+                            text: '-${percent.toString()}%',
                             fontSize: 14,
-                            fontColor: secondaryColor1,
+                            fontColor: Colors.green,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 15),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: const TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Sold By : ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'SHOPPEEN',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: const TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Status : ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'In-Stock',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: const TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'COD : ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Available',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: const TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Shipping : ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Free',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -282,11 +410,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 30),
+
                   const MyGoogleText(
                     text: 'Select Your Size',
                     fontSize: 16,
                     fontColor: Colors.black,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                   ),
                   const SizedBox(height: 10),
 
@@ -310,7 +439,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   decoration: const BoxDecoration(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(30)),
-                                    color: secondaryColor1,
+                                    color: primaryColor,
                                   ),
                                   child: Center(
                                     child: MyGoogleText(
@@ -344,136 +473,128 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      MyGoogleText(
-                        text: 'Select Colors',
-                        fontSize: 16,
-                        fontColor: Colors.black,
-                        fontWeight: FontWeight.normal,
-                      ),
-                      SizedBox(
-                        width: 110,
-                        child: Center(
-                          child: MyGoogleText(
-                            text: 'Quantity',
-                            fontSize: 16,
-                            fontColor: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
 
                   ///__________Select Color Buttons & Quantity button______________________________
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ///__________Select Color Buttons___________________________________
-                      SizedBox(
-                        height: 46,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, i) => GestureDetector(
+                  const MyGoogleText(
+                    text: 'Select Colors',
+                    fontSize: 16,
+                    fontColor: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+
+                  const SizedBox(height: 10.0),
+                  HorizontalList(
+                    spacing: 10,
+                    itemCount: selectColorImage.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Column(
+                        children: [
+                          GestureDetector(
                             onTap: () {
                               setState(() {
-                                selectedColor = colorList[i];
+                                selectedColorValue = index;
                               });
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: selectedColor == colorList[i]
-                                  ? Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(30)),
-                                        color: colorList[i],
-                                      ),
-                                      child: const Center(
-                                          child: Icon(
-                                        Icons.check,
-                                        color: Colors.white,
-                                      )),
-                                    )
-                                  : Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(30)),
-                                        color: colorList[i],
-                                      ),
-                                    ),
+                            child: selectedColorValue == index
+                                ? chooseColorWidget(
+                                    selectColorImage,
+                                    index,
+                                    primaryColor,
+                                  )
+                                : chooseColorWidget(
+                                    selectColorImage,
+                                    index,
+                                    secondaryColor3,
+                                  ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10.0),
+
+                  ///__________Select Color Buttons & Quantity button______________________________
+
+                  //const SizedBox(height: 10),
+                  const MyGoogleText(
+                    text: 'Quantity',
+                    fontSize: 16,
+                    fontColor: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: 110,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              initialValueFromText > 1
+                                  ? initialValueFromText--
+                                  : null;
+                            });
+                          },
+                          child: Material(
+                            elevation: 4,
+                            color: secondaryColor3,
+                            borderRadius: BorderRadius.circular(30),
+                            child: const SizedBox(
+                              width: 33,
+                              height: 33,
+                              child: Center(
+                                child: Icon(FeatherIcons.minus,
+                                    size: 25, color: textColors),
+                              ),
                             ),
                           ),
-                          itemCount: colorList.length,
                         ),
-                      ),
+                        Text(
+                          initialValueFromText.toString(),
+                          style: GoogleFonts.dmSans(fontSize: 18),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              initialValueFromText++;
+                            });
+                          },
+                          child: Material(
+                            elevation: 4,
+                            color: secondaryColor3,
+                            borderRadius: BorderRadius.circular(30),
+                            child: const SizedBox(
+                              width: 33,
+                              height: 33,
+                              child: Center(
+                                child: Icon(Icons.add,
+                                    size: 25, color: textColors),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
-                      ///Quantity button______________________________
-                      SizedBox(
-                        width: 110,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  initialValueFromText > 1
-                                      ? initialValueFromText--
-                                      : null;
-                                });
-                              },
-                              child: Material(
-                                elevation: 4,
-                                color: secondaryColor3,
-                                borderRadius: BorderRadius.circular(30),
-                                child: const SizedBox(
-                                  width: 33,
-                                  height: 33,
-                                  child: Center(
-                                    child: Icon(FeatherIcons.minus,
-                                        size: 25, color: textColors),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Text(
-                              initialValueFromText.toString(),
-                              style: GoogleFonts.dmSans(fontSize: 18),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  initialValueFromText++;
-                                });
-                              },
-                              child: Material(
-                                elevation: 4,
-                                color: secondaryColor3,
-                                borderRadius: BorderRadius.circular(30),
-                                child: const SizedBox(
-                                  width: 33,
-                                  height: 33,
-                                  child: Center(
-                                    child: Icon(Icons.add,
-                                        size: 25, color: textColors),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  const MyGoogleText(
+                    text: 'Check Delivery',
+                    fontSize: 16,
+                    fontColor: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 10),
+                  const TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter Pincode',
+                    ),
                   ),
 
                   ///_____________Description________________________________
+                  const SizedBox(height: 20),
                   Container(
                     width: double.infinity,
                     decoration: const BoxDecoration(
@@ -481,19 +602,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         bottom: BorderSide(width: 1, color: textColors),
                       ),
                     ),
-                    child: const ExpansionTile(
-                      title: Text('Description'),
+                    child: ExpansionTile(
+                      title: const Text('Description'),
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: ReadMoreText(
-                            'Flutter is Google’s mobile UI open source framework to build high-quality native (super fast) interfaces for iOS and Android apps with the unified codebase.',
+                            description,
                             trimLines: 2,
-                            colorClickableText: Colors.pink,
+                            colorClickableText: primaryColor,
                             trimMode: TrimMode.Line,
                             trimCollapsedText: 'Show more',
                             trimExpandedText: 'Show less',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                           /*child: ReadMoreText(
                             'These product details can be one sentence, a short paragraph or bulleted. They can be serious, funny or quirky. They can be located right next to or underneath product titles and product images. They can be scannable selling points or have strong readability.',
@@ -564,7 +686,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     text: 'Delivery & Services',
                     fontSize: 16,
                     fontColor: Colors.black,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                   ),
                   const SizedBox(height: 10),
                   Column(
@@ -576,20 +698,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Container(
                               height: 35,
                               width: 35,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 borderRadius:
-                                    const BorderRadius.all(Radius.circular(30)),
-                                color: secondaryColor1.withOpacity(.20),
+                                    BorderRadius.all(Radius.circular(30)),
+                                color: primaryColor,
                               ),
                               child: const Center(
                                   child: Icon(
                                 FeatherIcons.truck,
                                 size: 18,
+                                color: Colors.white,
                               )),
                             ),
                             const SizedBox(width: 8),
                             const MyGoogleText(
-                              text: 'Get it by Mon, 12 May',
+                              text: 'Delivered in 7-9 days',
                               fontSize: 16,
                               fontColor: Colors.black,
                               fontWeight: FontWeight.normal,
@@ -604,55 +727,82 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             Container(
                               height: 35,
                               width: 35,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 borderRadius:
-                                    const BorderRadius.all(Radius.circular(30)),
-                                color: secondaryColor1.withOpacity(.20),
-                              ),
-                              child: const Center(
-                                  child: Icon(
-                                FeatherIcons.creditCard,
-                                size: 18,
-                              )),
-                            ),
-                            const SizedBox(width: 8),
-                            const MyGoogleText(
-                              text: 'Pay on delivery available',
-                              fontSize: 16,
-                              fontColor: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(30)),
-                                color: secondaryColor1.withOpacity(.20),
+                                    BorderRadius.all(Radius.circular(30)),
+                                color: primaryColor,
                               ),
                               child: const Center(
                                   child: Icon(
                                 FeatherIcons.repeat,
                                 size: 18,
+                                color: Colors.white,
                               )),
                             ),
                             const SizedBox(width: 8),
-                            const Flexible(
-                              child: MyGoogleText(
-                                text:
-                                    'Easy 30 days return & exchange available',
-                                fontSize: 16,
-                                fontColor: Colors.black,
-                                fontWeight: FontWeight.normal,
+                            const MyGoogleText(
+                              text: 'Return & Replacement',
+                              fontSize: 16,
+                              fontColor: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 35,
+                              width: 35,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30)),
+                                color: primaryColor,
                               ),
+                              child: const Center(
+                                  child: Icon(
+                                FeatherIcons.disc,
+                                size: 18,
+                                color: Colors.white,
+                              )),
+                            ),
+                            const SizedBox(width: 8),
+                            const MyGoogleText(
+                              text: '4 hrs express delivery',
+                              fontSize: 16,
+                              fontColor: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 35,
+                              width: 35,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30)),
+                                color: primaryColor,
+                              ),
+                              child: const Center(
+                                  child: Icon(
+                                FeatherIcons.creditCard,
+                                size: 18,
+                                color: Colors.white,
+                              )),
+                            ),
+                            const SizedBox(width: 8),
+                            const MyGoogleText(
+                              text: 'Pay online or UPI id',
+                              fontSize: 16,
+                              fontColor: Colors.black,
+                              fontWeight: FontWeight.normal,
                             ),
                           ],
                         ),
@@ -661,26 +811,98 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  ///__________________Related Products____________________________
+                  const SizedBox(
+                    height: 10,
+                  ),
                   const MyGoogleText(
-                    text: 'Related Products',
+                    text: 'Highlights',
+                    fontSize: 16,
+                    fontColor: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 10),
+                  Table(
+                    children: [
+                      for (var attribute in highlights!)
+                        TableRow(children: [
+                          TableCell(
+                            child: Row(
+                              children: [
+                                MyGoogleText(
+                                  text:'\u2022 $attribute' ?? '',
+                                  fontSize: 16,
+                                  fontColor: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ],
+                            ),
+                          )
+                        ])
+                    ],
+                  ),
+
+                  ///product details
+                  const SizedBox(height: 10),
+                  const MyGoogleText(
+                    text: 'Product Details',
+                    fontSize: 16,
+                    fontColor: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 10),
+
+                  Table(
+                      // border: TableBorder.all(width: 1.0, color: Colors.black,borderRadius: const BorderRadius.all(Radius.zero)),
+                      children: [
+                        for (var attribute in attributes)
+                          TableRow(children: [
+                            TableCell(
+                              child: Row(
+                                children: [
+                                  MyGoogleText(
+                                    text:
+                                        attribute.displayName.toString() ?? '',
+                                    fontSize: 12,
+                                    fontColor: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  const Spacer(),
+                                  MyGoogleText(
+                                    text: getValues(attribute.value),
+                                    fontSize: 16,
+                                    fontColor: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ],
+                              ),
+                            )
+                          ])
+                      ]),
+
+                  ///__________________Related Products____________________________
+                  const SizedBox(height: 15),
+                  const MyGoogleText(
+                    text: 'Similar Product',
                     fontSize: 16,
                     fontColor: Colors.black,
                     fontWeight: FontWeight.normal,
                   ),
                   const SizedBox(height: 15),
-                  HorizontalList(itemCount: 20, itemBuilder: (_,index){
-                    return const Padding(
-                      padding: EdgeInsets.only(right: 15),
-                      child: ProductGreedShow(
-                        image: 'images/woman.png',
-                        productTitle: 'Blazer Trousers Suit',
-                        productPrice: '33.30',
-                        discountPercentage: '-30%',
+                  HorizontalList(
+                    spacing: 20,
+                    itemCount: 4,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ProductGreedShow1(
+                        image: images[0],
+                        productTitle: title,
+                        productPrice: sellingPrice,
+                        actualPrice: retailPrice,
+                        discountPercentage: ("-$percent%"),
                         isSingleView: false,
-                      ),
-                    );
-                  }),
+                        callCat: () {},
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -710,14 +932,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Button1(
                       buttonText: 'Buy now',
                       buttonColor: primaryColor,
-                      onPressFunction: () => const CartScreen().launch(context)),
+                      onPressFunction: () =>
+                          const CartScreen().launch(context)),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: ButtonType2(
                       buttonText: 'Add to Cart',
                       buttonColor: primaryColor,
-                      onPressFunction: ()  => const CartScreen().launch(context)),
+                      onPressFunction: () =>
+                          const CartScreen().launch(context)),
                 ),
               ],
             ),
@@ -725,5 +949,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       ),
     );
+  }
+
+  Container chooseColorWidget(List<dynamic> images, int index, Color color) {
+    return Container(
+      height: 120,
+      width: 120,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(images[index]),
+          fit: BoxFit.cover,
+        ),
+        borderRadius: const BorderRadius.all(Radius.zero),
+        border: Border.all(
+          width: 2,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  String getValues(value) {
+    debugPrint('value${value.toString()}');
+    if (contains(value.toString(), '[')) {
+      List list = value as List;
+      return list[0]['displayName'].toString() ?? " ";
+    } else {
+      return value.toString();
+    }
   }
 }

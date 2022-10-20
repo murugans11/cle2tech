@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shopeein/models/banner/banner.dart';
 
 import '../../models/categories/category.dart';
+import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
 import '../../utils/device/custom_error.dart';
 import '../../utils/dio/dio_error_util.dart';
@@ -41,6 +42,17 @@ class HomeRepository {
   Future<FeatureProductList> getFeatureProtectList() async {
     try {
       final FeatureProductList featureProductList = await _homeApi.getFeatureProductList();
+      print('featureProductList: $featureProductList');
+      return featureProductList;
+    } catch (e) {
+      print(e.toString());
+      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+    }
+  }
+
+  Future<CategorieItems> getCategoryProductListByName(String url ) async {
+    try {
+      final CategorieItems featureProductList = await _homeApi.getCategoryProductListByName(url);
       print('featureProductList: $featureProductList');
       return featureProductList;
     } catch (e) {

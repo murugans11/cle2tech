@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 
 import 'package:nb_utils/nb_utils.dart';
@@ -13,6 +14,7 @@ class ProductGreedShow1 extends StatefulWidget {
     required this.image,
     required this.productTitle,
     required this.productPrice,
+    required this.actualPrice,
     required this.discountPercentage,
     required this.isSingleView,
     required this.callCat
@@ -20,6 +22,7 @@ class ProductGreedShow1 extends StatefulWidget {
   final String image;
   final String productTitle;
   final String productPrice;
+  final String actualPrice;
   final String discountPercentage;
   final bool isSingleView;
   final Function callCat;
@@ -170,12 +173,28 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                     fontWeight: FontWeight.normal,
                   ),
                 ),
-                MyGoogleText(
-                  text: '\u{20B9}${widget.productPrice}',
-                  fontSize: 14,
-                  fontColor: Colors.black,
-                  fontWeight: FontWeight.normal,
+                Row(
+                  children: [
+                    MyGoogleText(
+                      text: '\u{20B9}${widget.productPrice}',
+                      fontSize: 14,
+                      fontColor: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      '\u{20B9}${widget.actualPrice}',
+                      style: GoogleFonts.dmSans(
+                        textStyle: const TextStyle(
+                          fontSize: 14,
+                          decoration: TextDecoration.lineThrough,
+                          color: textColors,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+
                 Padding(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Row(
