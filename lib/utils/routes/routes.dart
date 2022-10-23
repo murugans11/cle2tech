@@ -11,7 +11,8 @@ import '../../pages/home_page.dart';
 import '../../pages/product_detail_screen.dart';
 import '../../pages/profile_screen.dart';
 import '../../pages/search_page.dart';
-import '../../pages/single_category_screen.dart';
+import '../../pages/single_category_by_Item_screen.dart';
+import '../../pages/single_category_group_screen.dart';
 import '../../pages/splash_screen_one.dart';
 
 class Router {
@@ -45,10 +46,17 @@ class Router {
           settings: RouteSettings(arguments: args),
         );
 
-      case SingleCategoryScreen.routeName:
+      case SingleCategoryGroupScreen.routeName:
         dynamicArguments as CategoryItemDisplay;
         return MaterialPageRoute(
-          builder: (context) => const SingleCategoryScreen(),
+          builder: (context) => const SingleCategoryGroupScreen(),
+          settings: RouteSettings(arguments: dynamicArguments),
+        );
+
+        case SingleCategoryByItemScreen.routeName:
+        dynamicArguments as CategoryItemDisplay;
+        return MaterialPageRoute(
+          builder: (context) => const SingleCategoryByItemScreen(),
           settings: RouteSettings(arguments: dynamicArguments),
         );
 

@@ -40,16 +40,4 @@ class CategoriesGroup {
   }
 }
 
-class Category {
-  String? path;
-  String? displayName;
-  String? name;
-  bool? heading;
 
-  Category({
-    this.path,
-    this.displayName,
-    this.name,
-    this.heading,
-  });
-}

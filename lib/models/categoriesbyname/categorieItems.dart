@@ -4,36 +4,40 @@ class CategorieItems {
   int? status;
   String? message;
   Paginator? paginator;
-  List<ListingProduct>? listingProduct;
+  late List<ListingProduct> listingProduct;
   Category? category;
 
   CategorieItems({
     this.status,
     this.paginator,
-    this.listingProduct,
+    required this.listingProduct,
     this.message,
     this.category,
   });
 
   CategorieItems.fromJson(Map<String, dynamic> json) {
+    listingProduct = <ListingProduct>[];
     status = json['status'];
-    paginator = json['paginator'] != null ? Paginator.fromJson(json['paginator']) : null;
+    paginator = json['paginator'] != null
+        ? Paginator.fromJson(json['paginator'])
+        : null;
     if (json['listingProduct'] != null) {
-      listingProduct = <ListingProduct>[];
       json['listingProduct'].forEach((v) {
-        listingProduct!.add(ListingProduct.fromJson(v));
+        listingProduct.add(ListingProduct.fromJson(v));
       });
     }
     message = json['message'];
-    category = json['category'] != null ? Category.fromJson(json['category']) : null;
+    category =
+        json['category'] != null ? Category.fromJson(json['category']) : null;
   }
 
   factory CategorieItems.initial() => CategorieItems(
-      status: -1,
-      message: '',
-      paginator: Paginator(),
-      listingProduct: <ListingProduct>[],
-      category: Category());
+        status: -1,
+        message: '',
+        paginator: Paginator(),
+        listingProduct: <ListingProduct>[],
+        category: Category(),
+      );
 }
 
 class Paginator {
@@ -44,7 +48,7 @@ class Paginator {
   int? slNo;
   bool? hasPrevPage;
   bool? hasNextPage;
-  Null? prev;
+  int? prev;
   int? next;
 
   Paginator(
@@ -122,12 +126,24 @@ class CategoryItemDisplay {
   String? path;
   String? displayName;
   String? name;
-  bool? heading;
+  List<Category1>? categorieItemList;
 
   CategoryItemDisplay({
     this.name,
     this.displayName,
-    this.heading,
+    this.path,
+    this.categorieItemList,
+  });
+}
+
+class Category1 {
+  String? path;
+  String? displayName;
+  String? name;
+
+  Category1({
+    this.name,
+    this.displayName,
     this.path,
   });
 }

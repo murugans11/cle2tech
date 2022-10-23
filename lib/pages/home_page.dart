@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +9,7 @@ import 'package:shopeein/blocs/banner/bannerList_state.dart';
 import 'package:shopeein/constants/app_theme.dart';
 import 'package:shopeein/models/feature/feature_productes.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
-import 'package:shopeein/pages/single_category_screen.dart';
+import 'package:shopeein/pages/single_category_group_screen.dart';
 
 import '../blocs/banner/bannarList_bloc.dart';
 import '../blocs/category_groupe/categoryList_bloc.dart';
@@ -215,21 +215,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  final splitNames =  state.categoryList.categoryGroup![index].path?.split('/');
-                                  List splitList = [];
-                                  splitNames?.forEach((element) {
-                                    splitList.add(element);
-                                  });
-                                  final query = splitList.last;
-                                  final category = CategoryItemDisplay(
-                                    name: query,
-                                    displayName: state.categoryList.categoryGroup![index].title,
-                                    path: 'null',
-                                    heading: false,
-                                  );
-                                  Navigator.pushNamed(
-                                      context, SingleCategoryScreen.routeName,
-                                      arguments: category);
+                                  categoriesItemsClick(state, index, context);
                                 },
                                 child: Container(
                                   height: 60,
@@ -253,9 +239,7 @@ class _HomePageState extends State<HomePage> {
                                 height: 10,
                               ),
                               MyGoogleText(
-                                text: state.categoryList.categoryGroup?[index]
-                                        .title ??
-                                    '',
+                                text: state.categoryList.categoryGroup?[index].title ?? '',
                                 fontSize: 13,
                                 fontColor: Colors.black,
                                 fontWeight: FontWeight.normal,
@@ -273,6 +257,43 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  void categoriesItemsClick(CategoryState state, int index, BuildContext context) {
+
+    //Get the getegory item path last name
+    final splitNames = state.categoryList.categoryGroup![index].path?.split('/');
+    List splitList = [];
+    splitNames?.forEach((element) {
+      splitList.add(element);
+    });
+    final query = splitList.last;
+
+    List<Category1> categoryList = [];
+    for (var element in state.categoryList.categoryGroup![index].category) {
+      List e1 = element;
+      for (var element1 in e1) {
+        categoryList.add(
+          Category1(
+            name: element1['name'],
+            displayName: element1['displayName'],
+            path: element1['path'],
+          ),
+        );
+      }
+    }
+
+    final category = CategoryItemDisplay(
+      name: query,
+      displayName: state.categoryList.categoryGroup![index].title,
+      path: 'null',
+      categorieItemList: categoryList,
+    );
+
+    Navigator.pushNamed(
+        context, SingleCategoryGroupScreen.routeName,
+        arguments: category);
+
   }
 
   Widget _showFeatureList() {

@@ -10,6 +10,8 @@ import 'blocs/category_groupe/categoryList_bloc.dart';
 import 'blocs/featureproduct/feature_product_list_bloc.dart';
 import 'constants/app_theme.dart';
 import 'constants/strings.dart';
+import 'cubit/category_group_cubit.dart';
+import 'cubit/single_category_items_cubit.dart';
 import 'data/repository/home_repository.dart';
 import 'di/components/service_locator.dart';
 import 'utils/routes/routes.dart' as Router;
@@ -63,8 +65,12 @@ class MyApp extends StatelessWidget {
             create: (context) => FeatureProductListBloc(
                 homeRepository: context.read<HomeRepository>()),
           ),
-          BlocProvider<CategoriesItemsByNameBloc>(
-            create: (context) => CategoriesItemsByNameBloc(
+          BlocProvider<CategoryGroupCubit>(
+            create: (context) => CategoryGroupCubit(
+                homeRepository: context.read<HomeRepository>()),
+          ),
+          BlocProvider<SingleCategoryCubit>(
+            create: (context) => SingleCategoryCubit(
                 homeRepository: context.read<HomeRepository>()),
           ),
         ],

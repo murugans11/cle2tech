@@ -26,12 +26,23 @@ class CategoriesItemsByNameBloc
     FetchCategoriesItemsByNameEvent event,
     Emitter<CategoriesItemsByNameInitial> emit,
   ) async {
+
     emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+
     try {
+
       final CategorieItems categorieItems = await homeRepository.getCategoryProductListByName(event.url);
 
-      emit(state.copyWith(
-          status: NetworkCallStatusEnum.loaded, categorieItems: categorieItems));
+      state.categorieItems.status =categorieItems.status;
+      state.categorieItems.message =categorieItems.message;
+      state.categorieItems.paginator =categorieItems.paginator;
+      state.categorieItems.category =categorieItems.category;
+      categorieItems.listingProduct?.forEach((element) {
+        state.categorieItems.listingProduct?.add(element);
+      });
+
+      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categorieItems:  state.categorieItems));
+
     } on CustomError catch (e) {
       emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
     }

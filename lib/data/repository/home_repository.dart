@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:shopeein/models/banner/banner.dart';
 
 import '../../models/categories/category.dart';
@@ -52,12 +53,14 @@ class HomeRepository {
 
   Future<CategorieItems> getCategoryProductListByName(String url ) async {
     try {
+      debugPrint(url);
       final CategorieItems featureProductList = await _homeApi.getCategoryProductListByName(url);
       print('featureProductList: $featureProductList');
       return featureProductList;
     } catch (e) {
       print(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      return CategorieItems(listingProduct: []);
+      //throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
 }

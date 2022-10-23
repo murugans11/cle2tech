@@ -16,6 +16,7 @@ class Endpoints {
   static const String getHomePageBanner = "${baseUrl}banner";
   static const String getFeatureProductList = "${baseUrl}featureProduct";
   static const String getCategoryGroup = "${baseUrl}categoryGroup";
-  static const String getViewAllCategoryProductList = "${baseUrl}category";
-  static const String getCategoryProductListByName = "${baseUrl}categoryGroup";
+  static const String getItemsFromCategoryGroup = "${baseUrl}categoryGroup";
+  static const String getSingleItemListFromCategory = "${baseUrl}category";
+
 }

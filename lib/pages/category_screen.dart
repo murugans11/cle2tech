@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:shopeein/pages/single_category_screen.dart';
+import 'package:shopeein/pages/single_category_by_Item_screen.dart';
+import 'package:shopeein/pages/single_category_group_screen.dart';
 
 
 import '../blocs/category_groupe/categoryList_bloc.dart';
@@ -90,13 +91,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
     for (var element in list) {
       List e1 = element;
       for (var element1 in e1) {
-        print(element1['displayName']);
         category.add(
           CategoryItemDisplay(
             name: element1['name'],
             displayName: element1['displayName'],
             path: element1['path'],
-            heading: element1['heading'],
           ),
         );
       }
@@ -130,7 +129,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         delegate: SliverChildBuilderDelegate(
           (context, i) => ListTile(
             onTap: () {
-              Navigator.pushNamed(context, SingleCategoryScreen.routeName, arguments: category[i]);
+              Navigator.pushNamed(context, SingleCategoryByItemScreen.routeName, arguments: category[i]);
             },
             title: Text(category[i].displayName ?? ''),
           ),
