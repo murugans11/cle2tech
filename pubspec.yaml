@@ -33,6 +33,7 @@ dependencies:
   syncfusion_flutter_sliders: ^20.1.56
   string_validator: ^0.3.0
   flutter_sticky_header: ^0.6.4
+  device_info_plus: ^3.2.3
 
 dev_dependencies:
   flutter_test:

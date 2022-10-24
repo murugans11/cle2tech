@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/social_media_button.dart';
 import 'log_in_screen.dart';
 
 class SignUp extends StatefulWidget {
+  static const String routeName = "/SignUp";
+
   const SignUp({Key? key}) : super(key: key);
 
   @override
@@ -15,43 +18,48 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: primaryColor,
         elevation: 0.0,
         leading: GestureDetector(
           onTap: () {
-            finish(context);
+            Navigator.pop(context);
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(30)),
-                border: Border.all(
-                  width: 1,
-                  color: textColors,
-                ),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-            ),
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
+        ),
+        title: const MyGoogleText(
+          text: 'Sign Up',
+          fontColor: Colors.white,
+          fontWeight: FontWeight.normal,
+          fontSize: 20,
         ),
       ),
       body: Column(
         //mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(
+            height: 20,
+          ),
+          SizedBox(
+            height: 110,
+            width: 110,
+            child: Image(
+              image: AssetImage(
+                AppTheme.of(context)?.assets.logo1 ?? '',
+              ),
+            ),
+          ),
+          const SizedBox(
             height: 10,
           ),
-          const Image(image: AssetImage('images/maanstore_logo_1.png')),
-          const Spacer(),
           Container(
             padding: const EdgeInsets.all(30),
             width: double.infinity,
@@ -88,15 +96,15 @@ class _SignUpState extends State<SignUp> {
                 ),
                 const SizedBox(height: 20),
                 Button1(
-                    buttonText: 'Sign Up',
-                    buttonColor: primaryColor, onPressFunction: null,
-                   // onPressFunction: () => const WelComeScreen().launch(context),
+                  buttonText: 'Sign Up',
+                  buttonColor: primaryColor, onPressFunction: null,
+                  // onPressFunction: () => const WelComeScreen().launch(context),
                 ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                     const MyGoogleText(
+                    const MyGoogleText(
                       fontSize: 16,
                       fontColor: textColors,
                       text: 'Already have an account?',
@@ -104,12 +112,9 @@ class _SignUpState extends State<SignUp> {
                     ),
                     TextButton(
                       onPressed: () {
-                        const LogInScreen().launch(
-                          context,
-                          //pageRouteAnimation: PageRouteAnimation.Fade,
-                        );
+                        Navigator.pop(context);
                       },
-                      child:  const MyGoogleText(
+                      child: const MyGoogleText(
                         text: 'Sign In',
                         fontSize: 16,
                         fontColor: secondaryColor1,
@@ -118,8 +123,6 @@ class _SignUpState extends State<SignUp> {
                     )
                   ],
                 ),
-                const SizedBox(height: 20),
-                const SocialMediaButtons(),
               ],
             ),
           ),

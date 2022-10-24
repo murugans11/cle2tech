@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/auth_screen/sign_up.dart';
 
+import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/social_media_button.dart';
 import 'forgot_pass_screen.dart';
+import 'otp_auth_screen.dart';
 
 class LogInScreen extends StatefulWidget {
+  static const String routeName = "/LogInScreen";
+
   const LogInScreen({Key? key}) : super(key: key);
 
   @override
@@ -17,43 +21,44 @@ class LogInScreen extends StatefulWidget {
 
 class _LogInScreenState extends State<LogInScreen> {
   bool isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: primaryColor,
         elevation: 0.0,
         leading: GestureDetector(
           onTap: () {
-            finish(context);
+            Navigator.pop(context);
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(30)),
-                border: Border.all(
-                  width: 1,
-                  color: textColors,
-                ),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-            ),
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
+        ),
+        title: const MyGoogleText(
+          text: 'Login',
+          fontColor: Colors.white,
+          fontWeight: FontWeight.normal,
+          fontSize: 20,
         ),
       ),
       body: Column(
         //mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
-            height: 10,
+          const SizedBox(height: 20,),
+          SizedBox(
+            height: 110,
+            width: 110,
+            child: Image(
+              image: AssetImage(
+                AppTheme.of(context)?.assets.logo1 ?? '',
+              ),
+            ),
           ),
-          const Image(image: AssetImage('images/maanstore_logo_1.png')),
-          const Spacer(),
+          const SizedBox(height: 10,),
           Container(
             padding: const EdgeInsets.all(30),
             width: double.infinity,
@@ -138,19 +143,17 @@ class _LogInScreenState extends State<LogInScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        const SignUp().launch(context);
+                        Navigator.pushNamed(context, OtpAuthScreen.routeName);
                       },
                       child: const MyGoogleText(
                         text: 'Join now',
                         fontSize: 16,
-                        fontColor: secondaryColor1,
+                        fontColor: primaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     )
                   ],
                 ),
-                const SizedBox(height: 25),
-                const SocialMediaButtons(),
               ],
             ),
           ),

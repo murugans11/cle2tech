@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 
 import 'package:nb_utils/nb_utils.dart';
+import 'package:shopeein/data/repository/login_repository.dart';
+import 'package:shopeein/pages/auth_screen/log_in_screen.dart';
 
 import '../constants/constants.dart';
 import '../pages/product_detail_screen.dart';
@@ -75,7 +77,6 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                     )
                   : GestureDetector(
                       onTap: () {
-                        // const ProductDetailScreen().launch(context);
                          widget.callCat();
                       },
                       child: CachedNetworkImage(
@@ -105,9 +106,11 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                 top: 8,
                 child: GestureDetector(
                   onTap: () {
-                    setState(() {
+                   /* setState(() {
                       isFavorite = !isFavorite;
-                    });
+                    });*/
+                    Navigator.pushNamed(context, LogInScreen.routeName);
+
                   },
                   child: Container(
                     height: 35,

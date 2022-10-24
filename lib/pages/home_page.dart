@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
@@ -9,6 +7,7 @@ import 'package:shopeein/blocs/banner/bannerList_state.dart';
 import 'package:shopeein/constants/app_theme.dart';
 import 'package:shopeein/models/feature/feature_productes.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
+import 'package:shopeein/pages/single_category_by_Item_screen.dart';
 import 'package:shopeein/pages/single_category_group_screen.dart';
 
 import '../blocs/banner/bannarList_bloc.dart';
@@ -16,6 +15,7 @@ import '../blocs/category_groupe/categoryList_bloc.dart';
 import '../blocs/featureproduct/feature_product_list_bloc.dart';
 import '../constants/constants.dart';
 
+import '../models/banner/banner_list.dart';
 import '../models/categoriesbyname/categorieItems.dart';
 import '../utils/dio/network_call_status_enum.dart';
 import '../widgets/app_widgets.dart';
@@ -36,6 +36,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  List<BannerGroup>? categoryGroup = [];
+
   @override
   void initState() {
     super.initState();
@@ -136,14 +139,23 @@ class _HomePageState extends State<HomePage> {
         children: [
           BlocBuilder<BannerBloc, BannerState>(
             builder: (context, state) {
+              List<BannerGroup>? bannerMobile = [];
+              state.bannerList.categoryGroup?.forEach((element) {
+                if (element.bannerType == "mobile") {
+                  bannerMobile.add(element);
+                }else{
+                  categoryGroup?.add(element);
+                }
+              });
+
               return HorizontalList(
                 padding: const EdgeInsets.all(10),
-                itemCount: state.bannerList.categoryGroup?.length ?? 0,
+                itemCount: bannerMobile.length ?? 0,
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
                     onTap: () {
-                      debugPrint(
-                          "Category Item click${state.bannerList.categoryGroup?[index].resourcePath}");
+                      //debugPrint("Category Item click${bannerMobile[index].resourcePath}");
+                      bannerItemClick(bannerMobile, index, context);
                     },
                     child: Container(
                       height: 190,
@@ -153,9 +165,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: FittedBox(
                         child: Image(
-                          image: NetworkImage(state.bannerList
-                                  .categoryGroup?[index].resourcePath ??
-                              ''),
+                          image: NetworkImage(bannerMobile[index].resourcePath ?? ''),
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -239,7 +249,9 @@ class _HomePageState extends State<HomePage> {
                                 height: 10,
                               ),
                               MyGoogleText(
-                                text: state.categoryList.categoryGroup?[index].title ?? '',
+                                text: state.categoryList.categoryGroup?[index]
+                                        .title ??
+                                    '',
                                 fontSize: 13,
                                 fontColor: Colors.black,
                                 fontWeight: FontWeight.normal,
@@ -259,10 +271,27 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void categoriesItemsClick(CategoryState state, int index, BuildContext context) {
+  void bannerItemClick(List<BannerGroup> bannerMobile, int index, BuildContext context) {
+    final splitNames = bannerMobile[index].link?.split('/');
+    List splitList = [];
+    splitNames?.forEach((element) {
+      splitList.add(element);
+    });
+    final name = splitList.last;
+    final category = CategoryItemDisplay(
+      name: name,
+      displayName: name,
+      path: bannerMobile[index].link,
+      categorieItemList: null,
+    );
+    Navigator.pushNamed(context, SingleCategoryByItemScreen.routeName, arguments: category);
+  }
 
+  void categoriesItemsClick(
+      CategoryState state, int index, BuildContext context) {
     //Get the getegory item path last name
-    final splitNames = state.categoryList.categoryGroup![index].path?.split('/');
+    final splitNames =
+        state.categoryList.categoryGroup![index].path?.split('/');
     List splitList = [];
     splitNames?.forEach((element) {
       splitList.add(element);
@@ -290,10 +319,8 @@ class _HomePageState extends State<HomePage> {
       categorieItemList: categoryList,
     );
 
-    Navigator.pushNamed(
-        context, SingleCategoryGroupScreen.routeName,
+    Navigator.pushNamed(context, SingleCategoryGroupScreen.routeName,
         arguments: category);
-
   }
 
   Widget _showFeatureList() {
@@ -335,12 +362,11 @@ class _HomePageState extends State<HomePage> {
       physics: const ClampingScrollPhysics(), // 2nd add
       itemCount: state.featureProductList.featureProduct?.length ?? 0,
       itemBuilder: (_, mainIndex) {
+
         List<ListingProduct>? listingProduct = [];
-        state.featureProductList.featureProduct?[mainIndex].listing
-            ?.forEach((element1) {
+        state.featureProductList.featureProduct?[mainIndex].listing?.forEach((element1) {
           state.featureProductList.listingProduct?.forEach((element) {
-            String image =
-                element.keyDetails?.variant?[0].media?[0].resourcePath;
+            String image = element.keyDetails?.variant?[0].media?[0].resourcePath;
             if (element.id == element1 && !image.isEmptyOrNull) {
               listingProduct.add(element);
               return;
@@ -348,49 +374,439 @@ class _HomePageState extends State<HomePage> {
           });
         });
 
-        return Column(
-          children: [
-            getItemTitle(state, mainIndex),
-            HorizontalList(
-              spacing: 20,
-              itemCount: listingProduct.length,
-              itemBuilder: (BuildContext context, int index) {
-                ListingProduct? listingProductItems = listingProduct[index];
+        if(mainIndex == 1) {
+          List<BannerGroup> bannerFeature1 = [];
+          categoryGroup?.forEach((element) {
+            if (element.bannerType == "feature1") {
+              if(!bannerFeature1.contains(element)) {
+                bannerFeature1.add(element);
+              }
+            }
+          });
+          return Column(
+            children: [
+              HorizontalList(
+                padding: const EdgeInsets.all(10),
+                itemCount: bannerFeature1.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      debugPrint("Category Item click${bannerFeature1[index].resourcePath}");
+                      bannerItemClick(bannerFeature1, index, context);
+                    },
+                    child: Container(
+                      height: 190,
+                      width: 310,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: FittedBox(
+                        child: Image(
+                          image: NetworkImage(bannerFeature1[index].resourcePath ?? ''),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              getItemTitle(state, mainIndex),
+              HorizontalList(
+                spacing: 20,
+                itemCount: listingProduct.length,
+                itemBuilder: (BuildContext context, int index) {
+                  ListingProduct? listingProductItems = listingProduct[index];
 
-                String imageURL = '';
-                var parts = listingProductItems
-                    .keyDetails?.variant?[0].media?[0].resourcePath
-                    .split('.com');
-                if (parts != null) {
-                  var image = parts.sublist(1).join('.com').trim();
-                  imageURL =
-                      'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
-                }
-                final sellingPrice =
-                    listingProductItems.keyDetails?.variant?[0].sellingPrice;
-                final retailPrice =
-                    listingProductItems.keyDetails?.variant?[0].retailPrice;
-                int percent =
-                    ((int.parse(retailPrice) - int.parse(sellingPrice)) /
-                            int.parse(retailPrice) *
-                            100)
-                        .toInt();
-                return ProductGreedShow1(
-                  image: imageURL,
-                  productTitle: listingProductItems.keyDetails?.productTitle,
-                  productPrice: sellingPrice,
-                  actualPrice: retailPrice,
-                  discountPercentage: ("-$percent%"),
-                  isSingleView: false,
-                  callCat: () {
-                    Navigator.pushNamed(context, ProductDetailScreen.routeName,
-                        arguments: listingProductItems);
-                  },
-                );
-              },
-            ),
-          ],
-        );
+                  String imageURL = '';
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
+                  if (parts != null) {
+                    var image = parts.sublist(1).join('.com').trim();
+                    imageURL =
+                    'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                  }
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  int percent =
+                  ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                      int.parse(retailPrice) *
+                      100)
+                      .toInt();
+                  return ProductGreedShow1(
+                    image: imageURL,
+                    productTitle: listingProductItems.keyDetails?.productTitle,
+                    productPrice: sellingPrice,
+                    actualPrice: retailPrice,
+                    discountPercentage: ("-$percent%"),
+                    isSingleView: false,
+                    callCat: () {
+                      Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                          arguments: listingProductItems);
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        }
+        else if(mainIndex == 3){
+          List<BannerGroup> bannerFeature2 = [];
+          categoryGroup?.forEach((element) {
+            if (element.bannerType == "feature2") {
+             if(!bannerFeature2.contains(element)) {
+               bannerFeature2.add(element);
+             }
+            }
+          });
+          return Column(
+            children: [
+              HorizontalList(
+                padding: const EdgeInsets.all(10),
+                itemCount: bannerFeature2.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      bannerItemClick(bannerFeature2, index, context);
+                    },
+                    child: Container(
+                      height: 190,
+                      width: 310,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: FittedBox(
+                        child: Image(
+                          image: NetworkImage(bannerFeature2[index].resourcePath ?? ''),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              getItemTitle(state, mainIndex),
+              HorizontalList(
+                spacing: 20,
+                itemCount: listingProduct.length,
+                itemBuilder: (BuildContext context, int index) {
+                  ListingProduct? listingProductItems = listingProduct[index];
+
+                  String imageURL = '';
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
+                  if (parts != null) {
+                    var image = parts.sublist(1).join('.com').trim();
+                    imageURL =
+                    'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                  }
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  int percent =
+                  ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                      int.parse(retailPrice) *
+                      100)
+                      .toInt();
+                  return ProductGreedShow1(
+                    image: imageURL,
+                    productTitle: listingProductItems.keyDetails?.productTitle,
+                    productPrice: sellingPrice,
+                    actualPrice: retailPrice,
+                    discountPercentage: ("-$percent%"),
+                    isSingleView: false,
+                    callCat: () {
+                      Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                          arguments: listingProductItems);
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        }
+        else if(mainIndex == 5){
+          List<BannerGroup> bannerFeature3 = [];
+          categoryGroup?.forEach((element) {
+            if (element.bannerType == "feature3") {
+              if(!bannerFeature3.contains(element)) {
+                bannerFeature3.add(element);
+              }
+            }
+          });
+          return Column(
+            children: [
+              HorizontalList(
+                padding: const EdgeInsets.all(10),
+                itemCount: bannerFeature3.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      bannerItemClick(bannerFeature3, index, context);
+                    },
+                    child: Container(
+                      height: 190,
+                      width: 310,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: FittedBox(
+                        child: Image(
+                          image: NetworkImage(bannerFeature3[index].resourcePath ?? ''),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              getItemTitle(state, mainIndex),
+              HorizontalList(
+                spacing: 20,
+                itemCount: listingProduct.length,
+                itemBuilder: (BuildContext context, int index) {
+                  ListingProduct? listingProductItems = listingProduct[index];
+
+                  String imageURL = '';
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
+                  if (parts != null) {
+                    var image = parts.sublist(1).join('.com').trim();
+                    imageURL =
+                    'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                  }
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  int percent =
+                  ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                      int.parse(retailPrice) *
+                      100)
+                      .toInt();
+                  return ProductGreedShow1(
+                    image: imageURL,
+                    productTitle: listingProductItems.keyDetails?.productTitle,
+                    productPrice: sellingPrice,
+                    actualPrice: retailPrice,
+                    discountPercentage: ("-$percent%"),
+                    isSingleView: false,
+                    callCat: () {
+                      Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                          arguments: listingProductItems);
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        }
+
+        else if(mainIndex == 7){
+          List<BannerGroup> bannerFeature4 = [];
+          categoryGroup?.forEach((element) {
+            if (element.bannerType == "feature4") {
+              if(!bannerFeature4.contains(element)) {
+                bannerFeature4.add(element);
+              }
+            }
+          });
+          return Column(
+            children: [
+              HorizontalList(
+                padding: const EdgeInsets.all(10),
+                itemCount: bannerFeature4.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      bannerItemClick(bannerFeature4, index, context);
+                    },
+                    child: Container(
+                      height: 190,
+                      width: 310,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: FittedBox(
+                        child: Image(
+                          image: NetworkImage(bannerFeature4[index].resourcePath ?? ''),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              getItemTitle(state, mainIndex),
+              HorizontalList(
+                spacing: 20,
+                itemCount: listingProduct.length,
+                itemBuilder: (BuildContext context, int index) {
+                  ListingProduct? listingProductItems = listingProduct[index];
+
+                  String imageURL = '';
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
+                  if (parts != null) {
+                    var image = parts.sublist(1).join('.com').trim();
+                    imageURL =
+                    'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                  }
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  int percent =
+                  ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                      int.parse(retailPrice) *
+                      100)
+                      .toInt();
+                  return ProductGreedShow1(
+                    image: imageURL,
+                    productTitle: listingProductItems.keyDetails?.productTitle,
+                    productPrice: sellingPrice,
+                    actualPrice: retailPrice,
+                    discountPercentage: ("-$percent%"),
+                    isSingleView: false,
+                    callCat: () {
+                      Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                          arguments: listingProductItems);
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        }
+        else if(mainIndex == 9){
+          List<BannerGroup> bannerFeature5 = [];
+          categoryGroup?.forEach((element) {
+            if (element.bannerType == "feature5") {
+              if(!bannerFeature5.contains(element)) {
+                bannerFeature5.add(element);
+              }
+            }
+          });
+          return Column(
+            children: [
+              HorizontalList(
+                padding: const EdgeInsets.all(10),
+                itemCount: bannerFeature5.length ?? 0,
+                itemBuilder: (BuildContext context, int index) {
+                  return InkWell(
+                    onTap: () {
+                      bannerItemClick(bannerFeature5, index, context);
+                    },
+                    child: Container(
+                      height: 190,
+                      width: 310,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ),
+                      child: FittedBox(
+                        child: Image(
+                          image: NetworkImage(bannerFeature5[index].resourcePath ?? ''),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              getItemTitle(state, mainIndex),
+              HorizontalList(
+                spacing: 20,
+                itemCount: listingProduct.length,
+                itemBuilder: (BuildContext context, int index) {
+                  ListingProduct? listingProductItems = listingProduct[index];
+
+                  String imageURL = '';
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
+                  if (parts != null) {
+                    var image = parts.sublist(1).join('.com').trim();
+                    imageURL =
+                    'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                  }
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  int percent =
+                  ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                      int.parse(retailPrice) *
+                      100)
+                      .toInt();
+                  return ProductGreedShow1(
+                    image: imageURL,
+                    productTitle: listingProductItems.keyDetails?.productTitle,
+                    productPrice: sellingPrice,
+                    actualPrice: retailPrice,
+                    discountPercentage: ("-$percent%"),
+                    isSingleView: false,
+                    callCat: () {
+                      Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                          arguments: listingProductItems);
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        }
+
+        else{
+          return Column(
+            children: [
+              getItemTitle(state, mainIndex),
+              HorizontalList(
+                spacing: 20,
+                itemCount: listingProduct.length,
+                itemBuilder: (BuildContext context, int index) {
+                  ListingProduct? listingProductItems = listingProduct[index];
+
+                  String imageURL = '';
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
+                  if (parts != null) {
+                    var image = parts.sublist(1).join('.com').trim();
+                    imageURL =
+                    'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                  }
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  int percent =
+                  ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                      int.parse(retailPrice) *
+                      100)
+                      .toInt();
+                  return ProductGreedShow1(
+                    image: imageURL,
+                    productTitle: listingProductItems.keyDetails?.productTitle,
+                    productPrice: sellingPrice,
+                    actualPrice: retailPrice,
+                    discountPercentage: ("-$percent%"),
+                    isSingleView: false,
+                    callCat: () {
+                      Navigator.pushNamed(context, ProductDetailScreen.routeName,
+                          arguments: listingProductItems);
+                    },
+                  );
+                },
+              ),
+            ],
+          );
+        }
       },
     );
   }

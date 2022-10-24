@@ -46,7 +46,7 @@ class _SingleCategoryGroupScreenState extends State<SingleCategoryGroupScreen> {
   }
 
   void getUrl(CategoryItemDisplay categoryItemDisplay, context) {
-    var url = '${Endpoints.getItemsFromCategoryGroup}/${categoryItemDisplay.name}/?page=';
+    var url = '${Endpoints.getCategoryGroup}/${categoryItemDisplay.name}/?page=';
     BlocProvider.of<CategoryGroupCubit>(context).loadSingleCategory(url, page);
   }
 

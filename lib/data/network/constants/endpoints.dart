@@ -15,8 +15,8 @@ class Endpoints {
   // booking endpoints
   static const String getHomePageBanner = "${baseUrl}banner";
   static const String getFeatureProductList = "${baseUrl}featureProduct";
+
   static const String getCategoryGroup = "${baseUrl}categoryGroup";
-  static const String getItemsFromCategoryGroup = "${baseUrl}categoryGroup";
   static const String getSingleItemListFromCategory = "${baseUrl}category";
 
 }

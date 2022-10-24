@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shopeein/pages/initial_page.dart';
 
-
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
+import '../../pages/auth_screen/log_in_screen.dart';
+import '../../pages/auth_screen/otp_auth_screen.dart';
+import '../../pages/auth_screen/sign_up.dart';
 import '../../pages/best_seller_screen.dart';
 import '../../pages/cart_screen.dart';
 import '../../pages/category_screen.dart';
@@ -53,7 +55,7 @@ class Router {
           settings: RouteSettings(arguments: dynamicArguments),
         );
 
-        case SingleCategoryByItemScreen.routeName:
+      case SingleCategoryByItemScreen.routeName:
         dynamicArguments as CategoryItemDisplay;
         return MaterialPageRoute(
           builder: (context) => const SingleCategoryByItemScreen(),
@@ -65,6 +67,26 @@ class Router {
         return MaterialPageRoute(
           builder: (context) => const ProductDetailScreen(),
           settings: RouteSettings(arguments: args),
+        );
+
+      case LogInScreen.routeName:
+        return MaterialPageRoute(
+          builder: (_) {
+            return const LogInScreen();
+          },
+        );
+
+      case SignUp.routeName:
+        return MaterialPageRoute(
+          builder: (_) {
+            return const SignUp();
+          },
+        );
+        case OtpAuthScreen.routeName:
+        return MaterialPageRoute(
+          builder: (_) {
+            return const OtpAuthScreen();
+          },
         );
 
       case CartScreen.routeName:

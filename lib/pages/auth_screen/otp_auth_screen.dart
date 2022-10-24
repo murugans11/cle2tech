@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
-import 'package:nb_utils/nb_utils.dart';
 
+import 'package:shopeein/pages/auth_screen/sign_up.dart';
 import '../../constants/constants.dart';
 import '../../widgets/buttons.dart';
-import 'change_pass_screen.dart';
+
 import 'otp_test.dart';
 
 class OtpAuthScreen extends StatefulWidget {
+
+  static const String routeName = "/OtpAuthScreen";
+
   const OtpAuthScreen({Key? key}) : super(key: key);
 
   @override
@@ -20,28 +23,22 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: primaryColor,
         elevation: 0.0,
         leading: GestureDetector(
           onTap: () {
-            finish(context);
+            Navigator.pop(context);
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(30)),
-                border: Border.all(
-                  width: 1,
-                  color: textColors,
-                ),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-            ),
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
+        ),
+        title: const MyGoogleText(
+          text: 'OTP Authentication',
+          fontColor: Colors.white,
+          fontWeight: FontWeight.normal,
+          fontSize: 20,
         ),
       ),
       body: Column(
@@ -68,8 +65,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                   MyGoogleText(
                     fontSize: 16,
                     fontColor: textColors,
-                    text:
-                        'Please enter the 6-digit code sent to: shaidulislam@gmail.com',
+                    text: 'Please enter the 6-digit code sent to: shaidulislam@gmail.com',
                     fontWeight: FontWeight.normal,
                   ),
                 ],
@@ -97,7 +93,8 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                     const MyGoogleText(
                       fontSize: 16,
                       fontColor: textColors,
-                      text: 'Code send in 0:29',
+                     // text: 'Code send in 0:29',
+                      text: 'Code sent',
                       fontWeight: FontWeight.w500,
                     ),
                     TextButton(
@@ -116,7 +113,8 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                     buttonText: 'Continue',
                     buttonColor: primaryColor,
                     onPressFunction: () {
-                      const ChangePassScreen().launch(context);
+                      //const ChangePassScreen().launch(context);
+                      Navigator.pushNamed(context, SignUp.routeName);
                     }),
                 const SizedBox(height: 200),
               ],

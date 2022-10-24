@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopeein/blocs/banner/bannarList_bloc.dart';
 
-import 'blocs/categoriesIitembyname/categories_items_by_name_bloc.dart';
+
 import 'blocs/category_groupe/categoryList_bloc.dart';
 import 'blocs/featureproduct/feature_product_list_bloc.dart';
 import 'constants/app_theme.dart';
