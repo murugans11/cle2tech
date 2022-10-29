@@ -16,7 +16,7 @@ class FeatureProductListState extends Equatable {
     return FeatureProductListState(
       status: NetworkCallStatusEnum.initial,
       featureProductList: FeatureProductList.initial(),
-      error: CustomError(),
+      error: const CustomError(),
     );
   }
 

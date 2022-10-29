@@ -19,4 +19,13 @@ class Endpoints {
   static const String getCategoryGroup = "${baseUrl}categoryGroup";
   static const String getSingleItemListFromCategory = "${baseUrl}category";
 
+  //Login
+  static const String loginUsingCrendential = "${baseUrl}auth/login";
+
+  static const String getNewOtp = "${baseUrl}customer/otp";
+
+  static const String verifyOTP = "${baseUrl}auth/m/login";
+
+
+
 }

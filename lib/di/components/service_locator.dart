@@ -17,8 +17,7 @@ Future<void> setupLocator() async {
 
 
   // async singletons:----------------------------------------------------------
-  getIt.registerSingletonAsync<SharedPreferences>(
-      () => LocalModule.provideSharedPreference());
+  getIt.registerSingletonAsync<SharedPreferences>(() => LocalModule.provideSharedPreference());
 
   // singletons:----------------------------------------------------------------
   getIt.registerSingleton(SharedPreferenceHelper(await getIt.getAsync<SharedPreferences>()));
@@ -34,7 +33,7 @@ Future<void> setupLocator() async {
 
   // repository:----------------------------------------------------------------
   getIt.registerSingleton(HomeRepository(getIt<HomeApi>()));
-  getIt.registerSingleton(LoginRepository(getIt<SharedPreferenceHelper>()));
+  getIt.registerSingleton(LoginRepository(getIt<SharedPreferenceHelper>(),getIt<HomeApi>()));
 
 
 }

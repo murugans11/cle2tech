@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopeein/pages/initial_page.dart';
 
+import '../../cubit/category_group_cubit.dart';
+import '../../cubit/single_category_items_cubit.dart';
+import '../../data/repository/home_repository.dart';
+import '../../di/components/service_locator.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
+import '../../models/login/RequestOtpResponse.dart';
 import '../../pages/auth_screen/log_in_screen.dart';
 import '../../pages/auth_screen/otp_auth_screen.dart';
 import '../../pages/auth_screen/sign_up.dart';
@@ -26,6 +32,7 @@ class Router {
         return MaterialPageRoute(builder: (_) {
           return const SplashScreenOne();
         });
+
       case InitialPage.routeName:
         return MaterialPageRoute(builder: (_) {
           return const InitialPage();
@@ -51,14 +58,20 @@ class Router {
       case SingleCategoryGroupScreen.routeName:
         dynamicArguments as CategoryItemDisplay;
         return MaterialPageRoute(
-          builder: (context) => const SingleCategoryGroupScreen(),
+          builder: (context) => BlocProvider<CategoryGroupCubit>(
+            create: (context) => CategoryGroupCubit(homeRepository: getIt<HomeRepository>()),
+            child: const SingleCategoryGroupScreen(),
+          ),
           settings: RouteSettings(arguments: dynamicArguments),
         );
 
       case SingleCategoryByItemScreen.routeName:
         dynamicArguments as CategoryItemDisplay;
         return MaterialPageRoute(
-          builder: (context) => const SingleCategoryByItemScreen(),
+          builder: (context) => BlocProvider<SingleCategoryCubit>(
+            create: (context) => SingleCategoryCubit(homeRepository: getIt<HomeRepository>()),
+            child: const SingleCategoryByItemScreen(),
+          ),
           settings: RouteSettings(arguments: dynamicArguments),
         );
 
@@ -76,18 +89,21 @@ class Router {
           },
         );
 
+      case OtpAuthScreen.routeName:
+        final args = dynamicArguments as RequestOtpResponse;
+        return MaterialPageRoute(
+          builder: (context) => const OtpAuthScreen(),
+          settings: RouteSettings(arguments: args),
+        );
+
       case SignUp.routeName:
         return MaterialPageRoute(
           builder: (_) {
             return const SignUp();
           },
         );
-        case OtpAuthScreen.routeName:
-        return MaterialPageRoute(
-          builder: (_) {
-            return const OtpAuthScreen();
-          },
-        );
+
+
 
       case CartScreen.routeName:
         return MaterialPageRoute(

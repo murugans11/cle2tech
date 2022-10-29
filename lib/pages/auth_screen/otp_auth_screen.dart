@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:shopeein/pages/auth_screen/sign_up.dart';
 import '../../constants/constants.dart';
+import '../../models/login/RequestOtpResponse.dart';
 import '../../widgets/buttons.dart';
 
 import 'otp_test.dart';
@@ -20,6 +21,11 @@ class OtpAuthScreen extends StatefulWidget {
 class _OtpAuthScreenState extends State<OtpAuthScreen> {
   @override
   Widget build(BuildContext context) {
+
+    RequestOtpResponse requestOtpResponse = ModalRoute.of(context)!.settings.arguments as RequestOtpResponse;
+
+    String phone = requestOtpResponse.data.phone;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -54,18 +60,18 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
               width: 248,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  MyGoogleText(
+                children:  [
+                  const MyGoogleText(
                     fontSize: 26,
                     fontColor: Colors.black,
                     text: 'OTP Authentication',
                     fontWeight: FontWeight.bold,
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   MyGoogleText(
                     fontSize: 16,
                     fontColor: textColors,
-                    text: 'Please enter the 6-digit code sent to: shaidulislam@gmail.com',
+                    text: 'Please enter the 6-digit code sent to:$phone',
                     fontWeight: FontWeight.normal,
                   ),
                 ],
@@ -73,6 +79,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
             ),
           ),
           const Spacer(),
+
           Container(
             padding: const EdgeInsets.all(30),
             width: double.infinity,
@@ -85,8 +92,11 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
             ),
             child: Column(
               children: <Widget>[
+
                 const SizedBox(height: 10),
-                const OtpForm(),
+
+                OtpForm(requestOtpResponse: requestOtpResponse),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -108,6 +118,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                     )
                   ],
                 ),
+
                 const SizedBox(height: 20),
                 Button1(
                     buttonText: 'Continue',
@@ -116,6 +127,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                       //const ChangePassScreen().launch(context);
                       Navigator.pushNamed(context, SignUp.routeName);
                     }),
+
                 const SizedBox(height: 200),
               ],
             ),

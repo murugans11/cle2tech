@@ -53,10 +53,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<CategoriesBloc>(
-            create: (context) =>
-                CategoriesBloc(homeRepository: context.read<HomeRepository>()),
-          ),
+
           BlocProvider<BannerBloc>(
             create: (context) =>
                 BannerBloc(homeRepository: context.read<HomeRepository>()),
@@ -65,14 +62,21 @@ class MyApp extends StatelessWidget {
             create: (context) => FeatureProductListBloc(
                 homeRepository: context.read<HomeRepository>()),
           ),
-          BlocProvider<CategoryGroupCubit>(
+
+          BlocProvider<CategoriesBloc>(
+            create: (context) =>
+                CategoriesBloc(homeRepository: context.read<HomeRepository>()),
+          ),
+
+        /*  BlocProvider<CategoryGroupCubit>(
             create: (context) => CategoryGroupCubit(
                 homeRepository: context.read<HomeRepository>()),
-          ),
-          BlocProvider<SingleCategoryCubit>(
+          ),*/
+
+        /*  BlocProvider<SingleCategoryCubit>(
             create: (context) => SingleCategoryCubit(
                 homeRepository: context.read<HomeRepository>()),
-          ),
+          ),*/
         ],
         child: AppTheme(
           child: Builder(builder: (context) {

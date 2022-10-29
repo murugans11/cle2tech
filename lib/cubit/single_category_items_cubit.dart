@@ -32,9 +32,9 @@ class SingleCategoryCubit extends Cubit<SingleCategoryItemState> {
 
       final posts = (state as SingleCategoryLoading).oldPosts;
 
-      if (page == 1) {
+     /* if (page == 1) {
         posts.listingProduct.clear();
-      }
+      }*/
 
       List<ListingProduct> listingProduct = newPosts.listingProduct;
 

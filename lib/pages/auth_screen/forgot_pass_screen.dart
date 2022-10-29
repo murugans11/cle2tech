@@ -19,29 +19,23 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: primaryColor,
         elevation: 0.0,
         leading: GestureDetector(
           onTap: () {
-            finish(context);
+            Navigator.pop(context);
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(30)),
-                border: Border.all(
-                  width: 1,
-                  color: textColors,
-                ),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-            ),
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
           ),
         ),
+        /*title: const MyGoogleText(
+          text: 'Login',
+          fontColor: Colors.white,
+          fontWeight: FontWeight.normal,
+          fontSize: 20,
+        ),*/
       ),
       body: Column(
         //mainAxisAlignment: MainAxisAlignment.start,

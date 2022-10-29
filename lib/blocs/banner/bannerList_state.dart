@@ -1,12 +1,9 @@
 
-
 import 'package:equatable/equatable.dart';
 import 'package:shopeein/models/banner/banner.dart';
 
 import '../../utils/device/custom_error.dart';
 import '../../utils/dio/network_call_status_enum.dart';
-
-
 class BannerState extends Equatable {
 
   final NetworkCallStatusEnum status;
@@ -23,7 +20,7 @@ class BannerState extends Equatable {
     return BannerState(
       status: NetworkCallStatusEnum.initial,
       bannerList: BannerList.initial(),
-      error: CustomError(),
+      error: const CustomError(),
     );
   }
 

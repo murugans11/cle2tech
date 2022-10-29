@@ -30,9 +30,9 @@ class CategoryGroupCubit extends Cubit<CategoryGroupItemState> {
 
       final posts = (state as CategoryGroupLoading).oldPosts;
 
-      if (page == 1) {
+      /*if (page == 1) {
         posts.listingProduct.clear();
-      }
+      }*/
 
       List<ListingProduct> listingProduct = newPosts.listingProduct;
 

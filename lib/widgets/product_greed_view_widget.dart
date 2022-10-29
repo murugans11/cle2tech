@@ -11,16 +11,16 @@ import '../constants/constants.dart';
 import '../pages/product_detail_screen.dart';
 
 class ProductGreedShow1 extends StatefulWidget {
-  const ProductGreedShow1({
-    Key? key,
-    required this.image,
-    required this.productTitle,
-    required this.productPrice,
-    required this.actualPrice,
-    required this.discountPercentage,
-    required this.isSingleView,
-    required this.callCat
-  }) : super(key: key);
+  const ProductGreedShow1(
+      {Key? key,
+      required this.image,
+      required this.productTitle,
+      required this.productPrice,
+      required this.actualPrice,
+      required this.discountPercentage,
+      required this.isSingleView,
+      required this.callCat})
+      : super(key: key);
   final String image;
   final String productTitle;
   final String productPrice;
@@ -58,7 +58,7 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
               widget.isSingleView
                   ? GestureDetector(
                       onTap: () {
-                         //const ProductDetailScreen().launch(context);
+                        //const ProductDetailScreen().launch(context);
                         widget.callCat();
                       },
                       child: Container(
@@ -77,7 +77,7 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                     )
                   : GestureDetector(
                       onTap: () {
-                         widget.callCat();
+                        widget.callCat();
                       },
                       child: CachedNetworkImage(
                         imageUrl: widget.image.isEmpty ? '' : widget.image,
@@ -96,9 +96,8 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                             ),
                           ),
                         ),
-                         placeholder: (context, url) => const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                        placeholder: (context, url) => const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
                       ),
                     ),
               Positioned(
@@ -106,11 +105,10 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                 top: 8,
                 child: GestureDetector(
                   onTap: () {
-                   /* setState(() {
+                    /* setState(() {
                       isFavorite = !isFavorite;
                     });*/
                     Navigator.pushNamed(context, LogInScreen.routeName);
-
                   },
                   child: Container(
                     height: 35,
@@ -197,7 +195,6 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                     ),
                   ],
                 ),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: Row(

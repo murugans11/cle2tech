@@ -12,11 +12,14 @@ import '../cubit/category_group_cubit.dart';
 import '../cubit/single_category_items_cubit.dart';
 import '../cubit/single_category_items_state.dart';
 import '../data/network/constants/endpoints.dart';
+import '../data/repository/home_repository.dart';
+import '../di/components/service_locator.dart';
 import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
 import '../widgets/product_greed_view_widget.dart';
 
 class SingleCategoryByItemScreen extends StatefulWidget {
+
   static const String routeName = "/SingleCategoryByItemScreen";
 
   const SingleCategoryByItemScreen({super.key});
@@ -26,6 +29,8 @@ class SingleCategoryByItemScreen extends StatefulWidget {
 }
 
 class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen> {
+
+
 
   final scrollController = ScrollController();
 

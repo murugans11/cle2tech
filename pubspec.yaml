@@ -34,6 +34,8 @@ dependencies:
   string_validator: ^0.3.0
   flutter_sticky_header: ^0.6.4
   device_info_plus: ^3.2.3
+  fluttertoast: ^8.1.1
+  group_radio_button: ^1.2.0
 
 dev_dependencies:
   flutter_test:
