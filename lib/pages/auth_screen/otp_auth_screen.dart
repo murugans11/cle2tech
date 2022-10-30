@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-
 import 'package:shopeein/pages/auth_screen/sign_up.dart';
 import '../../constants/constants.dart';
 import '../../models/login/RequestOtpResponse.dart';
+import '../../models/register/request_otp.dart';
 import '../../widgets/buttons.dart';
 
 import 'otp_test.dart';
@@ -21,10 +21,10 @@ class OtpAuthScreen extends StatefulWidget {
 class _OtpAuthScreenState extends State<OtpAuthScreen> {
   @override
   Widget build(BuildContext context) {
+    RequestOtp requestOtpResponse =
+        ModalRoute.of(context)!.settings.arguments as RequestOtp;
 
-    RequestOtpResponse requestOtpResponse = ModalRoute.of(context)!.settings.arguments as RequestOtpResponse;
-
-    String phone = requestOtpResponse.data.phone;
+    String phone = requestOtpResponse.requestOtpResponse.data.phone;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -60,7 +60,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
               width: 248,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children:  [
+                children: [
                   const MyGoogleText(
                     fontSize: 26,
                     fontColor: Colors.black,
@@ -78,8 +78,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
               ),
             ),
           ),
-          const Spacer(),
-
+          //const Spacer(),
           Container(
             padding: const EdgeInsets.all(30),
             width: double.infinity,
@@ -92,18 +91,17 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
             ),
             child: Column(
               children: <Widget>[
-
                 const SizedBox(height: 10),
-
-                OtpForm(requestOtpResponse: requestOtpResponse),
-
+                OtpForm(
+                  requestOtpResponse: requestOtpResponse,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const MyGoogleText(
                       fontSize: 16,
                       fontColor: textColors,
-                     // text: 'Code send in 0:29',
+                      // text: 'Code send in 0:29',
                       text: 'Code sent',
                       fontWeight: FontWeight.w500,
                     ),
@@ -119,14 +117,14 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 20),
+                /*const SizedBox(height: 20),
                 Button1(
                     buttonText: 'Continue',
                     buttonColor: primaryColor,
                     onPressFunction: () {
                       //const ChangePassScreen().launch(context);
                       Navigator.pushNamed(context, SignUp.routeName);
-                    }),
+                    }),*/
 
                 const SizedBox(height: 200),
               ],

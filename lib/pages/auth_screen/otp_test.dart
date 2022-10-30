@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shopeein/pages/auth_screen/sign_up.dart';
 
 import '../../constants/constants.dart';
 import '../../data/repository/login_repository.dart';
@@ -8,13 +9,18 @@ import '../../di/components/service_locator.dart';
 import '../../models/login/OtpVerifyRequest.dart';
 import '../../models/login/RequestOtpResponse.dart';
 import '../../models/login/login_response.dart';
+import '../../models/register/request_otp.dart';
 import '../../utils/device/custom_error.dart';
 import '../../widgets/error_dialog.dart';
 
 class OtpForm extends StatefulWidget {
-  final RequestOtpResponse requestOtpResponse;
 
-  const OtpForm({Key? key, required this.requestOtpResponse}) : super(key: key);
+  final RequestOtp requestOtpResponse;
+
+  const OtpForm({
+    Key? key,
+    required this.requestOtpResponse,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -153,11 +159,22 @@ class _OtpFormState extends State<OtpForm> {
                           buffer.write(value);
                           pin6FocusNode.unfocus();
 
-                          var request = OtpVerifyRequest(
-                              loginId: widget.requestOtpResponse.data.phone,
-                              otp: buffer.toString(),
-                              requestId: widget.requestOtpResponse.data.requestId);
-                          _fetchLoginOtpResponse(request, context);
+                          if (widget.requestOtpResponse.toggleLoginOrNewRegister == 1) {
+                            final res = RequestOtp(
+                                toggleLoginOrNewRegister: widget.requestOtpResponse.toggleLoginOrNewRegister,
+                                otp: buffer.toString(),
+                                requestOtpResponse: widget.requestOtpResponse.requestOtpResponse);
+                            Navigator.pushNamed(context, SignUp.routeName, arguments: res);
+                          } else  {
+                            var request = OtpVerifyRequest(
+                                loginId: widget.requestOtpResponse
+                                    .requestOtpResponse.data.phone,
+                                otp: buffer.toString(),
+                                requestId: widget.requestOtpResponse
+                                    .requestOtpResponse.data.requestId);
+                            verifyLoginOtp(request, context);
+
+                          }
                           // Then you need to check is the code is correct or not
                         }
                       },
@@ -170,18 +187,18 @@ class _OtpFormState extends State<OtpForm> {
         : loader();
   }
 
-  FutureOr<void> _fetchLoginOtpResponse(
-      OtpVerifyRequest otpVerifyRequest, BuildContext buildContext) async {
+  FutureOr<void> verifyLoginOtp(OtpVerifyRequest otpVerifyRequest, BuildContext buildContext) async {
     try {
       final LoginRepository loginRepository = getIt<LoginRepository>();
 
-      final LoginResponse response = await loginRepository.loginWithOTPStep2(otpVerifyRequest);
+      final LoginResponse response = await loginRepository.verifyLoginWithPhoneNumberByOtp(otpVerifyRequest);
 
       setState(() {
         _isLoading = false;
       });
 
       debugPrint(response.user.token);
+      navigateToOtpScreen();
 
     } on CustomError catch (e) {
       setState(() {
@@ -189,6 +206,12 @@ class _OtpFormState extends State<OtpForm> {
       });
       errorDialog(buildContext, e.errMsg);
     }
+  }
+
+  void navigateToOtpScreen() {
+    Navigator.of(context)
+      ..pop()
+      ..pop();
   }
 
   Widget loader() {

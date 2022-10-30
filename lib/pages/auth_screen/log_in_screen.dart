@@ -11,6 +11,7 @@ import '../../data/repository/login_repository.dart';
 import '../../di/components/service_locator.dart';
 import '../../models/login/RequestOtpResponse.dart';
 import '../../models/login/login_requst.dart';
+import '../../models/register/request_otp.dart';
 import '../../utils/device/custom_error.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/error_dialog.dart';
@@ -76,11 +77,12 @@ class _LogInScreenState extends State<LogInScreen> {
                   Container(
                     height: 90,
                     width: 90,
-                    decoration:  BoxDecoration(
+                    decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(50)),
                       image: DecorationImage(
                         fit: BoxFit.fitWidth,
-                        image: AssetImage(AppTheme.of(context)?.assets.logo1 ?? ''),
+                        image: AssetImage(
+                            AppTheme.of(context)?.assets.logo1 ?? ''),
                       ),
                     ),
                   ),
@@ -113,7 +115,8 @@ class _LogInScreenState extends State<LogInScreen> {
                                   if (!RegExp(
                                           r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$')
                                       .hasMatch(value)) {
-                                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    if (!RegExp(
+                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                         .hasMatch(value)) {
                                       return "Enter Correct Email or Phone";
                                     } else {
@@ -143,9 +146,10 @@ class _LogInScreenState extends State<LogInScreen> {
                             ),
                             const SizedBox(height: 5),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Row(
+                               /* Row(
                                   children: [
                                     Checkbox(
                                       activeColor: secondaryColor1,
@@ -165,10 +169,12 @@ class _LogInScreenState extends State<LogInScreen> {
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ],
-                                ),
+                                ),*/
                                 TextButton(
                                   onPressed: () {
-                                    const ForgotPassScreen().launch(context);
+                                    //const ForgotPassScreen().launch(context);
+                                    _displayTextInputDialog(
+                                        context, "Forgot Password", 2);
                                   },
                                   child: const MyGoogleText(
                                     text: 'Forgot Password',
@@ -184,15 +190,16 @@ class _LogInScreenState extends State<LogInScreen> {
                               buttonText: 'Sign In',
                               buttonColor: primaryColor,
                               onPressFunction: () {
-
                                 Navigator.pushNamed(context, SignUp.routeName);
 
-                               if (formKey.currentState!.validate()) {
+                                if (formKey.currentState!.validate()) {
                                   setState(() {
                                     _isLoading = true;
                                   });
-                                  final username = userNameController.value.text;
-                                  final password = passwordController.value.text;
+                                  final username =
+                                      userNameController.value.text;
+                                  final password =
+                                      passwordController.value.text;
                                   LoginRequest loginRequest = LoginRequest(
                                       loginId: username, password: password);
                                   _loginWithCredentials(loginRequest, context);
@@ -216,7 +223,8 @@ class _LogInScreenState extends State<LogInScreen> {
                               buttonText: 'SingIn With Otp',
                               buttonColor: primaryColor,
                               onPressFunction: () {
-                                _displayTextInputDialog(context,"Login with opt");
+                                _displayTextInputDialog(
+                                    context, "Login with opt", 0);
                               },
                             ),
                             const SizedBox(height: 10),
@@ -231,7 +239,8 @@ class _LogInScreenState extends State<LogInScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    _displayTextInputDialog(context,"Register");
+                                    _displayTextInputDialog(
+                                        context, "Register", 1);
                                   },
                                   child: const MyGoogleText(
                                     text: 'Join now',
@@ -254,12 +263,12 @@ class _LogInScreenState extends State<LogInScreen> {
     return const Center(child: CircularProgressIndicator());
   }
 
-  Future<void> _displayTextInputDialog(BuildContext context ,String title) async {
+  Future<void> _displayTextInputDialog(BuildContext context, String title, int toggleLoginOrNewRegister) async {
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title:  Text(title),
+            title: Text(title),
             content: TextField(
               keyboardType: TextInputType.number,
               controller: otpController,
@@ -287,12 +296,12 @@ class _LogInScreenState extends State<LogInScreen> {
               TextButton(
                 onPressed: () {
                   final value = otpController.value.text;
-                  if (RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$')
-                      .hasMatch(value)) {
+                  if (RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$').hasMatch(value)) {
                     Navigator.pop(context);
-
-                    _fetchLoginOtpResponse(value, context);
-
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    verifyLoginOrRegisterByOtp(value, context, toggleLoginOrNewRegister);
                   } else {
                     Fluttertoast.showToast(
                         msg: "Your number is not valid",
@@ -317,15 +326,19 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   FutureOr<void> _loginWithCredentials(
+
       LoginRequest loginRequest, BuildContext buildContext) async {
     try {
       final LoginRepository loginRepository = getIt<LoginRepository>();
-      final LoginResponse response = await loginRepository.login(loginRequest);
-      response.user.token;
+
+      final LoginResponse response = await loginRepository.loginWithCredential(loginRequest);
+
       debugPrint(response.user.token);
+
       setState(() {
         _isLoading = false;
       });
+
       Fluttertoast.showToast(
           msg: "Login Success",
           toastLength: Toast.LENGTH_SHORT,
@@ -334,7 +347,9 @@ class _LogInScreenState extends State<LogInScreen> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+
       navigateLogin();
+
     } on CustomError catch (e) {
       setState(() {
         _isLoading = false;
@@ -343,23 +358,41 @@ class _LogInScreenState extends State<LogInScreen> {
     }
   }
 
-  void navigateLogin(){
+  void navigateLogin() {
     Navigator.pop(context);
   }
 
-
-  FutureOr<void> _fetchLoginOtpResponse(String phone, BuildContext buildContext) async {
+  FutureOr<void> verifyLoginOrRegisterByOtp(String phone,
+      BuildContext buildContext, int toggleLoginOrNewRegister) async {
     try {
+
       final LoginRepository loginRepository = getIt<LoginRepository>();
 
-      final RequestOtpResponse response = await loginRepository.loginWithOTPStep1(phone);
-      navigateToOtpScreen(response);
+      final RequestOtpResponse response = await loginRepository.loginWithPhoneNumber(phone, toggleLoginOrNewRegister);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      final res = RequestOtp(
+        toggleLoginOrNewRegister: toggleLoginOrNewRegister,
+        otp: '',
+        requestOtpResponse: response,
+      );
+
+      navigateToOtpScreen(res);
 
     } on CustomError catch (e) {
-      errorDialog(buildContext, e.errMsg);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      errorDialog(context, e.errMsg);
     }
   }
-  void navigateToOtpScreen(RequestOtpResponse response){
+
+  void navigateToOtpScreen(RequestOtp response) {
     Navigator.pushNamed(context, OtpAuthScreen.routeName, arguments: response);
   }
 }

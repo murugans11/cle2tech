@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shopeein/models/login/login_response.dart';
+import 'package:shopeein/models/register/RegistrationRequest.dart';
 
 import '../../models/login/OtpVerifyRequest.dart';
 import '../../models/login/RequestOtpResponse.dart';
@@ -25,43 +26,82 @@ class LoginRepository {
 
   // Login:---------------------------------------------------------------------
 
+  Future<LoginResponse> loginWithCredential(LoginRequest loginRequest) async {
 
-
-  Future<LoginResponse> login(LoginRequest loginRequest) async {
     try {
+
       final LoginResponse loginResponse = await _homeApi.doLogin(loginRequest);
+
       debugPrint('loginResponse: $loginResponse');
+
       _sharedPrefsHelper.saveAuthToken(loginResponse.user.token);
+
       _sharedPrefsHelper.saveIsLoggedIn(true);
+
       return loginResponse;
+
     } catch (e) {
+
       debugPrint(e.toString());
+
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
-  Future<RequestOtpResponse> loginWithOTPStep1(String mobileNumber) async {
+  Future<RequestOtpResponse> loginWithPhoneNumber(String mobileNumber,int toggleLoginOrNewRegister) async {
+
     try {
-      final RequestOtpResponse otpResponse = await _homeApi.loginWithOtpStep1(mobileNumber);
+
+      final RequestOtpResponse otpResponse  = await _homeApi.getOtp(mobileNumber,toggleLoginOrNewRegister);
+
       debugPrint('otpResponse: $otpResponse');
+
       return otpResponse;
+
+    } catch (e) {
+
+      debugPrint(e.toString());
+
+      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+    }
+  }
+
+  Future<LoginResponse> verifyLoginWithPhoneNumberByOtp(OtpVerifyRequest otpVerifyRequest) async {
+    try {
+
+      final LoginResponse loginResponse = await _homeApi.verifyOtp(otpVerifyRequest);
+
+      debugPrint('loginResponse: $loginResponse');
+
+      _sharedPrefsHelper.saveAuthToken(loginResponse.user.token);
+
+      _sharedPrefsHelper.saveIsLoggedIn(true);
+
+      return loginResponse;
+
     } catch (e) {
       debugPrint(e.toString());
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
 
-  Future<LoginResponse> loginWithOTPStep2(OtpVerifyRequest otpVerifyRequest) async {
+
+  Future<LoginResponse> verifyRegisterWithPhoneNumberByOtp(RegistrationRequest registrationRequest) async {
     try {
-      final LoginResponse loginResponse = await _homeApi.loginWithOtpStep2(otpVerifyRequest);
-      debugPrint('loginResponse: $loginResponse');
+      final LoginResponse loginResponse = await _homeApi.verifyRegisterOtp(registrationRequest);
+
+      debugPrint('registerResponse: $loginResponse');
+
       _sharedPrefsHelper.saveAuthToken(loginResponse.user.token);
+
       _sharedPrefsHelper.saveIsLoggedIn(true);
+
       return loginResponse;
     } catch (e) {
       debugPrint(e.toString());
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
+
 
   Future<void> saveIsLoggedIn(bool value) => _sharedPrefsHelper.saveIsLoggedIn(value);
 

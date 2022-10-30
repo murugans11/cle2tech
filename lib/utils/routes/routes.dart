@@ -9,6 +9,7 @@ import '../../di/components/service_locator.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
 import '../../models/login/RequestOtpResponse.dart';
+import '../../models/register/request_otp.dart';
 import '../../pages/auth_screen/log_in_screen.dart';
 import '../../pages/auth_screen/otp_auth_screen.dart';
 import '../../pages/auth_screen/sign_up.dart';
@@ -90,17 +91,17 @@ class Router {
         );
 
       case OtpAuthScreen.routeName:
-        final args = dynamicArguments as RequestOtpResponse;
+        final args = dynamicArguments as RequestOtp;
         return MaterialPageRoute(
           builder: (context) => const OtpAuthScreen(),
           settings: RouteSettings(arguments: args),
         );
 
       case SignUp.routeName:
+        final args = dynamicArguments as RequestOtp;
         return MaterialPageRoute(
-          builder: (_) {
-            return const SignUp();
-          },
+          builder: (context) => const SignUp(),
+          settings: RouteSettings(arguments: args),
         );
 
 

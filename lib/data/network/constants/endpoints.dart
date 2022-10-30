@@ -20,11 +20,23 @@ class Endpoints {
   static const String getSingleItemListFromCategory = "${baseUrl}category";
 
   //Login
-  static const String loginUsingCrendential = "${baseUrl}auth/login";
+  static const String loginUsingCredentials = "${baseUrl}auth/login";
+  static const String loginWithPhoneNumber = "${baseUrl}customer/otp";
 
-  static const String getNewOtp = "${baseUrl}customer/otp";
+  static const String verifyLoginWithPhoneNumberOtp = "${baseUrl}auth/m/login";
 
-  static const String verifyOTP = "${baseUrl}auth/m/login";
+  //Register
+  static const String registerNewPhoneNumber = "${baseUrl}customer/newOtp";
+  static const String verifyNewRegisterWithOtp = "${baseUrl}customer";
+
+  //Forgot password
+  static const String getForgotPasswordOtp = "${baseUrl}customer/forgot";
+
+
+
+
+
+
 
 
 
