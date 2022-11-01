@@ -17,8 +17,12 @@ import '../blocs/category_groupe/categoryList_bloc.dart';
 import '../blocs/featureproduct/feature_product_list_bloc.dart';
 import '../constants/constants.dart';
 
+import '../data/repository/home_repository.dart';
+import '../data/sharedpref/shared_preference_helper.dart';
+import '../di/components/service_locator.dart';
 import '../models/banner/banner_list.dart';
 import '../models/categoriesbyname/categorieItems.dart';
+import '../models/wishlist/verifywishlist.dart';
 import '../utils/dio/network_call_status_enum.dart';
 import '../widgets/error_dialog.dart';
 
@@ -36,16 +40,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   List<BannerGroup>? categoryGroup = [];
+
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
+  VerifyWishlist response = VerifyWishlist();
 
   @override
   void initState() {
     super.initState();
+    _asyncMethod();
     context.read<CategoriesBloc>().add(const FetchCategoriesItemsEvent());
     context.read<BannerBloc>().add(const FetchBannerItemsEvent());
-    context
-        .read<FeatureProductListBloc>()
-        .add(const FetchFeatureProductItemsEvent());
+    context.read<FeatureProductListBloc>().add(const FetchFeatureProductItemsEvent());
+  }
+
+  _asyncMethod() async {
+    var token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token);
+      setState(() {});
+    }
   }
 
   @override
@@ -60,13 +76,16 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: primaryColor,
         elevation: 0.0,
         titleSpacing: 0.0,
-        title: MyGoogleText(
-          text: AppTheme.of(context)?.values.appName ?? '',
-          fontSize: 20,
-          fontColor: Colors.white,
-          fontWeight: FontWeight.w500,
+        title: Container(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: Image.asset(
+            AppTheme.of(context)?.assets.logo2 ?? '',
+            height: 90.0,
+            width: 130.0,
+          ),
         ),
-        leading: Padding(
+
+        /*leading: Padding(
           padding: const EdgeInsets.all(4),
           child: GestureDetector(
             onTap: () {
@@ -89,7 +108,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-        ),
+        ),*/
+
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -390,32 +410,35 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 10),
               subBanner(bannerFeature1),
-
               getItemTitle(state, mainIndex),
               HorizontalList(
                 spacing: 20,
                 itemCount: listingProduct.length,
                 itemBuilder: (BuildContext context, int index) {
+
                   ListingProduct? listingProductItems = listingProduct[index];
 
                   String imageURL = '';
-                  var parts = listingProductItems
-                      .keyDetails?.variant?[0].media?[0].resourcePath
-                      .split('.com');
+                  var parts = listingProductItems.keyDetails?.variant?[0].media?[0].resourcePath.split('.com');
+
                   if (parts != null) {
                     var image = parts.sublist(1).join('.com').trim();
-                    imageURL =
-                        'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                    imageURL = 'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
                   }
-                  final sellingPrice =
-                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
-                  final retailPrice =
-                      listingProductItems.keyDetails?.variant?[0].retailPrice;
+
+                  final sellingPrice = listingProductItems.keyDetails?.variant?[0].sellingPrice;
+
+                  final retailPrice = listingProductItems.keyDetails?.variant?[0].retailPrice;
+
                   int percent =
                       ((int.parse(retailPrice) - int.parse(sellingPrice)) /
                               int.parse(retailPrice) *
                               100)
                           .toInt();
+
+                  final productId = listingProductItems.id;
+                  final sku = listingProductItems.keyDetails?.variant?[0].sku;
+
                   return ProductGreedShow1(
                     image: imageURL,
                     productTitle: listingProductItems.keyDetails?.productTitle,
@@ -428,6 +451,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    productId: productId,
+                    sku: sku,
+                    response: response,
                   );
                 },
               ),
@@ -447,8 +473,6 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 10),
               subBanner(bannerFeature2),
-
-
               const SizedBox(height: 20),
               getItemTitle(state, mainIndex),
               HorizontalList(
@@ -475,6 +499,9 @@ class _HomePageState extends State<HomePage> {
                               int.parse(retailPrice) *
                               100)
                           .toInt();
+
+                  final productId = listingProductItems.id;
+                  final sku = listingProductItems.keyDetails?.variant?[0].sku;
                   return ProductGreedShow1(
                     image: imageURL,
                     productTitle: listingProductItems.keyDetails?.productTitle,
@@ -487,6 +514,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    productId: productId,
+                    sku: sku,
+                    response: response,
                   );
                 },
               ),
@@ -505,8 +535,6 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 10),
               subBanner(bannerFeature3),
-
-
               const SizedBox(height: 20),
               getItemTitle(state, mainIndex),
               HorizontalList(
@@ -533,6 +561,8 @@ class _HomePageState extends State<HomePage> {
                               int.parse(retailPrice) *
                               100)
                           .toInt();
+                  final productId = listingProductItems.id;
+                  final sku = listingProductItems.keyDetails?.variant?[0].sku;
                   return ProductGreedShow1(
                     image: imageURL,
                     productTitle: listingProductItems.keyDetails?.productTitle,
@@ -545,6 +575,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    productId: productId,
+                    sku: sku,
+                    response: response,
                   );
                 },
               ),
@@ -563,7 +596,6 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 10),
               subBanner(bannerFeature4),
-
               const SizedBox(height: 20),
               getItemTitle(state, mainIndex),
               HorizontalList(
@@ -590,6 +622,8 @@ class _HomePageState extends State<HomePage> {
                               int.parse(retailPrice) *
                               100)
                           .toInt();
+                  final productId = listingProductItems.id;
+                  final sku = listingProductItems.keyDetails?.variant?[0].sku;
                   return ProductGreedShow1(
                     image: imageURL,
                     productTitle: listingProductItems.keyDetails?.productTitle,
@@ -602,6 +636,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    productId: productId,
+                    sku: sku,
+                    response: response,
                   );
                 },
               ),
@@ -620,7 +657,6 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 10),
               subBanner(bannerFeature5),
-
               const SizedBox(height: 20),
               getItemTitle(state, mainIndex),
               HorizontalList(
@@ -647,6 +683,8 @@ class _HomePageState extends State<HomePage> {
                               int.parse(retailPrice) *
                               100)
                           .toInt();
+                  final productId = listingProductItems.id;
+                  final sku = listingProductItems.keyDetails?.variant?[0].sku;
                   return ProductGreedShow1(
                     image: imageURL,
                     productTitle: listingProductItems.keyDetails?.productTitle,
@@ -659,6 +697,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    productId: productId,
+                    sku: sku,
+                    response: response,
                   );
                 },
               ),
@@ -692,6 +733,8 @@ class _HomePageState extends State<HomePage> {
                               int.parse(retailPrice) *
                               100)
                           .toInt();
+                  final productId = listingProductItems.id;
+                  final sku = listingProductItems.keyDetails?.variant?[0].sku;
                   return ProductGreedShow1(
                     image: imageURL,
                     productTitle: listingProductItems.keyDetails?.productTitle,
@@ -704,6 +747,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    productId: productId,
+                    sku: sku,
+                    response: response,
                   );
                 },
               ),
@@ -716,53 +762,51 @@ class _HomePageState extends State<HomePage> {
 
   Card subBanner(List<BannerGroup> bannerFeature1) {
     return Card(
-              shadowColor: Colors.grey,
-              margin: EdgeInsets.zero,
-              clipBehavior: Clip.antiAlias,
-              child: CarouselSlider(
-                options: CarouselOptions(
-                  height: 250.0,
-                  aspectRatio: 2.0,
-                  enableInfiniteScroll: false,
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  viewportFraction: 1,
-                ),
-                items: bannerFeature1.map((i) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return InkWell(
-                        onTap: () {
-                          for (int j = 0; j < bannerFeature1.length; j++) {
-                            if (i.resourcePath == bannerFeature1[j].resourcePath) {
-                              bannerItemClick(bannerFeature1, j, context);
-                            }
-                          }
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                          decoration:
-                              const BoxDecoration(color: Colors.amber),
-                          child: CachedNetworkImage(
-                            imageUrl: i.resourcePath,
-                            imageBuilder: (context, imageProvider) =>
-                                Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: imageProvider,
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            ),
-                          ),
+      shadowColor: Colors.grey,
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: CarouselSlider(
+        options: CarouselOptions(
+          height: 250.0,
+          aspectRatio: 2.0,
+          enableInfiniteScroll: false,
+          autoPlay: true,
+          enlargeCenterPage: true,
+          viewportFraction: 1,
+        ),
+        items: bannerFeature1.map((i) {
+          return Builder(
+            builder: (BuildContext context) {
+              return InkWell(
+                onTap: () {
+                  for (int j = 0; j < bannerFeature1.length; j++) {
+                    if (i.resourcePath == bannerFeature1[j].resourcePath) {
+                      bannerItemClick(bannerFeature1, j, context);
+                    }
+                  }
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: const BoxDecoration(color: Colors.amber),
+                  child: CachedNetworkImage(
+                    imageUrl: i.resourcePath,
+                    imageBuilder: (context, imageProvider) => Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.fill,
                         ),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
-            );
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
+      ),
+    );
   }
 
   Widget getItemTitle(FeatureProductListState state, int mainIndex) {

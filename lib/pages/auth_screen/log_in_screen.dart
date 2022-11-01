@@ -15,6 +15,7 @@ import '../../models/register/request_otp.dart';
 import '../../utils/device/custom_error.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/error_dialog.dart';
+import '../initial_page.dart';
 import 'forgot_pass_screen.dart';
 import 'otp_auth_screen.dart';
 
@@ -190,8 +191,6 @@ class _LogInScreenState extends State<LogInScreen> {
                               buttonText: 'Sign In',
                               buttonColor: primaryColor,
                               onPressFunction: () {
-                                Navigator.pushNamed(context, SignUp.routeName);
-
                                 if (formKey.currentState!.validate()) {
                                   setState(() {
                                     _isLoading = true;
@@ -359,7 +358,9 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   void navigateLogin() {
+
     Navigator.pop(context);
+
   }
 
   FutureOr<void> verifyLoginOrRegisterByOtp(String phone,

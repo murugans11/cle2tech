@@ -15,8 +15,8 @@ import '../models/wishlist/toggle_wishList_request.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../pages/product_detail_screen.dart';
 
-class ProductGreedShow1 extends StatefulWidget {
-  const ProductGreedShow1({
+class WishListGreedShow extends StatefulWidget {
+  const WishListGreedShow({
     Key? key,
     required this.image,
     required this.productTitle,
@@ -25,9 +25,7 @@ class ProductGreedShow1 extends StatefulWidget {
     required this.discountPercentage,
     required this.isSingleView,
     required this.callCat,
-    required this.productId,
-    required this.sku,
-    this.response
+
   }) : super(key: key);
   final String image;
   final String productTitle;
@@ -36,15 +34,13 @@ class ProductGreedShow1 extends StatefulWidget {
   final String discountPercentage;
   final bool isSingleView;
   final Function callCat;
-  final String productId;
-  final String sku;
-  final VerifyWishlist? response ;
+
 
   @override
-  State<ProductGreedShow1> createState() => _ProductGreedShow1State();
+  State<WishListGreedShow> createState() => _WishListGreedShowState();
 }
 
-class _ProductGreedShow1State extends State<ProductGreedShow1> {
+class _WishListGreedShowState extends State<WishListGreedShow> {
   bool isFavorite = false;
   double initialRating = 0;
   late double rating;
@@ -56,16 +52,6 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(widget.response != null){
-      if(widget.response?.user != null) {
-        widget.response?.user?.wishlist?.forEach((element) {
-          if(widget.sku ==  element.sku || widget.productId == element.listingId ){
-            isFavorite = true;
-          }
-        });
-      }
-    }
 
     return Container(
       decoration: BoxDecoration(
@@ -136,27 +122,11 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                     setState(() {
                       isFavorite = !isFavorite;
                     });
-                    SharedPreferenceHelper sharedPreferenceHelper =
-                        getIt<SharedPreferenceHelper>();
-                    var token = await sharedPreferenceHelper.authToken;
-                    if (token != null) {
-                      HomeRepository homeRepository = getIt<HomeRepository>();
-                      if (isFavorite) {
-                        var toggleWishListRequest = ToggleWishListRequest(
-                            productId: widget.productId,
-                            sku: widget.sku,
-                            action: "add");
-                        homeRepository.toggleWishList(toggleWishListRequest);
-                      } else {
-                        var toggleWishListRequest = ToggleWishListRequest(
-                            productId: widget.productId,
-                            sku: widget.sku,
-                            action: "remove");
-                        homeRepository.toggleWishList(toggleWishListRequest);
-                      }
-                    } else {
-                      Navigator.pushNamed(context, LogInScreen.routeName);
-                    }
+                    /*var toggleWishListRequest = ToggleWishListRequest(
+                        productId: widget.productId,
+                        sku: widget.sku,
+                        action: "remove");
+                    homeRepository.toggleWishList(toggleWishListRequest);*/
                   },
                   child: Container(
                     height: 35,

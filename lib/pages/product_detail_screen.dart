@@ -6,9 +6,14 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../constants/constants.dart';
+import '../data/repository/home_repository.dart';
+import '../data/sharedpref/shared_preference_helper.dart';
+import '../di/components/service_locator.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/wishlist/toggle_wishList_request.dart';
 import '../widgets/buttons.dart';
 import '../widgets/castomar_review_commends.dart';
 import '../widgets/product_greed_view_widget.dart';
@@ -18,7 +23,6 @@ import 'cart_screen.dart';
 import 'package:string_validator/string_validator.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-
   static const String routeName = "/ProductDetailScreen";
 
   const ProductDetailScreen({Key? key}) : super(key: key);
@@ -28,12 +32,28 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  PageController pageController = PageController(initialPage: 1);
+
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
+  VerifyWishlist response = VerifyWishlist();
+
+  @override
+  void initState() {
+    super.initState();
+    _asyncMethod();
+  }
+
+  _asyncMethod() async {
+    var token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token);
+      setState(() {});
+    }
+  }
 
   bool isFavorite = false;
   double initialRating = 0;
   late double rating;
-
 
   String selectedSize = '';
   final sizeList = [
@@ -67,7 +87,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final listingProduct = ModalRoute.of(context)!.settings.arguments as ListingProduct;
+    final listingProduct =
+        ModalRoute.of(context)!.settings.arguments as ListingProduct;
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
     /// Get the images
@@ -81,11 +102,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     final title = listingProduct.keyDetails?.productTitle;
-    final sellingPrice = listingProduct.keyDetails?.variant?[selectedColorValue].sellingPrice;
-    final retailPrice = listingProduct.keyDetails?.variant?[selectedColorValue].retailPrice;
-    final description = listingProduct.keyDetails?.description.replaceAll(exp, '');
-    List<Attributes> attributes = listingProduct.attributeGroup?[0].attributes ?? [];
-    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) / int.parse(retailPrice) * 100).toInt();
+    final sellingPrice =
+        listingProduct.keyDetails?.variant?[selectedColorValue].sellingPrice;
+    final retailPrice =
+        listingProduct.keyDetails?.variant?[selectedColorValue].retailPrice;
+    final description =
+        listingProduct.keyDetails?.description.replaceAll(exp, '');
+    List<Attributes> attributes =
+        listingProduct.attributeGroup?[0].attributes ?? [];
+    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+            int.parse(retailPrice) *
+            100)
+        .toInt();
 
     final highlights = listingProduct.keyDetails?.highlights;
     var selectColorImage = [];
@@ -100,6 +128,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       selectColorImage.add(
           'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/212x212/filters:format(png)/$image');
     });
+
+    final productId = listingProduct.id;
+    final sku = listingProduct.keyDetails?.variant?[selectedColorValue].sku;
+
+    if(response.user != null) {
+      response.user?.wishlist?.forEach((element) {
+        if(sku ==  element.sku || productId == element.listingId ){
+          isFavorite = true;
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: secondaryColor3,
@@ -148,10 +187,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Column(
                     children: [
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           setState(() {
                             isFavorite = !isFavorite;
                           });
+                          // getting token
+                          var token = await sharedPreferenceHelper.authToken;
+                          if (token != null) {
+                            HomeRepository homeRepository = getIt<HomeRepository>();
+                            if (isFavorite) {
+                              var toggleWishListRequest = ToggleWishListRequest(productId: productId, sku: sku, action: "add");
+                              homeRepository.toggleWishList(toggleWishListRequest);
+                            } else {
+                              var toggleWishListRequest = ToggleWishListRequest(productId: productId, sku: sku, action: "remove");
+                              homeRepository.toggleWishList(toggleWishListRequest);
+                            }
+                          }
                         },
                         child: Container(
                           height: 35,
@@ -829,7 +880,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             child: Row(
                               children: [
                                 MyGoogleText(
-                                  text:'\u2022 $attribute' ?? '',
+                                  text: '\u2022 $attribute' ?? '',
                                   fontSize: 16,
                                   fontColor: Colors.black,
                                   fontWeight: FontWeight.normal,
@@ -900,6 +951,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         discountPercentage: ("-$percent%"),
                         isSingleView: false,
                         callCat: () {},
+                        productId: productId,
+                        sku: sku,
                       );
                     },
                   ),

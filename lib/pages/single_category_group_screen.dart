@@ -11,8 +11,12 @@ import '../constants/constants.dart';
 
 import '../cubit/category_group_cubit.dart';
 import '../data/network/constants/endpoints.dart';
+import '../data/repository/home_repository.dart';
+import '../data/sharedpref/shared_preference_helper.dart';
+import '../di/components/service_locator.dart';
 import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/wishlist/verifywishlist.dart';
 import '../widgets/product_greed_view_widget.dart';
 
 class SingleCategoryGroupScreen extends StatefulWidget {
@@ -31,6 +35,24 @@ class _SingleCategoryGroupScreenState extends State<SingleCategoryGroupScreen> {
   final scrollController = ScrollController();
 
   int page = 1;
+
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
+  VerifyWishlist response = VerifyWishlist();
+
+  @override
+  void initState() {
+    _asyncMethod();
+    super.initState();
+  }
+
+  _asyncMethod() async {
+    var token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token);
+      setState(() {});
+    }
+  }
 
 
 
@@ -107,7 +129,7 @@ class _SingleCategoryGroupScreenState extends State<SingleCategoryGroupScreen> {
         children: [
           productType.isNotEmpty
               ? HorizontalList(
-                  itemCount: productType.length ?? 0,
+                  itemCount: productType.length,
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       onTap: () {
@@ -206,8 +228,7 @@ class _SingleCategoryGroupScreenState extends State<SingleCategoryGroupScreen> {
     });
   }
 
-  ProductGreedShow1 getItem(List<ListingProduct>? listingProductList, int index,
-      BuildContext context) {
+  ProductGreedShow1 getItem(List<ListingProduct>? listingProductList, int index, BuildContext context) {
     String imageURL = '';
     var parts = listingProductList?[index]
         .keyDetails
@@ -220,14 +241,16 @@ class _SingleCategoryGroupScreenState extends State<SingleCategoryGroupScreen> {
       imageURL =
           'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
     }
-    final sellingPrice =
-        listingProductList?[index].keyDetails?.variant?[0].sellingPrice;
-    final retailPrice =
-        listingProductList?[index].keyDetails?.variant?[0].retailPrice;
-    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
-            int.parse(retailPrice) *
-            100)
-        .toInt();
+    final sellingPrice = listingProductList?[index].keyDetails?.variant?[0].sellingPrice;
+
+    final retailPrice = listingProductList?[index].keyDetails?.variant?[0].retailPrice;
+
+    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) / int.parse(retailPrice) * 100).toInt();
+
+    final productId = listingProductList?[index].id;
+
+    final sku =  listingProductList?[index].keyDetails?.variant?[0].sku;
+
     return ProductGreedShow1(
       image: imageURL,
       productTitle: listingProductList?[index].keyDetails?.productTitle,
@@ -238,7 +261,9 @@ class _SingleCategoryGroupScreenState extends State<SingleCategoryGroupScreen> {
       callCat: () {
         Navigator.pushNamed(context, ProductDetailScreen.routeName,
             arguments: listingProductList?[index]);
-      },
+      }, productId: productId,
+      sku: sku,
+      response: response,
     );
   }
 

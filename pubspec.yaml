@@ -57,8 +57,6 @@ flutter:
     - assets/images/
     - assets/icons/
     - images/
-    - images/grocery/
-    - images/watch/
   fonts:
     - family: ProductSans
       fonts:

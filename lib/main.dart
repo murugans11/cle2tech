@@ -12,6 +12,7 @@ import 'constants/app_theme.dart';
 import 'constants/strings.dart';
 import 'cubit/category_group_cubit.dart';
 import 'cubit/single_category_items_cubit.dart';
+import 'cubit/wishlist/wish_list_response_cubit.dart';
 import 'data/repository/home_repository.dart';
 import 'di/components/service_locator.dart';
 import 'utils/routes/routes.dart' as Router;
@@ -68,15 +69,12 @@ class MyApp extends StatelessWidget {
                 CategoriesBloc(homeRepository: context.read<HomeRepository>()),
           ),
 
-        /*  BlocProvider<CategoryGroupCubit>(
-            create: (context) => CategoryGroupCubit(
+          BlocProvider<WishListResponseCubit>(
+            create: (context) => WishListResponseCubit(
                 homeRepository: context.read<HomeRepository>()),
-          ),*/
+          ),
 
-        /*  BlocProvider<SingleCategoryCubit>(
-            create: (context) => SingleCategoryCubit(
-                homeRepository: context.read<HomeRepository>()),
-          ),*/
+
         ],
         child: AppTheme(
           child: Builder(builder: (context) {

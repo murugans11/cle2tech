@@ -32,6 +32,13 @@ class Endpoints {
   //Forgot password
   static const String getForgotPasswordOtp = "${baseUrl}customer/forgot";
 
+  //WishList
+  static const String toggleWishList = "${baseUrl}wishlist";
+
+  static const String verifyWishList = "${baseUrl}auth/login/success";
+
+
+
 
 
 

@@ -13,9 +13,11 @@ import '../cubit/single_category_items_cubit.dart';
 import '../cubit/single_category_items_state.dart';
 import '../data/network/constants/endpoints.dart';
 import '../data/repository/home_repository.dart';
+import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/wishlist/verifywishlist.dart';
 import '../widgets/product_greed_view_widget.dart';
 
 class SingleCategoryByItemScreen extends StatefulWidget {
@@ -25,16 +27,40 @@ class SingleCategoryByItemScreen extends StatefulWidget {
   const SingleCategoryByItemScreen({super.key});
 
   @override
-  State<SingleCategoryByItemScreen> createState() => _SingleCategoryByItemScreenState();
+  State<SingleCategoryByItemScreen> createState() =>
+      _SingleCategoryByItemScreenState();
 }
 
 class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen> {
 
-
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
+  VerifyWishlist response = VerifyWishlist();
 
   final scrollController = ScrollController();
 
   int page = 1;
+
+  @override
+  void initState() {
+    _asyncMethod();
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      //do your stuff
+    }
+  }
+
+  _asyncMethod() async {
+    var token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token);
+      setState(() {});
+    }
+  }
 
   void setupScrollController(context, CategoryItemDisplay categoryItemDisplay) {
     scrollController.addListener(() {
@@ -55,19 +81,18 @@ class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen>
       });
       final query = splitList.last;
       var url = '${Endpoints.getSingleItemListFromCategory}/$query/?page=';
-      BlocProvider.of<SingleCategoryCubit>(context).loadSingleCategory(url, page);
-    };
+      BlocProvider.of<SingleCategoryCubit>(context)
+          .loadSingleCategory(url, page);
+    }
+    ;
   }
-
-
 
   @override
   Widget build(BuildContext context) {
-
-    CategoryItemDisplay categoryItemDisplay = ModalRoute.of(context)!.settings.arguments as CategoryItemDisplay;
+    CategoryItemDisplay categoryItemDisplay =
+        ModalRoute.of(context)!.settings.arguments as CategoryItemDisplay;
     getUrl(categoryItemDisplay, context);
     setupScrollController(context, categoryItemDisplay);
-
 
     return Scaffold(
       //backgroundColor: primaryColor.withOpacity(0.05),
@@ -178,25 +203,36 @@ class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen>
 
   ProductGreedShow1 getItem(List<ListingProduct>? listingProductList, int index, BuildContext context) {
     String imageURL = '';
+
     var parts = listingProductList?[index]
         .keyDetails
         ?.variant?[0]
         .media?[0]
         .resourcePath
         .split('.com');
+
     if (parts != null) {
       var image = parts.sublist(1).join('.com').trim();
       imageURL =
           'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
     }
+
     final sellingPrice =
         listingProductList?[index].keyDetails?.variant?[0].sellingPrice;
+
     final retailPrice =
         listingProductList?[index].keyDetails?.variant?[0].retailPrice;
+
     int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
             int.parse(retailPrice) *
             100)
         .toInt();
+
+    final productId = listingProductList?[index].id;
+
+    final sku =
+        listingProductList?[index].keyDetails?.variant?[0].sku;
+
     return ProductGreedShow1(
       image: imageURL,
       productTitle: listingProductList?[index].keyDetails?.productTitle,
@@ -205,8 +241,12 @@ class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen>
       discountPercentage: ("-$percent%"),
       isSingleView: false,
       callCat: () {
-        Navigator.pushNamed(context, ProductDetailScreen.routeName, arguments: listingProductList?[index]);
+        Navigator.pushNamed(context, ProductDetailScreen.routeName,
+            arguments: listingProductList?[index]);
       },
+      productId: productId,
+      sku: sku,
+      response: response,
     );
   }
 

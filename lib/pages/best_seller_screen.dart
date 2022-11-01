@@ -8,27 +8,52 @@ import 'package:shopeein/pages/product_detail_screen.dart';
 
 import '../constants/constants.dart';
 
+import '../data/repository/home_repository.dart';
+import '../data/sharedpref/shared_preference_helper.dart';
+import '../di/components/service_locator.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/wishlist/verifywishlist.dart';
 import '../widgets/filter_widget.dart';
 import '../widgets/product_greed_view_widget.dart';
 
 import '../widgets/sort_widget.dart';
 
 class BestSellerScreen extends StatefulWidget {
+
   static const String routeName = "/BestSellerScreen";
 
   const BestSellerScreen({Key? key}) : super(key: key);
 
   @override
   State<BestSellerScreen> createState() => _BestSellerScreenState();
+
 }
 
 class _BestSellerScreenState extends State<BestSellerScreen> {
-  var currentItem = 0;
+
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
+  VerifyWishlist response = VerifyWishlist();
+
   bool isSingleView = false;
 
   @override
+  void initState() {
+    _asyncMethod();
+    super.initState();
+  }
+
+  _asyncMethod() async {
+    var token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token);
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     final listingProductList = ModalRoute.of(context)!.settings.arguments as ListingItem;
 
     return Scaffold(
@@ -229,27 +254,28 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
   }
 
   ProductGreedShow1 getItem(ListingItem listingProductList, int index, BuildContext context) {
+
     String imageURL = '';
-    var parts = listingProductList
-        .listingProduct[index].keyDetails?.variant?[0].media?[0].resourcePath
-        .split('.com');
+    var parts = listingProductList.listingProduct[index].keyDetails?.variant?[0].media?[0].resourcePath.split('.com');
+
     if (parts != null) {
       var image = parts.sublist(1).join('.com').trim();
-      imageURL =
-          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+      imageURL = 'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
     }
-    final sellingPrice = listingProductList
-        .listingProduct[index].keyDetails?.variant?[0].sellingPrice;
-    final retailPrice = listingProductList
-        .listingProduct[index].keyDetails?.variant?[0].retailPrice;
-    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
-            int.parse(retailPrice) *
-            100)
-        .toInt();
+
+    final sellingPrice = listingProductList.listingProduct[index].keyDetails?.variant?[0].sellingPrice;
+
+    final retailPrice = listingProductList.listingProduct[index].keyDetails?.variant?[0].retailPrice;
+
+    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) / int.parse(retailPrice) * 100).toInt();
+
+    final productId = listingProductList.listingProduct[index].id;
+
+    final sku =  listingProductList.listingProduct[index].keyDetails?.variant?[0].sku;
+
     return ProductGreedShow1(
       image: imageURL,
-      productTitle:
-          listingProductList.listingProduct[index].keyDetails?.productTitle,
+      productTitle: listingProductList.listingProduct[index].keyDetails?.productTitle,
       productPrice: sellingPrice,
       actualPrice: retailPrice,
       discountPercentage: ("-$percent%"),
@@ -258,6 +284,9 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
         Navigator.pushNamed(context, ProductDetailScreen.routeName,
             arguments: listingProductList.listingProduct[index]);
       },
+      productId: productId,
+      sku: sku,
+      response: response,
     );
   }
 }

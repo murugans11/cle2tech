@@ -1,10 +1,11 @@
 import 'dart:async';
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:shopeein/models/banner/banner.dart';
 import 'package:dio/dio.dart';
+import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
+import '../../../../di/components/service_locator.dart';
 import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
 import '../../../../models/feature/feature_productes.dart';
@@ -13,9 +14,11 @@ import '../../../../models/login/RequestOtpResponse.dart';
 import '../../../../models/login/login_requst.dart';
 import '../../../../models/login/login_response.dart';
 import '../../../../models/register/RegistrationRequest.dart';
+import '../../../../models/wishlist/toggle_wishList_request.dart';
+import '../../../../models/wishlist/wish_list_response.dart';
+import '../../../sharedpref/shared_preference_helper.dart';
 import '../../dio_client.dart';
 import '../../constants/endpoints.dart';
-
 
 class HomeApi {
   // dio instance
@@ -28,13 +31,11 @@ class HomeApi {
 
   Future<BannerList> getBannerList() async {
     try {
-
-      final categoryGroupResponse = await _dioClient.get(Endpoints.getHomePageBanner);
+      final categoryGroupResponse =
+          await _dioClient.get(Endpoints.getHomePageBanner);
 
       return BannerList.fromJson(categoryGroupResponse);
-
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
@@ -43,13 +44,11 @@ class HomeApi {
 
   Future<CategoryList> getCategoryGroup() async {
     try {
-
-      final categoryGroupResponse = await _dioClient.get(Endpoints.getCategoryGroup);
+      final categoryGroupResponse =
+          await _dioClient.get(Endpoints.getCategoryGroup);
 
       return CategoryList.fromJson(categoryGroupResponse);
-
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
@@ -58,13 +57,11 @@ class HomeApi {
 
   Future<FeatureProductList> getFeatureProductList() async {
     try {
-
-      final featureProductResponse = await _dioClient.get(Endpoints.getFeatureProductList);
+      final featureProductResponse =
+          await _dioClient.get(Endpoints.getFeatureProductList);
 
       return FeatureProductList.fromJson(featureProductResponse);
-
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
@@ -73,13 +70,10 @@ class HomeApi {
 
   Future<CategorieItems> getCategoryProductListByName(String url) async {
     try {
-
       final viewAllCategoryProductListResponse = await _dioClient.get(url);
 
       return CategorieItems.fromJson(viewAllCategoryProductListResponse);
-
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
@@ -88,56 +82,49 @@ class HomeApi {
 
   Future<LoginResponse> doLogin(LoginRequest loginRequest) async {
     try {
-
-      final loginResponse = await _dioClient.post(Endpoints.loginUsingCredentials, data: loginRequest.toJson());
+      final loginResponse = await _dioClient
+          .post(Endpoints.loginUsingCredentials, data: loginRequest.toJson());
 
       return LoginResponse.fromJson(loginResponse);
-
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
     }
   }
 
-  Future<RequestOtpResponse> getOtp(String number, int toggleLoginOrNewRegister) async {
+  Future<RequestOtpResponse> getOtp(
+      String number, int toggleLoginOrNewRegister) async {
     try {
-
-
       if (toggleLoginOrNewRegister == 0) {
-
         debugPrint(Endpoints.loginWithPhoneNumber);
 
         debugPrint(toJson1(number).toString());
 
-        final requestOtpResponse = await _dioClient.post(Endpoints.loginWithPhoneNumber, data: toJson1(number));
+        final requestOtpResponse = await _dioClient
+            .post(Endpoints.loginWithPhoneNumber, data: toJson1(number));
 
         return RequestOtpResponse.fromJson(requestOtpResponse);
-
-      }
-      else if (toggleLoginOrNewRegister == 1){
-
+      } else if (toggleLoginOrNewRegister == 1) {
         debugPrint(Endpoints.registerNewPhoneNumber);
 
         debugPrint(toJson1(number).toString());
 
-        final requestOtpResponse = await _dioClient.post(Endpoints.registerNewPhoneNumber, data: toJson1(number));
+        final requestOtpResponse = await _dioClient
+            .post(Endpoints.registerNewPhoneNumber, data: toJson1(number));
 
         return RequestOtpResponse.fromJson(requestOtpResponse);
-      }
-      else {
-
+      } else {
         debugPrint(Endpoints.getForgotPasswordOtp);
 
         debugPrint(toJson1(number).toString());
 
-        final requestOtpResponse = await _dioClient.post(Endpoints.getForgotPasswordOtp, data: toJson1(number));
+        final requestOtpResponse = await _dioClient
+            .post(Endpoints.getForgotPasswordOtp, data: toJson1(number));
 
         return RequestOtpResponse.fromJson(requestOtpResponse);
       }
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
@@ -146,40 +133,107 @@ class HomeApi {
 
   Future<LoginResponse> verifyOtp(OtpVerifyRequest otpVerifyRequest) async {
     try {
-
       debugPrint(Endpoints.verifyLoginWithPhoneNumberOtp);
 
       debugPrint(otpVerifyRequest.toJson().toString());
 
-      final loginResponse = await _dioClient.post(Endpoints.verifyLoginWithPhoneNumberOtp, data: otpVerifyRequest.toJson());
+      final loginResponse = await _dioClient.post(
+          Endpoints.verifyLoginWithPhoneNumberOtp,
+          data: otpVerifyRequest.toJson());
 
       return LoginResponse.fromJson(loginResponse);
-
     } catch (e) {
       debugPrint(e.toString());
       throw e;
     }
   }
 
-  Future<LoginResponse> verifyRegisterOtp(RegistrationRequest registrationRequest) async {
+  Future<LoginResponse> verifyRegisterOtp(
+      RegistrationRequest registrationRequest) async {
     try {
-
       debugPrint(Endpoints.verifyNewRegisterWithOtp);
 
       debugPrint(registrationRequest.toJson().toString());
 
-      final loginResponse = await _dioClient.post(Endpoints.verifyNewRegisterWithOtp, data: registrationRequest.toJson());
+      final loginResponse = await _dioClient.post(
+          Endpoints.verifyNewRegisterWithOtp,
+          data: registrationRequest.toJson());
 
       return LoginResponse.fromJson(loginResponse);
-
     } catch (e) {
-
       debugPrint(e.toString());
 
       throw e;
     }
   }
 
+  Future<void> toggleWishList(
+      ToggleWishListRequest toggleWishListRequest) async {
+    try {
+      debugPrint(Endpoints.toggleWishList);
+
+      debugPrint(toggleWishListRequest.toJson().toString());
+
+      //  final loginResponse = await _dioClient.post(Endpoints.toggleWishList, data: toggleWishListRequest.toJson());
+      SharedPreferenceHelper sharedPreferenceHelper =
+          getIt<SharedPreferenceHelper>();
+      // getting token
+      var token = await sharedPreferenceHelper.authToken;
+
+      final response = await _dioClient.post(Endpoints.toggleWishList,
+          data: toggleWishListRequest.toJson(),
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      Map<String, dynamic> json = response;
+      debugPrint(json.toString());
+
+      /* if(response.statusCode == 401){
+
+      }*/
+
+    } catch (e) {
+      debugPrint(e.toString());
+
+      // throw e;
+    }
+  }
+
+  Future<WishListResponse> getWishList(String token) async {
+    try {
+      debugPrint(Endpoints.toggleWishList);
+      final response = await _dioClient.get(Endpoints.toggleWishList,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      return WishListResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<VerifyWishlist> verifyWishList(String token) async {
+    try {
+      debugPrint(Endpoints.verifyWishList);
+
+      final response = await _dioClient.get(Endpoints.verifyWishList,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+      debugPrint(response.toString());
+      return VerifyWishlist.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
 
   Map<String, String> toJson1(String loginid) {
     final data = <String, String>{};

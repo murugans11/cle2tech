@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shopeein/models/banner/banner.dart';
+import 'package:shopeein/models/wishlist/toggle_wishList_request.dart';
+import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../../models/categories/category.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
+import '../../models/wishlist/wish_list_response.dart';
 import '../../utils/device/custom_error.dart';
 import '../../utils/dio/dio_error_util.dart';
 import '../network/apis/home/home_api.dart';
@@ -14,17 +17,18 @@ class HomeRepository {
   // api objects
   final HomeApi _homeApi;
 
-  HomeRepository(
-    this._homeApi,
-  );
+  HomeRepository(this._homeApi,);
 
   Future<CategoryList> getCategoryGroup() async {
     try {
       final CategoryList categoryList = await _homeApi.getCategoryGroup();
-      print('categoryList: $categoryList');
+
+      debugPrint('categoryList: $categoryList');
+
       return categoryList;
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
+
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
@@ -32,35 +36,85 @@ class HomeRepository {
   Future<BannerList> getBannerList() async {
     try {
       final BannerList bannerList = await _homeApi.getBannerList();
-      print('bannerList: $bannerList');
+
+      debugPrint('bannerList: $bannerList');
+
       return bannerList;
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
+
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
 
   Future<FeatureProductList> getFeatureProtectList() async {
     try {
-      final FeatureProductList featureProductList = await _homeApi.getFeatureProductList();
-      print('featureProductList: $featureProductList');
+      final FeatureProductList featureProductList = await _homeApi
+          .getFeatureProductList();
+
+      debugPrint('featureProductList: $featureProductList');
+
       return featureProductList;
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
+
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
 
-  Future<CategorieItems> getCategoryProductListByName(String url ) async {
+  Future<CategorieItems> getCategoryProductListByName(String url) async {
     try {
-      debugPrint(url);
-      final CategorieItems featureProductList = await _homeApi.getCategoryProductListByName(url);
-      print('featureProductList: $featureProductList');
+      final CategorieItems featureProductList = await _homeApi
+          .getCategoryProductListByName(url);
+
+      debugPrint('featureProductList: $featureProductList');
+
       return featureProductList;
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
+
       return CategorieItems(listingProduct: []);
       //throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+    }
+  }
+
+  Future<void> toggleWishList(
+      ToggleWishListRequest toggleWishListRequest) async {
+    try {
+      await _homeApi.toggleWishList(toggleWishListRequest);
+    } catch (e) {
+      debugPrint(e.toString());
+
+      //throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+    }
+  }
+
+  Future<VerifyWishlist> verifyWishList(String token) async {
+    try {
+      final VerifyWishlist verifyWishlist = await _homeApi.verifyWishList(
+          token);
+
+      debugPrint('verifyWishlist: $verifyWishlist');
+
+      return verifyWishlist;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+
+  Future<WishListResponse> getWishList(String token) async {
+    try {
+      final WishListResponse wishListResponse = await _homeApi.getWishList(token);
+
+      debugPrint('wishListResponse: $wishListResponse');
+
+      return wishListResponse;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
     }
   }
 }
