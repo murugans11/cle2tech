@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconly/iconly.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
 
 import '../constants/constants.dart';
@@ -11,10 +9,13 @@ import '../data/repository/home_repository.dart';
 import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/wishlist/toggle_wishList_request.dart';
 import '../models/wishlist/wish_list_response.dart';
-import '../widgets/product_greed_view_widget.dart';
+
+import '../widgets/wishlist_greed_view_widget.dart';
 
 class WishlistScreen extends StatefulWidget {
+
   static const String routeName = "/WishListPage";
 
   const WishlistScreen({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class WishlistScreen extends StatefulWidget {
 
 class _WishlistScreenState extends State<WishlistScreen> /*with WidgetsBindingObserver */ {
 
-  var token = null;
+  var token;
   SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
 
@@ -147,7 +148,7 @@ class _WishlistScreenState extends State<WishlistScreen> /*with WidgetsBindingOb
     });
   }
 
-  ProductGreedShow1 getItem(List<ListingProduct>? listingProductList, int index,
+  WishListGreedShow getItem(List<ListingProduct>? listingProductList, int index,
       BuildContext context) {
     String imageURL = '';
 
@@ -179,7 +180,7 @@ class _WishlistScreenState extends State<WishlistScreen> /*with WidgetsBindingOb
 
     final sku = listingProductList?[index].keyDetails?.variant?[0].sku;
 
-    return ProductGreedShow1(
+    return WishListGreedShow(
       image: imageURL,
       productTitle: listingProductList?[index].keyDetails?.productTitle,
       productPrice: sellingPrice,
@@ -189,6 +190,16 @@ class _WishlistScreenState extends State<WishlistScreen> /*with WidgetsBindingOb
       callCat: () {
         Navigator.pushNamed(context, ProductDetailScreen.routeName,
             arguments: listingProductList?[index]);
+      },
+      deleteCat: () async {
+        HomeRepository homeRepository = getIt<HomeRepository>();
+        var toggleWishListRequest = ToggleWishListRequest(
+            productId: productId,
+            sku: sku,
+            action: "remove");
+        await homeRepository.toggleWishList(toggleWishListRequest);
+        setState(() {
+        });
       },
       productId: productId,
       sku: sku,

@@ -8,9 +8,11 @@ import 'package:shopeein/blocs/banner/bannerList_event.dart';
 import 'package:shopeein/blocs/banner/bannerList_state.dart';
 import 'package:shopeein/constants/app_theme.dart';
 import 'package:shopeein/models/feature/feature_productes.dart';
+import 'package:shopeein/pages/initial_page.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
 import 'package:shopeein/pages/single_category_by_Item_screen.dart';
 import 'package:shopeein/pages/single_category_group_screen.dart';
+import 'package:shopeein/pages/splash_screen_one.dart';
 
 import '../blocs/banner/bannarList_bloc.dart';
 import '../blocs/category_groupe/categoryList_bloc.dart';
@@ -28,6 +30,7 @@ import '../widgets/error_dialog.dart';
 
 import '../widgets/notificition_screen.dart';
 import '../widgets/product_greed_view_widget.dart';
+import 'auth_screen/log_in_screen.dart';
 import 'best_seller_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -40,10 +43,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   List<BannerGroup>? categoryGroup = [];
 
-  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  SharedPreferenceHelper sharedPreferenceHelper =
+      getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
   VerifyWishlist response = VerifyWishlist();
 
@@ -53,7 +56,9 @@ class _HomePageState extends State<HomePage> {
     _asyncMethod();
     context.read<CategoriesBloc>().add(const FetchCategoriesItemsEvent());
     context.read<BannerBloc>().add(const FetchBannerItemsEvent());
-    context.read<FeatureProductListBloc>().add(const FetchFeatureProductItemsEvent());
+    context
+        .read<FeatureProductListBloc>()
+        .add(const FetchFeatureProductItemsEvent());
   }
 
   _asyncMethod() async {
@@ -157,6 +162,7 @@ class _HomePageState extends State<HomePage> {
       body: ListView(
         children: [
           const SizedBox(height: 10),
+
           BlocConsumer<CategoriesBloc, CategoryState>(
             listener: (context, state) {
               if (state.status == NetworkCallStatusEnum.error) {
@@ -208,9 +214,13 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
+
           const SizedBox(height: 10),
+
           _createBannerItems(),
+
           const SizedBox(height: 5),
+
           Container(
               padding: const EdgeInsets.only(left: 15, top: 15),
               width: double.infinity,
@@ -415,20 +425,24 @@ class _HomePageState extends State<HomePage> {
                 spacing: 20,
                 itemCount: listingProduct.length,
                 itemBuilder: (BuildContext context, int index) {
-
                   ListingProduct? listingProductItems = listingProduct[index];
 
                   String imageURL = '';
-                  var parts = listingProductItems.keyDetails?.variant?[0].media?[0].resourcePath.split('.com');
+                  var parts = listingProductItems
+                      .keyDetails?.variant?[0].media?[0].resourcePath
+                      .split('.com');
 
                   if (parts != null) {
                     var image = parts.sublist(1).join('.com').trim();
-                    imageURL = 'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+                    imageURL =
+                        'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
                   }
 
-                  final sellingPrice = listingProductItems.keyDetails?.variant?[0].sellingPrice;
+                  final sellingPrice =
+                      listingProductItems.keyDetails?.variant?[0].sellingPrice;
 
-                  final retailPrice = listingProductItems.keyDetails?.variant?[0].retailPrice;
+                  final retailPrice =
+                      listingProductItems.keyDetails?.variant?[0].retailPrice;
 
                   int percent =
                       ((int.parse(retailPrice) - int.parse(sellingPrice)) /
@@ -450,6 +464,9 @@ class _HomePageState extends State<HomePage> {
                       Navigator.pushNamed(
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
+                    },
+                    navToLogin: () {
+                      _navigateAndDisplaySelection(context);
                     },
                     productId: productId,
                     sku: sku,
@@ -514,6 +531,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    navToLogin: () {
+                      _navigateAndDisplaySelection(context);
+                    },
                     productId: productId,
                     sku: sku,
                     response: response,
@@ -574,6 +594,9 @@ class _HomePageState extends State<HomePage> {
                       Navigator.pushNamed(
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
+                    },
+                    navToLogin: () {
+                      _navigateAndDisplaySelection(context);
                     },
                     productId: productId,
                     sku: sku,
@@ -636,6 +659,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    navToLogin: () {
+                      _navigateAndDisplaySelection(context);
+                    },
                     productId: productId,
                     sku: sku,
                     response: response,
@@ -697,6 +723,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    navToLogin: () {
+                      _navigateAndDisplaySelection(context);
+                    },
                     productId: productId,
                     sku: sku,
                     response: response,
@@ -747,6 +776,9 @@ class _HomePageState extends State<HomePage> {
                           context, ProductDetailScreen.routeName,
                           arguments: listingProductItems);
                     },
+                    navToLogin: () {
+                      _navigateAndDisplaySelection(context);
+                    },
                     productId: productId,
                     sku: sku,
                     response: response,
@@ -758,6 +790,30 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
+  }
+
+  // Navigator.pop.
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LogInScreen()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    if (result != null) {
+      setState(() {
+      // Navigator.popAndPushNamed(context, HomePage.routeName);
+       Navigator.of(context)
+           .pushNamedAndRemoveUntil(InitialPage.routeName, (Route<dynamic> route) => false);
+      });
+    }
   }
 
   Card subBanner(List<BannerGroup> bannerFeature1) {

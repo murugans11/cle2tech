@@ -19,8 +19,11 @@ import '../widgets/castomar_review_commends.dart';
 import '../widgets/product_greed_view_widget.dart';
 import '../widgets/review_bottom_sheet_1.dart';
 import '../widgets/single_product_total_review.dart';
+import 'auth_screen/log_in_screen.dart';
 import 'cart_screen.dart';
 import 'package:string_validator/string_validator.dart';
+
+final counter = ValueNotifier<bool>(false);
 
 class ProductDetailScreen extends StatefulWidget {
   static const String routeName = "/ProductDetailScreen";
@@ -32,8 +35,8 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-
-  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  SharedPreferenceHelper sharedPreferenceHelper =
+      getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
   VerifyWishlist response = VerifyWishlist();
 
@@ -56,6 +59,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late double rating;
 
   String selectedSize = '';
+
   final sizeList = [
     'S',
     'M',
@@ -84,6 +88,54 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     'images/profilePic.jpg',
     'images/profilePic.jpg',
   ];
+
+  Container chooseColorWidget(List<dynamic> images, int index, Color color) {
+    return Container(
+      height: 120,
+      width: 120,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(images[index]),
+          fit: BoxFit.cover,
+        ),
+        borderRadius: const BorderRadius.all(Radius.zero),
+        border: Border.all(
+          width: 2,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  String getValues(value) {
+    debugPrint('value${value.toString()}');
+    if (contains(value.toString(), '[')) {
+      List list = value as List;
+      return list[0]['displayName'].toString() ?? " ";
+    } else {
+      return value.toString();
+    }
+  }
+
+  // Navigator.pop.
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LogInScreen()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$result')));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +184,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final productId = listingProduct.id;
     final sku = listingProduct.keyDetails?.variant?[selectedColorValue].sku;
 
-    if(response.user != null) {
+    counter.value = false;
+    if (response.user != null) {
       response.user?.wishlist?.forEach((element) {
-        if(sku ==  element.sku || productId == element.listingId ){
+        if (sku == element.sku || productId == element.listingId) {
           isFavorite = true;
+          counter.value = true;
         }
       });
     }
@@ -188,48 +242,66 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            isFavorite = !isFavorite;
-                          });
                           // getting token
                           var token = await sharedPreferenceHelper.authToken;
                           if (token != null) {
-                            HomeRepository homeRepository = getIt<HomeRepository>();
-                            if (isFavorite) {
-                              var toggleWishListRequest = ToggleWishListRequest(productId: productId, sku: sku, action: "add");
-                              homeRepository.toggleWishList(toggleWishListRequest);
+                            HomeRepository homeRepository =
+                                getIt<HomeRepository>();
+
+                            if (!isFavorite) {
+                              var toggleWishListRequest = ToggleWishListRequest(
+                                  productId: productId,
+                                  sku: sku,
+                                  action: "add");
+                              await homeRepository
+                                  .toggleWishList(toggleWishListRequest);
+
+                              isFavorite = !isFavorite;
+                              counter.value = true;
                             } else {
-                              var toggleWishListRequest = ToggleWishListRequest(productId: productId, sku: sku, action: "remove");
-                              homeRepository.toggleWishList(toggleWishListRequest);
+                              var toggleWishListRequest = ToggleWishListRequest(
+                                  productId: productId,
+                                  sku: sku,
+                                  action: "remove");
+                              await homeRepository
+                                  .toggleWishList(toggleWishListRequest);
+
+                              isFavorite = !isFavorite;
+                              counter.value = false;
                             }
                           }
                         },
-                        child: Container(
-                          height: 35,
-                          width: 35,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              width: 1,
-                              color: primaryColor.withOpacity(0.05),
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(30),
-                            ),
-                          ),
-                          child: isFavorite
-                              ? const Center(
-                                  child: Icon(
-                                    Icons.favorite,
-                                    color: secondaryColor1,
+                        child: ValueListenableBuilder<bool>(
+                            valueListenable: counter,
+                            builder: (context, value, _) {
+                              return Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    width: 1,
+                                    color: primaryColor.withOpacity(0.05),
                                   ),
-                                )
-                              : const Center(
-                                  child: Icon(
-                                  Icons.favorite_border,
-                                  color: secondaryColor1,
-                                )),
-                        ),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(30),
+                                  ),
+                                ),
+                                child: value
+                                    ? const Center(
+                                        child: Icon(
+                                          Icons.favorite,
+                                          color: secondaryColor1,
+                                        ),
+                                      )
+                                    : const Center(
+                                        child: Icon(
+                                          Icons.favorite_border,
+                                          color: secondaryColor1,
+                                        ),
+                                      ),
+                              );
+                            }),
                       ),
                       const SizedBox(height: 15),
                       GestureDetector(
@@ -721,10 +793,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           },
                         ),
                         CastomarReviewCommends(
-                            peopleReviewName: peopleReviewName,
-                            peopleReviewPhoto: peopleReviewPhoto,
-                            peopleReviewRatings: peopleReviewRatings,
-                            peopleReviewCommends: peopleReviewCommends),
+                          peopleReviewName: peopleReviewName,
+                          peopleReviewPhoto: peopleReviewPhoto,
+                          peopleReviewRatings: peopleReviewRatings,
+                          peopleReviewCommends: peopleReviewCommends,
+                        ),
                       ],
                     ),
                   ),
@@ -951,6 +1024,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         discountPercentage: ("-$percent%"),
                         isSingleView: false,
                         callCat: () {},
+                        navToLogin: () {
+                          _navigateAndDisplaySelection(context);
+                        },
                         productId: productId,
                         sku: sku,
                       );
@@ -991,10 +1067,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ButtonType2(
-                      buttonText: 'Add to Cart',
-                      buttonColor: primaryColor,
-                      onPressFunction: () =>
-                          const CartScreen().launch(context)),
+                    buttonText: 'Add to Cart',
+                    buttonColor: primaryColor,
+                    onPressFunction: () => Navigator.pushNamed(
+                      context,
+                      CartScreen.routeName,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1004,31 +1083,5 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Container chooseColorWidget(List<dynamic> images, int index, Color color) {
-    return Container(
-      height: 120,
-      width: 120,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: NetworkImage(images[index]),
-          fit: BoxFit.cover,
-        ),
-        borderRadius: const BorderRadius.all(Radius.zero),
-        border: Border.all(
-          width: 2,
-          color: color,
-        ),
-      ),
-    );
-  }
 
-  String getValues(value) {
-    debugPrint('value${value.toString()}');
-    if (contains(value.toString(), '[')) {
-      List list = value as List;
-      return list[0]['displayName'].toString() ?? " ";
-    } else {
-      return value.toString();
-    }
-  }
 }

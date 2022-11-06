@@ -16,19 +16,20 @@ import '../models/wishlist/verifywishlist.dart';
 import '../pages/product_detail_screen.dart';
 
 class ProductGreedShow1 extends StatefulWidget {
-  const ProductGreedShow1({
-    Key? key,
-    required this.image,
-    required this.productTitle,
-    required this.productPrice,
-    required this.actualPrice,
-    required this.discountPercentage,
-    required this.isSingleView,
-    required this.callCat,
-    required this.productId,
-    required this.sku,
-    this.response
-  }) : super(key: key);
+  const ProductGreedShow1(
+      {Key? key,
+      required this.image,
+      required this.productTitle,
+      required this.productPrice,
+      required this.actualPrice,
+      required this.discountPercentage,
+      required this.isSingleView,
+      required this.callCat,
+      required this.navToLogin,
+      required this.productId,
+      required this.sku,
+      this.response})
+      : super(key: key);
   final String image;
   final String productTitle;
   final String productPrice;
@@ -36,9 +37,10 @@ class ProductGreedShow1 extends StatefulWidget {
   final String discountPercentage;
   final bool isSingleView;
   final Function callCat;
+  final Function navToLogin;
   final String productId;
   final String sku;
-  final VerifyWishlist? response ;
+  final VerifyWishlist? response;
 
   @override
   State<ProductGreedShow1> createState() => _ProductGreedShow1State();
@@ -56,11 +58,11 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
 
   @override
   Widget build(BuildContext context) {
-
-    if(widget.response != null){
-      if(widget.response?.user != null) {
+    if (widget.response != null) {
+      if (widget.response?.user != null) {
         widget.response?.user?.wishlist?.forEach((element) {
-          if(widget.sku ==  element.sku || widget.productId == element.listingId ){
+          if (widget.sku == element.sku ||
+              widget.productId == element.listingId) {
             isFavorite = true;
           }
         });
@@ -133,29 +135,38 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                 top: 8,
                 child: GestureDetector(
                   onTap: () async {
-                    setState(() {
-                      isFavorite = !isFavorite;
-                    });
+
                     SharedPreferenceHelper sharedPreferenceHelper =
                         getIt<SharedPreferenceHelper>();
                     var token = await sharedPreferenceHelper.authToken;
                     if (token != null) {
                       HomeRepository homeRepository = getIt<HomeRepository>();
-                      if (isFavorite) {
+                      if (!isFavorite) {
                         var toggleWishListRequest = ToggleWishListRequest(
                             productId: widget.productId,
                             sku: widget.sku,
                             action: "add");
-                        homeRepository.toggleWishList(toggleWishListRequest);
+                        await homeRepository.toggleWishList(toggleWishListRequest);
+
+                        setState(() {
+                          isFavorite = !isFavorite;
+                        });
+
                       } else {
                         var toggleWishListRequest = ToggleWishListRequest(
                             productId: widget.productId,
                             sku: widget.sku,
                             action: "remove");
-                        homeRepository.toggleWishList(toggleWishListRequest);
+                        await homeRepository.toggleWishList(toggleWishListRequest);
+
+                        setState(() {
+                          isFavorite = !isFavorite;
+                        });
+
                       }
                     } else {
-                      Navigator.pushNamed(context, LogInScreen.routeName);
+                      widget.navToLogin();
+                     // Navigator.pushNamed(context, LogInScreen.routeName);
                     }
                   },
                   child: Container(
@@ -251,14 +262,14 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                         rating: initialRating,
                         activeColor: ratingColor,
                         inActiveColor: ratingColor,
-                        size: 18,
-                        onRatingChanged: (aRating) {
-                          setState(() {
+                        size: 18, onRatingChanged: (double rating) {},
+                        /*onRatingChanged: (aRating) {
+                         setState(() {
                             initialRating = aRating;
                           });
-                        },
+                        },*/
                       ),
-                      const SizedBox(
+                      /*const SizedBox(
                         width: 7,
                       ),
                       Container(
@@ -274,7 +285,7 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                           IconlyLight.bag,
                           color: primaryColor,
                         )),
-                      ),
+                      ),*/
                     ],
                   ),
                 )

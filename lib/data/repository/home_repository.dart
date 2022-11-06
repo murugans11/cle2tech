@@ -4,6 +4,7 @@ import 'package:shopeein/models/banner/banner.dart';
 import 'package:shopeein/models/wishlist/toggle_wishList_request.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
+import '../../models/cart/CartResponse.dart';
 import '../../models/categories/category.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
@@ -84,7 +85,6 @@ class HomeRepository {
       await _homeApi.toggleWishList(toggleWishListRequest);
     } catch (e) {
       debugPrint(e.toString());
-
       //throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
@@ -117,4 +117,20 @@ class HomeRepository {
       throw e;
     }
   }
+
+
+  Future<CartResponse> getCartList(String token) async {
+    try {
+      final CartResponse cartResponse = await _homeApi.getCartList(token);
+
+      debugPrint('cartResponse: $cartResponse');
+
+      return cartResponse;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+
 }

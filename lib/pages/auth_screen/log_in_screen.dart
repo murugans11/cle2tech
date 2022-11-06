@@ -54,7 +54,8 @@ class _LogInScreenState extends State<LogInScreen> {
           elevation: 0.0,
           leading: GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              //Navigator.pop(context);
+              Navigator.pop(context, null);
             },
             child: const Icon(
               Icons.arrow_back,
@@ -359,7 +360,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
   void navigateLogin() {
 
-    Navigator.pop(context);
+    Navigator.pop(context, 'Login.');
 
   }
 

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
-import 'package:shopeein/pages/profile_screen.dart';
-import 'package:shopeein/pages/wishlist_screen.dart';
+
 
 import '../constants/app_theme.dart';
 import '../constants/constants.dart';
-import 'cart_screen.dart';
-import 'category_screen.dart';
-import 'home_page.dart';
+
 
 class InitialPage extends StatefulWidget {
   static const String routeName = "/InitialPage";

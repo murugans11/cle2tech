@@ -14,6 +14,7 @@ import '../di/components/service_locator.dart';
 import '../models/wishlist/toggle_wishList_request.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../pages/product_detail_screen.dart';
+import '../pages/wishlist_screen.dart';
 
 class WishListGreedShow extends StatefulWidget {
   const WishListGreedShow({
@@ -25,6 +26,9 @@ class WishListGreedShow extends StatefulWidget {
     required this.discountPercentage,
     required this.isSingleView,
     required this.callCat,
+    required this.deleteCat,
+    required this.productId,
+    required this.sku,
 
   }) : super(key: key);
   final String image;
@@ -34,6 +38,9 @@ class WishListGreedShow extends StatefulWidget {
   final String discountPercentage;
   final bool isSingleView;
   final Function callCat;
+  final Function deleteCat;
+  final String productId;
+  final String sku;
 
 
   @override
@@ -67,27 +74,7 @@ class _WishListGreedShowState extends State<WishListGreedShow> {
           Stack(
             alignment: Alignment.topRight,
             children: [
-              widget.isSingleView
-                  ? GestureDetector(
-                      onTap: () {
-                        //const ProductDetailScreen().launch(context);
-                        widget.callCat();
-                      },
-                      child: Container(
-                        height: 250,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(8),
-                            topLeft: Radius.circular(8),
-                          ),
-                          color: secondaryColor3,
-                          image: DecorationImage(
-                            image: NetworkImage(widget.image),
-                          ),
-                        ),
-                      ),
-                    )
-                  : GestureDetector(
+              GestureDetector(
                       onTap: () {
                         widget.callCat();
                       },
@@ -118,15 +105,9 @@ class _WishListGreedShowState extends State<WishListGreedShow> {
                 right: 8,
                 top: 8,
                 child: GestureDetector(
-                  onTap: () async {
-                    setState(() {
-                      isFavorite = !isFavorite;
-                    });
-                    /*var toggleWishListRequest = ToggleWishListRequest(
-                        productId: widget.productId,
-                        sku: widget.sku,
-                        action: "remove");
-                    homeRepository.toggleWishList(toggleWishListRequest);*/
+                  onTap: ()  {
+                    _loadingIndicator();
+                    widget.deleteCat();
                   },
                   child: Container(
                     height: 35,
@@ -141,14 +122,13 @@ class _WishListGreedShowState extends State<WishListGreedShow> {
                         Radius.circular(30),
                       ),
                     ),
-                    child: isFavorite
-                        ? const Center(
+                    child:  const Center(
                             child: Icon(
-                              Icons.favorite,
+                              Icons.delete,
                               color: secondaryColor1,
                             ),
-                          )
-                        : const Center(child: Icon(Icons.favorite_border)),
+                          ),
+
                   ),
                 ),
               ),
@@ -223,12 +203,12 @@ class _WishListGreedShowState extends State<WishListGreedShow> {
                         inActiveColor: ratingColor,
                         size: 18,
                         onRatingChanged: (aRating) {
-                          setState(() {
+                         /* setState(() {
                             initialRating = aRating;
-                          });
+                          });*/
                         },
                       ),
-                      const SizedBox(
+                   /*   const SizedBox(
                         width: 7,
                       ),
                       Container(
@@ -244,7 +224,7 @@ class _WishListGreedShowState extends State<WishListGreedShow> {
                           IconlyLight.bag,
                           color: primaryColor,
                         )),
-                      ),
+                      ),*/
                     ],
                   ),
                 )
@@ -253,6 +233,13 @@ class _WishListGreedShowState extends State<WishListGreedShow> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _loadingIndicator() {
+    return const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 }

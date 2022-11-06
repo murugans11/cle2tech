@@ -72,7 +72,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                       scrollDirection: Axis.horizontal,
                       itemCount: 2,
                       itemBuilder: (BuildContext ctx, index) {
-                        return const CartItemsSingleView();
+                        return  CartItemsSingleView(index: index);
                       },
                     ),
                   ),

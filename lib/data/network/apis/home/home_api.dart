@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../../../../di/components/service_locator.dart';
+import '../../../../models/cart/CartResponse.dart';
 import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
 import '../../../../models/feature/feature_productes.dart';
@@ -196,7 +197,6 @@ class HomeApi {
 
     } catch (e) {
       debugPrint(e.toString());
-
       // throw e;
     }
   }
@@ -216,6 +216,23 @@ class HomeApi {
       throw e;
     }
   }
+
+  Future<CartResponse> getCartList(String token) async {
+    try {
+      debugPrint(Endpoints.toggleWishList);
+      final response = await _dioClient.get(Endpoints.getCartList,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      return CartResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
 
   Future<VerifyWishlist> verifyWishList(String token) async {
     try {

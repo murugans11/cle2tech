@@ -17,6 +17,7 @@ import '../widgets/filter_widget.dart';
 import '../widgets/product_greed_view_widget.dart';
 
 import '../widgets/sort_widget.dart';
+import 'auth_screen/log_in_screen.dart';
 
 class BestSellerScreen extends StatefulWidget {
 
@@ -284,9 +285,29 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
         Navigator.pushNamed(context, ProductDetailScreen.routeName,
             arguments: listingProductList.listingProduct[index]);
       },
+      navToLogin: () {
+        _navigateAndDisplaySelection(context);
+      },
       productId: productId,
       sku: sku,
       response: response,
     );
+  }
+
+  // Navigator.pop.
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(context,
+      MaterialPageRoute(builder: (context) => const LogInScreen()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+
   }
 }

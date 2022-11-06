@@ -19,6 +19,7 @@ import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../widgets/product_greed_view_widget.dart';
+import 'auth_screen/log_in_screen.dart';
 
 class SingleCategoryByItemScreen extends StatefulWidget {
 
@@ -244,6 +245,9 @@ class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen>
         Navigator.pushNamed(context, ProductDetailScreen.routeName,
             arguments: listingProductList?[index]);
       },
+      navToLogin: () {
+        _navigateAndDisplaySelection(context);
+      },
       productId: productId,
       sku: sku,
       response: response,
@@ -255,5 +259,24 @@ class _SingleCategoryByItemScreenState extends State<SingleCategoryByItemScreen>
       padding: EdgeInsets.all(8.0),
       child: Center(child: CircularProgressIndicator()),
     );
+  }
+
+  // Navigator.pop.
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(context,
+      MaterialPageRoute(builder: (context) => const LogInScreen()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$result')));
   }
 }
