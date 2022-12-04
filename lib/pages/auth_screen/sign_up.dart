@@ -33,10 +33,12 @@ class _SignUpState extends State<SignUp> {
   //bool variable created
   bool isChecked = false;
 
-  String _verticalGroupValue = "Male";
+
   final userFirstNameController = TextEditingController();
   final userLastNameController = TextEditingController();
   final passwordController = TextEditingController();
+
+  String _verticalGroupValue = "Male";
   final List<String> _status = ["Male", "Female", "Other"];
 
   @override
@@ -149,6 +151,7 @@ class _SignUpState extends State<SignUp> {
                             controller: passwordController,
                           ),
                           const SizedBox(height: 20),
+
                           RadioGroup<String>.builder(
                             direction: Axis.horizontal,
                             groupValue: _verticalGroupValue,
@@ -164,6 +167,7 @@ class _SignUpState extends State<SignUp> {
                               item,
                             ),
                           ),
+
                           const SizedBox(height: 20),
                           Button1(
                             buttonText: 'Sign Up',

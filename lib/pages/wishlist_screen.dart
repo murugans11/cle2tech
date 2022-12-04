@@ -148,8 +148,8 @@ class _WishlistScreenState extends State<WishlistScreen> /*with WidgetsBindingOb
     });
   }
 
-  WishListGreedShow getItem(List<ListingProduct>? listingProductList, int index,
-      BuildContext context) {
+  WishListGreedShow getItem(List<ListingProduct>? listingProductList, int index, BuildContext context) {
+
     String imageURL = '';
 
     var parts = listingProductList?[index]

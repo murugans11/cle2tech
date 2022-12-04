@@ -34,11 +34,12 @@ class Endpoints {
 
   //WishList
   static const String toggleWishList = "${baseUrl}wishlist";
+  static const String verifyWishList = "${baseUrl}auth/login/success";
 
   //CartList
   static const String getCartList = "${baseUrl}cart";
 
-  static const String verifyWishList = "${baseUrl}auth/login/success";
+
 
 
 

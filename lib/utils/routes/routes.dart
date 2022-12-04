@@ -8,7 +8,6 @@ import '../../data/repository/home_repository.dart';
 import '../../di/components/service_locator.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
-import '../../models/login/RequestOtpResponse.dart';
 import '../../models/register/request_otp.dart';
 import '../../pages/auth_screen/log_in_screen.dart';
 import '../../pages/auth_screen/otp_auth_screen.dart';

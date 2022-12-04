@@ -1,22 +1,44 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/widgets/quantity_counter.dart';
 
 import '../constants/constants.dart';
+import '../pages/check_out_screen.dart';
+import 'buttons.dart';
 
 class CartItemsSingleView extends StatefulWidget {
+  const CartItemsSingleView({
+    Key? key,
+    required this.productTitle,
+    required this.resourcePath,
+    required this.displayColourName,
+    required this.displaySizeName,
+    required this.sellingPrice,
+    required this.mrp,
+    required this.percentage,
+    required this.callCat,
+    required this.callupdate,
+    required this.qty,
+  }) : super(key: key);
 
-  const CartItemsSingleView({Key? key, required this.index}) : super(key: key);
-
-  final int index;
+  final String resourcePath;
+  final String productTitle;
+  final String displayColourName;
+  final String displaySizeName;
+  final String sellingPrice;
+  final String mrp;
+  final int percentage;
+  final String qty;
+  final Function callCat;
+  final Function callupdate;
 
   @override
   State<CartItemsSingleView> createState() => _CartItemsSingleViewState();
 }
 
 class _CartItemsSingleViewState extends State<CartItemsSingleView> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -27,101 +49,103 @@ class _CartItemsSingleViewState extends State<CartItemsSingleView> {
       ),
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(15)),
-            border: Border.all(
-              width: 1,
-              color: secondaryColor3,
-            )),
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          border: Border.all(
+            width: 1,
+            color: secondaryColor3,
+          ),
+        ),
         child: Row(
           children: [
-
             Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Container(
-                height: 140,
-                width: 140,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
+              child: CachedNetworkImage(
+                imageUrl:
+                    widget.resourcePath.isEmpty ? '' : widget.resourcePath,
+                imageBuilder: (context, imageProvider) => Container(
+                  height: 140,
+                  width: 140,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: secondaryColor3,
+                    ),
                     color: secondaryColor3,
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.fitHeight,
+                    ),
                   ),
-                  borderRadius: const BorderRadius.all(Radius.circular(15)),
-                  color: secondaryColor3,
-                  image: const DecorationImage(
-                      image: AssetImage('images/woman.png')),
                 ),
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Padding(
                   padding: const EdgeInsets.all(5.0),
-                  child: MyGoogleText(
-                    text: 'Para Homens ${widget.index}',
-                    fontSize: 16,
-                    fontColor: Colors.black,
-                    fontWeight: FontWeight.normal,
+                  child: SizedBox(
+                    width: context.width() / 2,
+                    child: MyGoogleText(
+                      text: widget.productTitle,
+                      fontSize: 13,
+                      fontColor: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-
-                const SizedBox(
+                SizedBox(
                   child: Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child:  MyGoogleText(
-                      text: 'Color:',
+                    padding: const EdgeInsets.all(5.0),
+                    child: MyGoogleText(
+                      text: 'Color: ${widget.displayColourName}',
                       fontSize: 12,
                       fontColor: Colors.black,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
                 ),
-
                 SizedBox(
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: const [
-
-                            MyGoogleText(
-                              text: 'Size:',
-                              fontSize: 12,
-                              fontColor: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                            SizedBox(width: 5),
-                            MyGoogleText(
-                              text: 'L',
-                              fontSize: 14,
-                              fontColor: Colors.red,
-                              fontWeight: FontWeight.normal,
-                            ),
-
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const MyGoogleText(
+                          text: 'Size:',
+                          fontSize: 12,
+                          fontColor: Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        const SizedBox(width: 5),
+                        MyGoogleText(
+                          text: widget.displaySizeName,
+                          fontSize: 14,
+                          fontColor: Colors.red,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ],
                     ),
                   ),
                 ),
-
-                 SizedBox(
+                SizedBox(
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Row(
                       children: [
-
-                        const MyGoogleText(
-                          text: '\u{20B9}500',
+                        MyGoogleText(
+                          text: '\u{20B9}${widget.sellingPrice}',
                           fontSize: 16,
                           fontColor: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
-
                         const SizedBox(width: 10),
-
                         Text(
-                          '\u{20B9}500',
+                          '\u{20B9}${widget.mrp}',
                           style: GoogleFonts.dmSans(
                             textStyle: const TextStyle(
                               fontSize: 16,
@@ -130,22 +154,21 @@ class _CartItemsSingleViewState extends State<CartItemsSingleView> {
                             ),
                           ),
                         ),
-
                         const SizedBox(width: 10),
-
                         Container(
                           height: 30,
-                          width: context.width()/5.0,
+                          width: context.width() / 5.0,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border: Border.all(width: 1, color: secondaryColor3),
+                            border:
+                                Border.all(width: 1, color: secondaryColor3),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(15),
                             ),
                           ),
                           child: Center(
                             child: MyGoogleText(
-                              text: '-${50.toString()}% off',
+                              text: '-${widget.percentage}% off',
                               fontSize: 14,
                               fontColor: Colors.green,
                               fontWeight: FontWeight.bold,
@@ -156,7 +179,6 @@ class _CartItemsSingleViewState extends State<CartItemsSingleView> {
                     ),
                   ),
                 ),
-
                 SizedBox(
                   width: context.width() / 2,
                   child: Padding(
@@ -170,12 +192,27 @@ class _CartItemsSingleViewState extends State<CartItemsSingleView> {
                           fontColor: Colors.green,
                           fontWeight: FontWeight.normal,
                         ),
-                        QuantityCounter(initialValue: 0, sizeOfButtons: 22),
+                        QuantityCounter(
+                          initialValue: int.parse(widget.qty),
+                          sizeOfButtons: 22,
+                          callupdate: (currentQty) {
+                            widget.callupdate(currentQty);
+                          },
+                        ),
                       ],
                     ),
                   ),
                 ),
-
+                TextButton(
+                  style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.red),
+                  ),
+                  onPressed: () {
+                    widget.callCat();
+                  },
+                  child: const Text('Remove'),
+                ),
                 const SizedBox(width: 10),
               ],
             )

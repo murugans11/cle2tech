@@ -4,6 +4,7 @@ import 'package:shopeein/models/banner/banner.dart';
 import 'package:shopeein/models/wishlist/toggle_wishList_request.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
+import '../../models/cart/CartRequest.dart';
 import '../../models/cart/CartResponse.dart';
 import '../../models/categories/category.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
@@ -65,8 +66,7 @@ class HomeRepository {
 
   Future<CategorieItems> getCategoryProductListByName(String url) async {
     try {
-      final CategorieItems featureProductList = await _homeApi
-          .getCategoryProductListByName(url);
+      final CategorieItems featureProductList = await _homeApi.getCategoryProductListByName(url);
 
       debugPrint('featureProductList: $featureProductList');
 
@@ -122,6 +122,20 @@ class HomeRepository {
   Future<CartResponse> getCartList(String token) async {
     try {
       final CartResponse cartResponse = await _homeApi.getCartList(token);
+
+      debugPrint('cartResponse: $cartResponse');
+
+      return cartResponse;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+
+  Future<CartResponse> addUpdateDeleteCart(String token,CartRequest cartRequest) async {
+    try {
+      final CartResponse cartResponse = await _homeApi.addUpdateDeleteCart(token,cartRequest);
 
       debugPrint('cartResponse: $cartResponse');
 

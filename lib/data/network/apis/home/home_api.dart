@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../../../../di/components/service_locator.dart';
+import '../../../../models/cart/CartRequest.dart';
 import '../../../../models/cart/CartResponse.dart';
 import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
@@ -217,23 +218,6 @@ class HomeApi {
     }
   }
 
-  Future<CartResponse> getCartList(String token) async {
-    try {
-      debugPrint(Endpoints.toggleWishList);
-      final response = await _dioClient.get(Endpoints.getCartList,
-          options: Options(headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          }));
-
-      return CartResponse.fromJson(response);
-    } catch (e) {
-      debugPrint(e.toString());
-      throw e;
-    }
-  }
-
-
   Future<VerifyWishlist> verifyWishList(String token) async {
     try {
       debugPrint(Endpoints.verifyWishList);
@@ -248,6 +232,47 @@ class HomeApi {
     } catch (e) {
       debugPrint(e.toString());
 
+      throw e;
+    }
+  }
+
+  Future<CartResponse> getCartList(String token) async {
+    try {
+      debugPrint(Endpoints.getCartList);
+      final response = await _dioClient.get(Endpoints.getCartList,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      return CartResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<CartResponse> addUpdateDeleteCart(String token,CartRequest cartRequest) async {
+    try {
+
+      debugPrint(Endpoints.getCartList);
+
+      var request = CartRequest(action: cartRequest.action,items: cartRequest.items);
+
+      final response = await _dioClient.put(
+        Endpoints.getCartList,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+
+        data: request.toJson(),
+
+      );
+
+      return CartResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
       throw e;
     }
   }

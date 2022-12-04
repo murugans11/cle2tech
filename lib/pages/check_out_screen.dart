@@ -202,7 +202,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                   const SizedBox(height: 20),
 
                   ///_____Cost_Section_____________
-                  const CartCostSection(),
+                  const CartCostSection(price: 0,discount: 0,couponDiscount: 0,deliveryCharges: 0,totalAmount: 0,count: 0,),
 
                   ///___________Pay_Now_Button___________________________________
                   Button1(

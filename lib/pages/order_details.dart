@@ -97,7 +97,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const CartCostSection(),
+                   // const CartCostSection(),
+                    const CartCostSection(price: 0,discount: 0,couponDiscount: 0,deliveryCharges: 0,totalAmount: 0,count: 0,),
                     const SizedBox(height: 20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -42,16 +42,16 @@ class CartResponse {
 
 class CartDetails {
   String? sku;
-  int? qty;
+  dynamic qty;
   String? productTitle;
-  String? sellingPrice;
-  int? retailPrice;
-  String? productId;
+  dynamic sellingPrice;
+  dynamic retailPrice;
+  dynamic productId;
   ResourcePath? resourcePath;
   List<OptionalAttributes>? optionalAttributes;
   bool? isCashOnDelivery;
   String? slug;
-  String? mrp;
+  dynamic mrp;
 
   CartDetails(
       {this.sku,
@@ -79,7 +79,7 @@ class CartDetails {
     if (json['optionalAttributes'] != null) {
       optionalAttributes = <OptionalAttributes>[];
       json['optionalAttributes'].forEach((v) {
-        optionalAttributes!.add(new OptionalAttributes.fromJson(v));
+        optionalAttributes!.add(OptionalAttributes.fromJson(v));
       });
     }
     isCashOnDelivery = json['isCashOnDelivery'];

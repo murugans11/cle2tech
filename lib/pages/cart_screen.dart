@@ -9,25 +9,29 @@ import '../cubit/cart/cart_list_response_state.dart';
 import '../data/repository/home_repository.dart';
 import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
+import '../models/cart/CartRequest.dart';
 import '../models/cart/CartResponse.dart';
 import '../widgets/buttons.dart';
 import '../widgets/cart_cost_section.dart';
 import '../widgets/cart_item_single_view.dart';
 import 'check_out_screen.dart';
+import 'confirm_order_screen.dart';
 
 class CartScreen extends StatefulWidget {
+
   static const String routeName = "/CartScreen";
 
   const CartScreen({Key? key}) : super(key: key);
 
   @override
   State<CartScreen> createState() => _CartScreenState();
+
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List colorCodes = [10, 20, 30];
-
   var token;
+  var update = true;
+
   SharedPreferenceHelper sharedPreferenceHelper =
       getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
@@ -35,8 +39,6 @@ class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
     super.initState();
-    // Add the observer.
-    //WidgetsBinding.instance.addObserver(this);
     _asyncMethod();
   }
 
@@ -49,12 +51,13 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (token != null) {
-      BlocProvider.of<CartListResponseCubit>(context).loadCartList(token);
+    if (update) {
+      if (token != null) {
+        BlocProvider.of<CartListResponseCubit>(context).loadCartList(token);
+      }
     }
 
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -90,7 +93,6 @@ class _CartScreenState extends State<CartScreen> {
           fontSize: 18,
         ),
       ),
-
       body: token == null
           ? const Center(
               child: Text('CartList is empty'),
@@ -98,103 +100,9 @@ class _CartScreenState extends State<CartScreen> {
           : ListView(
               scrollDirection: Axis.vertical,
               children: [
-
                 const SizedBox(height: 10),
-
                 _postList(),
-
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(30),
-                      topLeft: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
-
-                      /*Container(
-                      height: 60,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(15),
-                        ),
-                        border: Border.all(width: 1, color: textColors),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            height: 40,
-                            width: 60,
-                            decoration: const BoxDecoration(
-                              border: Border(
-                                  right: BorderSide(width: 1, color: textColors)),
-                            ),
-                            child: const Center(
-                                child: Icon(
-                              Icons.percent,
-                              color: textColors,
-                            )),
-                          ),
-                          SizedBox(
-                              width: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: TextFormField(
-                                  cursorColor: textColors,
-                                  decoration: const InputDecoration(
-                                      floatingLabelBehavior:
-                                          FloatingLabelBehavior.never,
-                                      border: InputBorder.none,
-                                      label: MyGoogleText(
-                                        text: 'Coupon code',
-                                        fontColor: textColors,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      )),
-                                ),
-                              )),
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              height: 60,
-                              width: 80,
-                              decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(15),
-                                      bottomRight: Radius.circular(15)),
-                                  color: secondaryColor1),
-                              child: const Center(
-                                  child: MyGoogleText(
-                                      text: 'Apply',
-                                      fontSize: 14,
-                                      fontColor: Colors.white,
-                                      fontWeight: FontWeight.normal)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),*/
-
-                      //const SizedBox(height: 20),
-
-                      const CartCostSection(),
-
-                      Button1(
-                          buttonText: 'Check Out',
-                          buttonColor: primaryColor,
-                          onPressFunction: () {
-                            const CheckOutScreen().launch(context);
-                          }),
-                    ],
-                  ),
-                ),
+                _postList1(),
               ],
             ),
     );
@@ -203,96 +111,188 @@ class _CartScreenState extends State<CartScreen> {
   Widget _postList() {
     return BlocBuilder<CartListResponseCubit, CartListResponseState>(
         builder: (context, state) {
-          if (state is CartListResponseInitial) {
-            return _loadingIndicator();
-          }
+      if (state is CartListResponseInitial) {
+        return _loadingIndicator();
+      }
 
-          if (state is CartListResponseEmpty) {
-            return const Center(
-              child: Text('CartList is empty'),
+      if (state is CartListResponseEmpty) {
+        return const Center(
+          child: Text('CartList is empty'),
+        );
+      }
+
+      var cartListResponse = CartResponse();
+      if (state is CartListResponseLoaded) {
+        cartListResponse = state.cartResponse;
+      }
+
+      return ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          primary: false,
+          padding: const EdgeInsets.all(8),
+          itemCount: cartListResponse.cartDetails?.length ?? 0,
+          itemBuilder: (BuildContext context, int index) {
+            String sku = cartListResponse.cartDetails?[index].sku ?? '';
+            String qty =
+                cartListResponse.cartDetails?[index].qty.toString() ?? '';
+
+            String imageURL = '';
+            var parts = cartListResponse
+                .cartDetails?[index].resourcePath?.resourcePath
+                ?.split('.com');
+            if (parts != null) {
+              var image = parts.sublist(1).join('.com').trim();
+              imageURL =
+                  'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
+            }
+
+            String sellingPrice =
+                cartListResponse.cartDetails?[index].sellingPrice.toString() ??
+                    '0';
+
+            String retailPrice =
+                cartListResponse.cartDetails?[index].retailPrice.toString() ??
+                    '0';
+
+            String mrp =
+                cartListResponse.cartDetails?[index].mrp.toString() ?? '0';
+
+            int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) /
+                    int.parse(mrp) *
+                    100)
+                .toInt();
+
+            String productTitle =
+                cartListResponse.cartDetails?[index].productTitle ?? '';
+
+            final optionalAttributes =
+                cartListResponse.cartDetails?[index].optionalAttributes;
+
+            String displayColourName = '';
+            String displaySizeName = '';
+
+            optionalAttributes?.forEach((element) {
+              if (element.displayName == "Color") {
+                final attributeOptionValue = element.attributeOptionValue;
+                attributeOptionValue?.forEach((element1) {
+                  displayColourName = element1.displayName ?? '';
+                });
+              } else {
+                final attributeOptionValue = element.attributeOptionValue;
+                attributeOptionValue?.forEach((element1) {
+                  displaySizeName = element1.displayName ?? '';
+                });
+              }
+            });
+
+            return CartItemsSingleView(
+              resourcePath: imageURL,
+              productTitle: productTitle,
+              displayColourName: displayColourName,
+              displaySizeName: displaySizeName,
+              sellingPrice: sellingPrice,
+              mrp: mrp,
+              percentage: percentage,
+              callCat: () {
+                deleteAnItemFromCart(cartListResponse, index, context);
+              },
+              callupdate: (currentQty) {
+                updateAnItemFromCart(cartListResponse, index, context,currentQty);
+              },
+              qty: qty,
             );
-          }
+          });
+    });
+  }
 
-          var cartListResponse = CartResponse();
-          if (state is CartListResponseLoaded) {
-            cartListResponse = state.cartResponse;
-          }
+  void deleteAnItemFromCart(
+      CartResponse cartListResponse, int index, BuildContext context) {
+    setState(() {
+      List<Items>? items = [];
+      var item = Items(
+          sku: cartListResponse.cartDetails?[index].sku,
+          qty: cartListResponse.cartDetails?[index].qty);
+      items.add(item);
+      var request = CartRequest(action: "remove", items: items);
 
-          return  ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              primary: false,
-              padding: const EdgeInsets.all(8),
-              itemCount: cartListResponse.cartDetails?.length ?? 0,
-              itemBuilder: (BuildContext context, int index) {
+      BlocProvider.of<CartListResponseCubit>(context)
+          .addUpdateDeleteCart(token, request);
+      update = false;
+    });
+  }
 
-                return Slidable(
-                  // Specify a key if the Slidable is dismissible.
-                  key: Key(colorCodes[index].toString()),
-                  // The end action pane is the one at the right or the bottom side.
-                  endActionPane: ActionPane(
-                    motion: const ScrollMotion(),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: GestureDetector(
-                          child: Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.1),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(30)),
-                            ),
-                            child: const Center(
-                                child: Icon(
-                                  Icons.favorite_border,
-                                  size: 35,
-                                  color: primaryColor,
-                                )),
-                          ),
-                          onTap: () {
-                            setState(() {});
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: GestureDetector(
-                          child: Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              color: secondaryColor1.withOpacity(0.1),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(30)),
-                            ),
-                            child: const Center(
-                                child: Icon(
-                                  Icons.delete,
-                                  size: 35,
-                                  color: secondaryColor1,
-                                )),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              colorCodes.removeAt(index);
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+  void updateAnItemFromCart(CartResponse cartListResponse, int index, BuildContext context,int qty) {
 
-                  child: CartItemsSingleView(
-                    index: index,
-                  ),
-                  //
-                );
+    setState(() {
+      List<Items>? items = [];
+      var item = Items(
+          sku: cartListResponse.cartDetails?[index].sku,
+          qty: qty);
+      items.add(item);
+      var request = CartRequest(action: "update", items: items);
 
-              });
-        });
+      BlocProvider.of<CartListResponseCubit>(context).addUpdateDeleteCart(token, request);
+      update = false;
+    });
+  }
+
+  Widget _postList1() {
+    return BlocBuilder<CartListResponseCubit, CartListResponseState>(
+        builder: (context, state) {
+      var cartListResponse = CartResponse();
+      if (state is CartListResponseLoaded) {
+        cartListResponse = state.cartResponse;
+      }
+
+      final int price = cartListResponse.priceDetails?.price ?? 0;
+      final int sellingPrice = cartListResponse.priceDetails?.sellingPrice ?? 0;
+      final int discount = cartListResponse.priceDetails?.discount ?? 0;
+      final int couponDiscount =
+          cartListResponse.priceDetails?.couponDiscount ?? 0;
+      final int deliveryCharges =
+          cartListResponse.priceDetails?.deliveryCharges ?? 0;
+      final int totalAmount = cartListResponse.priceDetails?.totalAmount ?? 0;
+      final int count = cartListResponse.priceDetails?.count ?? 0;
+
+      return count == 0
+          ? const Center(
+              child: Text('CartList is empty'),
+            )
+          : Container(
+              padding: const EdgeInsets.all(20),
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(30),
+                  topLeft: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+
+                  //const SizedBox(height: 20),
+                  CartCostSection(
+                      price: price,
+                      discount: discount,
+                      couponDiscount: couponDiscount,
+                      deliveryCharges: deliveryCharges,
+                      totalAmount: totalAmount,
+                      count: count),
+
+                  Button1(
+                      buttonText: 'Check Out',
+                      buttonColor: primaryColor,
+                      onPressFunction: () {
+                        const ConfirmOrderScreen().launch(context);
+                      }),
+                ],
+              ),
+            );
+    });
   }
 
   Widget _loadingIndicator() {

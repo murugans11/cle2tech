@@ -56,9 +56,7 @@ class _HomePageState extends State<HomePage> {
     _asyncMethod();
     context.read<CategoriesBloc>().add(const FetchCategoriesItemsEvent());
     context.read<BannerBloc>().add(const FetchBannerItemsEvent());
-    context
-        .read<FeatureProductListBloc>()
-        .add(const FetchFeatureProductItemsEvent());
+    context.read<FeatureProductListBloc>().add(const FetchFeatureProductItemsEvent());
   }
 
   _asyncMethod() async {

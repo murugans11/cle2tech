@@ -23,6 +23,9 @@ import 'auth_screen/log_in_screen.dart';
 import 'cart_screen.dart';
 import 'package:string_validator/string_validator.dart';
 
+import 'check_out_screen.dart';
+import 'confirm_order_screen.dart';
+
 final counter = ValueNotifier<bool>(false);
 
 class ProductDetailScreen extends StatefulWidget {
@@ -979,28 +982,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       // border: TableBorder.all(width: 1.0, color: Colors.black,borderRadius: const BorderRadius.all(Radius.zero)),
                       children: [
                         for (var attribute in attributes)
-                          TableRow(children: [
-                            TableCell(
-                              child: Row(
-                                children: [
-                                  MyGoogleText(
-                                    text:
-                                        attribute.displayName.toString() ?? '',
-                                    fontSize: 12,
-                                    fontColor: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  const Spacer(),
-                                  MyGoogleText(
-                                    text: getValues(attribute.value),
-                                    fontSize: 16,
-                                    fontColor: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ],
-                              ),
-                            )
-                          ])
+                          TableRow(
+                            children: [
+                              TableCell(
+                                child: Row(
+                                  children: [
+                                    MyGoogleText(
+                                      text: attribute.displayName.toString() ??
+                                          '',
+                                      fontSize: 12,
+                                      fontColor: Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    const Spacer(),
+                                    MyGoogleText(
+                                      text: getValues(attribute.value),
+                                      fontSize: 16,
+                                      fontColor: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          )
                       ]),
 
                   ///__________________Related Products____________________________
@@ -1062,7 +1067,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       buttonText: 'Buy now',
                       buttonColor: primaryColor,
                       onPressFunction: () =>
-                          const CartScreen().launch(context)),
+                          const ConfirmOrderScreen().launch(context)),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -1082,6 +1087,4 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
-
-
 }
