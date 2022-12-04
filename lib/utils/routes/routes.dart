@@ -19,6 +19,7 @@ import '../../pages/home_page.dart';
 import '../../pages/product_detail_screen.dart';
 import '../../pages/profile_screen.dart';
 import '../../pages/search_page.dart';
+import '../../pages/shipping_address.dart';
 import '../../pages/single_category_by_Item_screen.dart';
 import '../../pages/single_category_group_screen.dart';
 import '../../pages/splash_screen_one.dart';
@@ -103,12 +104,17 @@ class Router {
           settings: RouteSettings(arguments: args),
         );
 
-
-
       case CartScreen.routeName:
         return MaterialPageRoute(
           builder: (_) {
             return const CartScreen();
+          },
+        );
+
+      case ShippingAddress.routeName:
+        return MaterialPageRoute(
+          builder: (_) {
+            return  ShippingAddress();
           },
         );
 

@@ -93,7 +93,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                const ShippingAddress().launch(context);
+                                 ShippingAddress().launch(context);
                               },
                               child: const MyGoogleText(
                                 text: 'Change',

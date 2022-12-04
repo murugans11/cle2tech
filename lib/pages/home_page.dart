@@ -43,10 +43,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   List<BannerGroup>? categoryGroup = [];
 
-  SharedPreferenceHelper sharedPreferenceHelper =
-      getIt<SharedPreferenceHelper>();
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
   VerifyWishlist response = VerifyWishlist();
 
@@ -67,10 +67,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+
 
   @override
   Widget build(BuildContext context) {

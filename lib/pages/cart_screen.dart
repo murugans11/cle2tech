@@ -66,7 +66,7 @@ class _CartScreenState extends State<CartScreen> {
             padding: EdgeInsets.only(right: 20),
             child: Center(
               child: MyGoogleText(
-                text: '2 items',
+                text: '',
                 fontSize: 16,
                 fontColor: secondaryColor2,
                 fontWeight: FontWeight.normal,
@@ -93,6 +93,7 @@ class _CartScreenState extends State<CartScreen> {
           fontSize: 18,
         ),
       ),
+
       body: token == null
           ? const Center(
               child: Text('CartList is empty'),
@@ -105,6 +106,7 @@ class _CartScreenState extends State<CartScreen> {
                 _postList1(),
               ],
             ),
+
     );
   }
 

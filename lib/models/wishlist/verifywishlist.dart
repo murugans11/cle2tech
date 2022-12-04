@@ -11,38 +11,55 @@ class VerifyWishlist {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['success'] = success;
-    data['message'] = message;
-    if (user != null) {
-      data['user'] = user!.toJson();
-    }
-    return data;
-  }
 }
 
 class User {
+  Profile? profile;
   List<Wishlist>? wishlist;
+  List<Addresses>? addresses;
 
-  User({this.wishlist});
+  User({this.profile,this.wishlist,this.addresses,});
 
   User.fromJson(Map<String, dynamic> json) {
+
+    profile = json['profile'] != null ? Profile.fromJson(json['profile']) : null;
+
     if (json['wishlist'] != null) {
       wishlist = <Wishlist>[];
       json['wishlist'].forEach((v) {
         wishlist!.add(Wishlist.fromJson(v));
       });
     }
+
+    if (json['addresses'] != null) {
+      addresses = <Addresses>[];
+      json['addresses'].forEach((v) { addresses!.add(Addresses.fromJson(v)); });
+    }
+
+
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (wishlist != null) {
-      data['wishlist'] = wishlist!.map((v) => v.toJson()).toList();
-    }
-    return data;
+}
+
+class Profile {
+  String? firstName;
+  String? lastName;
+  String? mobileNo;
+  String? picture;
+  String? isVerified;
+  String? gender;
+
+  Profile({this.firstName, this.lastName, this.mobileNo, this.picture, this.isVerified, this.gender});
+
+  Profile.fromJson(Map<String, dynamic> json) {
+    firstName = json['firstName'];
+    lastName = json['lastName'];
+    mobileNo = json['mobileNo'];
+    picture = json['picture'];
+    isVerified = json['isVerified'];
+    gender = json['gender'];
   }
+
 }
 
 class Wishlist {
@@ -58,11 +75,37 @@ class Wishlist {
     sId = json['_id'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['sku'] = sku;
-    data['listingId'] = listingId;
-    data['_id'] = sId;
-    return data;
+
+}
+
+class Addresses {
+  String? addressId;
+  String? firstName;
+  String? lastName;
+  String? mobileNo;
+  String? pincode;
+  String? locality;
+  String? address;
+  String? city;
+  String? state;
+  String? country;
+  String? addressType;
+  String? sId;
+
+  Addresses({this.addressId, this.firstName, this.lastName, this.mobileNo, this.pincode, this.locality, this.address, this.city, this.state, this.country, this.addressType, this.sId});
+
+  Addresses.fromJson(Map<String, dynamic> json) {
+    addressId = json['addressId'];
+    firstName = json['firstName'];
+    lastName = json['lastName'];
+    mobileNo = json['mobileNo'];
+    pincode = json['pincode'];
+    locality = json['locality'];
+    address = json['address'];
+    city = json['city'];
+    state = json['state'];
+    country = json['country'];
+    addressType = json['addressType'];
+    sId = json['_id'];
   }
 }

@@ -98,6 +98,7 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
           fontSize: 18,
         ),
       ),
+
       body: SingleChildScrollView(
         child: Column(
           //mainAxisAlignment: MainAxisAlignment.center,
