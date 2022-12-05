@@ -549,6 +549,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                           ),
                         ],
                       ),
+
                       Row(
                         children: [
                           Column(

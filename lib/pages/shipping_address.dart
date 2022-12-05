@@ -20,6 +20,7 @@ class ShippingAddress extends StatefulWidget {
 }
 
 class _ShippingAddressState extends State<ShippingAddress> {
+
   int checked = 0;
 
   Future<VerifyWishlist> _getLatest() async {
@@ -38,7 +39,9 @@ class _ShippingAddressState extends State<ShippingAddress> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
