@@ -9,6 +9,7 @@ import '../pages/check_out_screen.dart';
 import 'buttons.dart';
 
 class CartItemsSingleView extends StatefulWidget {
+
   const CartItemsSingleView({
     Key? key,
     required this.productTitle,

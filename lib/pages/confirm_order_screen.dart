@@ -5,6 +5,7 @@ import 'package:group_radio_button/group_radio_button.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/payment_method_screen.dart';
 import 'package:shopeein/pages/shipping_address.dart';
+import 'package:shopeein/widgets/offer_screen.dart';
 
 import '../constants/constants.dart';
 import '../cubit/cart/cart_list_response_cubit.dart';
@@ -37,16 +38,37 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
       getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
 
+  final _couPanControler = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _asyncMethod();
+    _couPanControler.addListener(_coupanValues);
+  }
+
+  @override
+  void dispose() {
+    _couPanControler.dispose();
+    super.dispose();
+  }
+
+  void _coupanValues() {
+    debugPrint("coupan values ${_couPanControler.text}");
   }
 
   _asyncMethod() async {
     final tokenValues = await sharedPreferenceHelper.authToken;
     setState(() {
       token = tokenValues;
+    });
+  }
+
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, OfferScreen.routeName);
+    if (!mounted) return;
+    setState(() {
+      _couPanControler.text = result.toString();
     });
   }
 
@@ -350,7 +372,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       children: const [
@@ -429,7 +452,11 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextFormField(
-                                cursorColor: textColors,
+                                controller: _couPanControler,
+                                autofocus: false,
+                                cursorColor: Colors.white,
+                                cursorWidth: 0,
+                                showCursor: false,
                                 decoration: const InputDecoration(
                                     floatingLabelBehavior:
                                         FloatingLabelBehavior.never,
@@ -440,6 +467,15 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.normal,
                                     )),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _couPanControler.text = value;
+                                  });
+                                },
+                                onTap: () {
+                                  // Navigator.pushNamed(context, OfferScreen.routeName);
+                                  _navigateAndDisplaySelection(context);
+                                },
                               ),
                             )),
                         GestureDetector(
@@ -448,10 +484,11 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             height: 60,
                             width: 80,
                             decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(15),
-                                    bottomRight: Radius.circular(15)),
-                                color: primaryColor),
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15)),
+                              color: primaryColor,
+                            ),
                             child: const Center(
                                 child: MyGoogleText(
                                     text: 'Apply',
@@ -549,7 +586,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                           ),
                         ],
                       ),
-
                       Row(
                         children: [
                           Column(

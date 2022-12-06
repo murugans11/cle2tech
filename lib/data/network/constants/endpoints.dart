@@ -38,6 +38,12 @@ class Endpoints {
 
   //CartList
   static const String getCartList = "${baseUrl}cart";
+  static const String addAddress = "${baseUrl}customerAddress";
+
+  static const String getCouPan = "${baseUrl}offer";
+
+
+
 
 
 

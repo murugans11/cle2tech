@@ -23,6 +23,7 @@ import '../../pages/shipping_address.dart';
 import '../../pages/single_category_by_Item_screen.dart';
 import '../../pages/single_category_group_screen.dart';
 import '../../pages/splash_screen_one.dart';
+import '../../widgets/offer_screen.dart';
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
@@ -60,7 +61,8 @@ class Router {
         dynamicArguments as CategoryItemDisplay;
         return MaterialPageRoute(
           builder: (context) => BlocProvider<CategoryGroupCubit>(
-            create: (context) => CategoryGroupCubit(homeRepository: getIt<HomeRepository>()),
+            create: (context) =>
+                CategoryGroupCubit(homeRepository: getIt<HomeRepository>()),
             child: const SingleCategoryGroupScreen(),
           ),
           settings: RouteSettings(arguments: dynamicArguments),
@@ -70,7 +72,8 @@ class Router {
         dynamicArguments as CategoryItemDisplay;
         return MaterialPageRoute(
           builder: (context) => BlocProvider<SingleCategoryCubit>(
-            create: (context) => SingleCategoryCubit(homeRepository: getIt<HomeRepository>()),
+            create: (context) =>
+                SingleCategoryCubit(homeRepository: getIt<HomeRepository>()),
             child: const SingleCategoryByItemScreen(),
           ),
           settings: RouteSettings(arguments: dynamicArguments),
@@ -114,7 +117,13 @@ class Router {
       case ShippingAddress.routeName:
         return MaterialPageRoute(
           builder: (_) {
-            return  ShippingAddress();
+            return const ShippingAddress();
+          },
+        );
+      case OfferScreen.routeName:
+        return MaterialPageRoute(
+          builder: (_) {
+            return const OfferScreen();
           },
         );
 

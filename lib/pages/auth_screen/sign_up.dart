@@ -127,8 +127,8 @@ class _SignUpState extends State<SignUp> {
                           TextFormField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              labelText: 'First Name',
-                              hintText: 'Please Enter Your First Name',
+                              labelText: 'Last Name',
+                              hintText: 'Please Enter Your Last Name',
                             ),
                             validator: (value) =>
                               value!.length < 2

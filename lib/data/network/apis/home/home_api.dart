@@ -6,10 +6,12 @@ import 'package:dio/dio.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../../../../di/components/service_locator.dart';
+import '../../../../models/address/add_address_request.dart';
 import '../../../../models/cart/CartRequest.dart';
 import '../../../../models/cart/CartResponse.dart';
 import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
+import '../../../../models/coupan/coupon_response.dart';
 import '../../../../models/feature/feature_productes.dart';
 import '../../../../models/login/OtpVerifyRequest.dart';
 import '../../../../models/login/RequestOtpResponse.dart';
@@ -276,6 +278,47 @@ class HomeApi {
       throw e;
     }
   }
+
+  Future<String> addCustomerAddress(String token, AddAddressRequest addressRequest) async {
+    try {
+
+      debugPrint(Endpoints.addAddress);
+
+      final response = await _dioClient.post(
+        Endpoints.addAddress,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+
+        data: addressRequest.toJson(),
+
+      );
+
+      return response.toString();
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<CouponResponse> getCouPanList(String token) async {
+    try {
+      debugPrint(Endpoints.getCouPan);
+      final response = await _dioClient.get(Endpoints.getCouPan,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      return CouponResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+
 
   Map<String, String> toJson1(String loginid) {
     final data = <String, String>{};
