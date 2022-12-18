@@ -209,7 +209,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       buttonText: 'Pay Now',
                       buttonColor: primaryColor,
                       onPressFunction: () {
-                        const ConfirmOrderScreen().launch(context);
+                        Navigator.pushNamed(context, ConfirmOrderScreen.routeName);
                       }),
                 ],
               ),

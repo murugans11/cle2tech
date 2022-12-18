@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../models/categoriesbyname/categorieItems.dart';
+import '../../../models/categoriesbyname/categorieItems.dart';
 
 @immutable
 abstract class SingleCategoryItemState {}

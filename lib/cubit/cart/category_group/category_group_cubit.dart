@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../data/repository/home_repository.dart';
-import '../models/categoriesbyname/categorieItems.dart';
-import '../models/feature/feature_productes.dart';
+import '../../../data/repository/home_repository.dart';
+import '../../../models/categoriesbyname/categorieItems.dart';
+import '../../../models/feature/feature_productes.dart';
 
 part 'category_groupe_state.dart';
 

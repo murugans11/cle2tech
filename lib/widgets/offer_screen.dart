@@ -27,7 +27,7 @@ class _OfferScreenState extends State<OfferScreen> {
 
     var token = await sharedPreferenceHelper.authToken;
     if (token != null) {
-      response = await homeRepository.getCouPanList(token);
+      response = await homeRepository.getCouPonList(token);
     }
     return response;
   }
@@ -74,8 +74,7 @@ class _OfferScreenState extends State<OfferScreen> {
                 children: [
                   FutureBuilder<CouponResponse>(
                     future: _getLatest(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<CouponResponse> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<CouponResponse> snapshot) {
                       return snapshot.hasData
                           ? ListView.builder(
                               shrinkWrap: true,
@@ -141,13 +140,6 @@ class _OfferScreenState extends State<OfferScreen> {
                             );
                     },
                   ),
-                  /* ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: 10,
-                      itemBuilder: (context, index) {
-
-                      })*/
                 ],
               ),
             ),

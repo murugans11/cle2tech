@@ -4,9 +4,15 @@ import 'package:group_radio_button/group_radio_button.dart';
 
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/payment_method_screen.dart';
+import 'package:shopeein/pages/pin_code_verification_screen.dart';
 import 'package:shopeein/pages/shipping_address.dart';
+import 'package:shopeein/utils/dio/network_call_status_enum.dart';
 import 'package:shopeein/widgets/offer_screen.dart';
 
+
+import '../blocs/make_order/markorder_bloc.dart';
+import '../blocs/make_order/markorder_event.dart';
+import '../blocs/make_order/markorder_state.dart';
 import '../constants/constants.dart';
 import '../cubit/cart/cart_list_response_cubit.dart';
 import '../cubit/cart/cart_list_response_state.dart';
@@ -15,13 +21,17 @@ import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/cart/CartRequest.dart';
 import '../models/cart/CartResponse.dart';
+import '../models/otp_verify/OrderOtpVerifyRequest.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../widgets/buttons.dart';
 import '../widgets/cart_cost_section.dart';
 import '../widgets/cart_item_single_view.dart';
-import '../widgets/confirmation_popup.dart';
+
 
 class ConfirmOrderScreen extends StatefulWidget {
+
+  static const String routeName = "/ConfirmOrderScreen";
+
   const ConfirmOrderScreen({Key? key}) : super(key: key);
 
   @override
@@ -29,38 +39,61 @@ class ConfirmOrderScreen extends StatefulWidget {
 }
 
 class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
-  String _verticalGroupValue = "Cash on Delivery";
-  final List<String> _status = ["Cash on Delivery", "Online Payment"];
-  var token;
+  var token = '';
+  var orderId = '';
   var update = true;
+  var addressId = '';
+  var _verticalGroupValue = "Cash on Delivery";
+  final _status = ["Cash on Delivery", "Online Payment"];
 
-  SharedPreferenceHelper sharedPreferenceHelper =
-      getIt<SharedPreferenceHelper>();
+  final _couponController = TextEditingController();
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
 
-  final _couPanControler = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _asyncMethod();
-    _couPanControler.addListener(_coupanValues);
-  }
-
-  @override
-  void dispose() {
-    _couPanControler.dispose();
-    super.dispose();
-  }
-
-  void _coupanValues() {
-    debugPrint("coupan values ${_couPanControler.text}");
-  }
-
-  _asyncMethod() async {
+  void _initOrder() async {
     final tokenValues = await sharedPreferenceHelper.authToken;
+    final orderInit = await homeRepository.getOrderInit(tokenValues ?? '');
     setState(() {
-      token = tokenValues;
+      token = tokenValues ?? '';
+      orderId = orderInit ?? '';
+    });
+  }
+
+  void deleteAnItemFromCart(
+      CartResponse cartListResponse, int index, BuildContext context) {
+    setState(() {
+      List<Items>? items = [];
+      var item = Items(
+          sku: cartListResponse.cartDetails?[index].sku,
+          qty: cartListResponse.cartDetails?[index].qty);
+      items.add(item);
+      var request = CartRequest(action: "remove", items: items);
+
+      BlocProvider.of<CartListResponseCubit>(context)
+          .addUpdateDeleteCart(token, request);
+      update = false;
+    });
+  }
+
+  void updateAnItemFromCart(
+      CartResponse cartListResponse, int index, BuildContext context, int qty) {
+    setState(() {
+      List<Items>? items = [];
+      var item = Items(sku: cartListResponse.cartDetails?[index].sku, qty: qty);
+      items.add(item);
+      var request = CartRequest(action: "update", items: items);
+
+      BlocProvider.of<CartListResponseCubit>(context)
+          .addUpdateDeleteCart(token, request);
+      update = false;
+    });
+  }
+
+  void applyCoupon(BuildContext context, String couponCode, String orderId) {
+    setState(() {
+      BlocProvider.of<CartListResponseCubit>(context)
+          .applyCoupon(token, couponCode, orderId);
+      update = false;
     });
   }
 
@@ -68,8 +101,22 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     final result = await Navigator.pushNamed(context, OfferScreen.routeName);
     if (!mounted) return;
     setState(() {
-      _couPanControler.text = result.toString();
+      _couponController.text = result.toString();
     });
+  }
+
+  Future<VerifyWishlist> _getLatest() async {
+    VerifyWishlist response = VerifyWishlist();
+    var token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token);
+    }
+    return response;
+  }
+
+  Future<String> makeOnOrder() async {
+    token = await sharedPreferenceHelper.authToken ?? '';
+    return await homeRepository.makeAnOrder(token, orderId, addressId, "COD");
   }
 
   Widget _postList() {
@@ -82,6 +129,13 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
       if (state is CartListResponseEmpty) {
         return const Center(
           child: Text('CartList is empty'),
+        );
+      }
+
+      if (state is CartListResponseError) {
+        var error = state.errorMessage;
+        return Center(
+          child: Text(error),
         );
       }
 
@@ -172,36 +226,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     });
   }
 
-  void deleteAnItemFromCart(
-      CartResponse cartListResponse, int index, BuildContext context) {
-    setState(() {
-      List<Items>? items = [];
-      var item = Items(
-          sku: cartListResponse.cartDetails?[index].sku,
-          qty: cartListResponse.cartDetails?[index].qty);
-      items.add(item);
-      var request = CartRequest(action: "remove", items: items);
-
-      BlocProvider.of<CartListResponseCubit>(context)
-          .addUpdateDeleteCart(token, request);
-      update = false;
-    });
-  }
-
-  void updateAnItemFromCart(
-      CartResponse cartListResponse, int index, BuildContext context, int qty) {
-    setState(() {
-      List<Items>? items = [];
-      var item = Items(sku: cartListResponse.cartDetails?[index].sku, qty: qty);
-      items.add(item);
-      var request = CartRequest(action: "update", items: items);
-
-      BlocProvider.of<CartListResponseCubit>(context)
-          .addUpdateDeleteCart(token, request);
-      update = false;
-    });
-  }
-
   Widget _postList1() {
     return BlocBuilder<CartListResponseCubit, CartListResponseState>(
         builder: (context, state) {
@@ -259,17 +283,16 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     );
   }
 
-  Future<VerifyWishlist> _getLatest() async {
-    SharedPreferenceHelper sharedPreferenceHelper =
-        getIt<SharedPreferenceHelper>();
-    HomeRepository homeRepository = getIt<HomeRepository>();
-    VerifyWishlist response = VerifyWishlist();
+  @override
+  void initState() {
+    _initOrder();
+    super.initState();
+  }
 
-    var token = await sharedPreferenceHelper.authToken;
-    if (token != null) {
-      response = await homeRepository.verifyWishList(token);
-    }
-    return response;
+  @override
+  void dispose() {
+    _couponController.dispose();
+    super.dispose();
   }
 
   @override
@@ -316,6 +339,11 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                     future: _getLatest(),
                     builder: (BuildContext context,
                         AsyncSnapshot<VerifyWishlist> snapshot) {
+                      if (snapshot.hasData) {
+                        addressId =
+                            snapshot.data?.user?.addresses?[0].addressId ?? '';
+                      }
+
                       return snapshot.hasData
                           ? Column(
                               mainAxisSize: MainAxisSize.min,
@@ -452,7 +480,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextFormField(
-                                controller: _couPanControler,
+                                controller: _couponController,
                                 autofocus: false,
                                 cursorColor: Colors.white,
                                 cursorWidth: 0,
@@ -469,7 +497,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     )),
                                 onChanged: (value) {
                                   setState(() {
-                                    _couPanControler.text = value;
+                                    _couponController.text = value;
                                   });
                                 },
                                 onTap: () {
@@ -479,7 +507,13 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                               ),
                             )),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            //apply coupon here
+                            var couPon = _couponController.value.text;
+                            if (couPon.isNotEmpty) {
+                              applyCoupon(context, couPon, orderId);
+                            }
+                          },
                           child: Container(
                             height: 60,
                             width: 80,
@@ -491,10 +525,11 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             ),
                             child: const Center(
                                 child: MyGoogleText(
-                                    text: 'Apply',
-                                    fontSize: 14,
-                                    fontColor: Colors.white,
-                                    fontWeight: FontWeight.normal)),
+                              text: 'Apply',
+                              fontSize: 14,
+                              fontColor: Colors.white,
+                              fontWeight: FontWeight.normal,
+                            )),
                           ),
                         ),
                       ],
@@ -616,25 +651,42 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
-                  Button1(
-                      buttonText: 'Pay Now',
-                      buttonColor: primaryColor,
-                      onPressFunction: () {
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            opaque: false,
-                            pageBuilder: (BuildContext context, _, __) =>
-                                const RedeemConfirmationScreen(
-                              image: 'images/confirm_order_pupup.png',
-                              mainText: 'Order successfully!',
-                              subText:
-                                  'Your order will be delivered soon. Thank you.',
-                              buttonText: 'Back to Home',
-                            ),
-                          ),
-                        );
-                      }),
+                  BlocConsumer<MakeOrderBloc, MakeOrderState>(
+                    builder: (context, state) {
+                      if (state.status == NetworkCallStatusEnum.loading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return Button1(
+                          buttonText: 'Pay Now',
+                          buttonColor: primaryColor,
+                          onPressFunction: () {
+                            context.read<MakeOrderBloc>().add(
+                                MakeOrderRequestEvent(
+                                    token: token,
+                                    id: orderId,
+                                    deliveryAddress: addressId,
+                                    paymentType: "COD"));
+                          });
+                    },
+                    listener: (context, state) {
+                      if (state.status == NetworkCallStatusEnum.loaded) {
+
+                        var request = OrderOtpVerifyRequest(token: token, requestId: state.requestId, orderId: orderId);
+
+                        Navigator.pushNamed(context, PinCodeVerificationScreen.routeName,arguments: request);
+
+                      } else if (state.status == NetworkCallStatusEnum.error) {
+                        Fluttertoast.showToast(
+                            msg: state.error.errMsg,
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      }
+                    },
+                  )
                 ],
               ),
             ),

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:shopeein/pages/auth_screen/sign_up.dart';
 import '../../constants/constants.dart';
-import '../../models/login/RequestOtpResponse.dart';
 import '../../models/register/request_otp.dart';
-import '../../widgets/buttons.dart';
-
 import 'otp_test.dart';
 
 class OtpAuthScreen extends StatefulWidget {

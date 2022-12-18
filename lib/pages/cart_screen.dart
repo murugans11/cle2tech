@@ -289,7 +289,7 @@ class _CartScreenState extends State<CartScreen> {
                       buttonText: 'Check Out',
                       buttonColor: primaryColor,
                       onPressFunction: () {
-                        const ConfirmOrderScreen().launch(context);
+                        Navigator.pushNamed(context, ConfirmOrderScreen.routeName);
                       }),
                 ],
               ),

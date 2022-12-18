@@ -7,12 +7,13 @@ class CartResponse {
   PriceDetails? priceDetails;
   List<ListingProduct>? listingProduct;
 
-  CartResponse(
-      {this.status,
-      this.message,
-      this.cartDetails,
-      this.priceDetails,
-      this.listingProduct});
+  CartResponse({
+    this.status,
+    this.message,
+    this.cartDetails,
+    this.priceDetails,
+    this.listingProduct,
+  });
 
   CartResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -29,14 +30,12 @@ class CartResponse {
         ? PriceDetails.fromJson(json['priceDetails'])
         : null;
 
-
     if (json['listingProduct'] != null) {
       listingProduct = <ListingProduct>[];
       json['listingProduct'].forEach((v) {
         listingProduct!.add(ListingProduct.fromJson(v));
       });
     }
-
   }
 }
 

@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:shopeein/cubit/wishlist/wish_list_response_state.dart';
+
 
 import '../../data/repository/home_repository.dart';
 import '../../models/cart/CartRequest.dart';
@@ -13,32 +13,50 @@ class CartListResponseCubit extends Cubit<CartListResponseState> {
       : super(CartListResponseInitial());
 
   void loadCartList(String token) {
-    if (state is WishListResponseInitial) {
+    if (state is CartListResponseInitial) {
       emit(CartListResponseInitial());
     }
-    homeRepository.getCartList(token).then(
-          (cartListResponse) => {
-            if (cartListResponse.cartDetails == null)
-              {emit(CartListResponseEmpty())}
-            else
-              {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
-          },
-        );
+    homeRepository
+        .getCartList(token)
+        .then(
+          (cartListResponse) =>
+      {
+        if (cartListResponse.cartDetails == null)
+          {emit(CartListResponseEmpty())}
+        else
+          {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
+      },
+    );
   }
 
   void addUpdateDeleteCart(String token, CartRequest cartRequest) {
-
-    emit(CartListResponseLoaded( cartResponse: CartResponse()));
+    emit(CartListResponseLoaded(cartResponse: CartResponse()));
 
     homeRepository.addUpdateDeleteCart(token, cartRequest).then(
-          (cartListResponse) => {
-            if (cartListResponse.cartDetails == null)
-              {emit(CartListResponseEmpty())}
-            else
-              {
-                emit(CartListResponseLoaded( cartResponse: cartListResponse))
-              }
-          },
-        );
+          (cartListResponse) =>
+      {
+        if (cartListResponse.cartDetails == null)
+          {emit(CartListResponseEmpty())}
+        else
+          {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
+      },
+    );
+  }
+
+  void applyCoupon(String token, String couponCode, String orderId) {
+
+    emit(CartListResponseLoaded(cartResponse: CartResponse()));
+
+    homeRepository.applyCoupon(token, couponCode, orderId).then(
+          (cartListResponse) =>
+      {
+        if (cartListResponse.cartDetails == null)
+          {emit(CartListResponseEmpty())}
+        else
+          {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
+      },
+    ).onError((error, stackTrace) => {{emit(CartListResponseError(errorMessage: error.toString()))}})
+        .whenComplete(() => {});
+
   }
 }

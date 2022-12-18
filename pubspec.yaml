@@ -36,6 +36,7 @@ dependencies:
   device_info_plus: ^3.2.3
   fluttertoast: ^8.1.1
   group_radio_button: ^1.2.0
+  pin_code_fields: ^7.4.0
 
 dev_dependencies:
   flutter_test:

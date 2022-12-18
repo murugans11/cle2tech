@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopeein/pages/initial_page.dart';
 
-import '../../cubit/category_group_cubit.dart';
-import '../../cubit/single_category_items_cubit.dart';
+import '../../blocs/make_order/markorder_bloc.dart';
+import '../../cubit/cart/category_group/category_group_cubit.dart';
+import '../../cubit/cart/single_category_group/single_category_items_cubit.dart';
 import '../../data/repository/home_repository.dart';
 import '../../di/components/service_locator.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
+import '../../models/otp_verify/OrderOtpVerifyRequest.dart';
 import '../../models/register/request_otp.dart';
 import '../../pages/auth_screen/log_in_screen.dart';
 import '../../pages/auth_screen/otp_auth_screen.dart';
@@ -15,7 +17,9 @@ import '../../pages/auth_screen/sign_up.dart';
 import '../../pages/best_seller_screen.dart';
 import '../../pages/cart_screen.dart';
 import '../../pages/category_screen.dart';
+import '../../pages/confirm_order_screen.dart';
 import '../../pages/home_page.dart';
+import '../../pages/pin_code_verification_screen.dart';
 import '../../pages/product_detail_screen.dart';
 import '../../pages/profile_screen.dart';
 import '../../pages/search_page.dart';
@@ -79,6 +83,27 @@ class Router {
           settings: RouteSettings(arguments: dynamicArguments),
         );
 
+        case ConfirmOrderScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<MakeOrderBloc>(
+            create: (context) => MakeOrderBloc(homeRepository: getIt<HomeRepository>()),
+            child: const ConfirmOrderScreen(),
+          ),
+        );
+
+
+      case PinCodeVerificationScreen.routeName:
+        dynamicArguments as OrderOtpVerifyRequest;
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<MakeOrderBloc>(
+            create: (context) =>
+                MakeOrderBloc(homeRepository: getIt<HomeRepository>()),
+            child: const PinCodeVerificationScreen(),
+          ),
+          settings: RouteSettings(arguments: dynamicArguments),
+        );
+
+
       case ProductDetailScreen.routeName:
         final args = dynamicArguments as ListingProduct;
         return MaterialPageRoute(
@@ -131,6 +156,7 @@ class Router {
         return MaterialPageRoute(builder: (_) {
           return const ProfileScreen();
         });
+
 
       case SearchPage.routeName:
         return MaterialPageRoute(builder: (_) {

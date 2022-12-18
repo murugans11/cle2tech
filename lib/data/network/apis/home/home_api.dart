@@ -254,12 +254,13 @@ class HomeApi {
     }
   }
 
-  Future<CartResponse> addUpdateDeleteCart(String token,CartRequest cartRequest) async {
+  Future<CartResponse> addUpdateDeleteCart(
+      String token, CartRequest cartRequest) async {
     try {
-
       debugPrint(Endpoints.getCartList);
 
-      var request = CartRequest(action: cartRequest.action,items: cartRequest.items);
+      var request =
+          CartRequest(action: cartRequest.action, items: cartRequest.items);
 
       final response = await _dioClient.put(
         Endpoints.getCartList,
@@ -267,9 +268,7 @@ class HomeApi {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         }),
-
         data: request.toJson(),
-
       );
 
       return CartResponse.fromJson(response);
@@ -279,9 +278,9 @@ class HomeApi {
     }
   }
 
-  Future<String> addCustomerAddress(String token, AddAddressRequest addressRequest) async {
+  Future<String> addCustomerAddress(
+      String token, AddAddressRequest addressRequest) async {
     try {
-
       debugPrint(Endpoints.addAddress);
 
       final response = await _dioClient.post(
@@ -290,9 +289,7 @@ class HomeApi {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         }),
-
         data: addressRequest.toJson(),
-
       );
 
       return response.toString();
@@ -304,8 +301,8 @@ class HomeApi {
 
   Future<CouponResponse> getCouPanList(String token) async {
     try {
-      debugPrint(Endpoints.getCouPan);
-      final response = await _dioClient.get(Endpoints.getCouPan,
+      debugPrint(Endpoints.applyCoupon);
+      final response = await _dioClient.get(Endpoints.applyCoupon,
           options: Options(headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer $token",
@@ -318,7 +315,111 @@ class HomeApi {
     }
   }
 
+  Future<CartResponse> applyCoupon(
+      String token, String couponCode, String orderId) async {
+    try {
+      debugPrint(Endpoints.applyCoupon);
 
+      final data = <String, String>{};
+      data['couponCode'] = couponCode;
+      data['orderId'] = orderId;
+
+      final response = await _dioClient.post(
+        Endpoints.applyCoupon,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+
+      return CartResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<String> makeAnOrder(String token, String id, String deliveryAddress,
+      String paymentType) async {
+    try {
+      final data = <String, String>{};
+      data['id'] = id;
+      data['deliveryAddress'] = deliveryAddress;
+      data['paymentType'] = paymentType;
+
+      String gfg1 = Endpoints.makeOrder;
+      String gfg2 = id;
+      var url = gfg1 + gfg2;
+      debugPrint(url);
+
+      final response = await _dioClient.put(
+        url,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+      var status = response['status'];
+      var message = response['message'];
+      var requestId = response['otpData']['requestId'];
+      debugPrint(requestId.toString());
+      return requestId;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<String> getOrderInit(String token) async {
+    try {
+      debugPrint(Endpoints.getOrderInit);
+      final response = await _dioClient.post(Endpoints.getOrderInit,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }),
+          data: {});
+
+      var status = response['status'];
+      var message = response['message'];
+      var orderId = response['orderData']['orderId'];
+      debugPrint(orderId.toString());
+
+      return orderId;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<String> verifyOtpOrder(String token, String otp, String requestId, String id) async {
+    try {
+      debugPrint(Endpoints.verifyOtp);
+
+      final data = <String, String>{};
+      data['otp'] = otp;
+      data['requestId'] = requestId;
+      data['id'] = id;
+
+      final response = await _dioClient.post(
+        Endpoints.verifyOtp,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+
+      debugPrint(response.toString());
+
+      return response.toString();
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
 
   Map<String, String> toJson1(String loginid) {
     final data = <String, String>{};

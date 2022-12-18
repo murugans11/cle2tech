@@ -142,8 +142,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final listingProduct =
-        ModalRoute.of(context)!.settings.arguments as ListingProduct;
+    final listingProduct = ModalRoute.of(context)!.settings.arguments as ListingProduct;
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
     /// Get the images
@@ -1063,12 +1062,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
-                  child: Button1(
-                      buttonText: 'Buy now',
-                      buttonColor: primaryColor,
-                      onPressFunction: () =>
-                          const ConfirmOrderScreen().launch(context)),
-                ),
+                    child: Button1(
+                  buttonText: 'Buy now',
+                  buttonColor: primaryColor,
+                  onPressFunction: () => Navigator.pushNamed(
+                      context, ConfirmOrderScreen.routeName),
+                )),
                 const SizedBox(width: 10),
                 Expanded(
                   child: ButtonType2(

@@ -8,11 +8,11 @@ import 'package:shopeein/blocs/banner/bannarList_bloc.dart';
 
 import 'blocs/category_groupe/categoryList_bloc.dart';
 import 'blocs/featureproduct/feature_product_list_bloc.dart';
+import 'blocs/make_order/markorder_bloc.dart';
 import 'constants/app_theme.dart';
 import 'constants/strings.dart';
 import 'cubit/cart/cart_list_response_cubit.dart';
-import 'cubit/category_group_cubit.dart';
-import 'cubit/single_category_items_cubit.dart';
+
 import 'cubit/wishlist/wish_list_response_cubit.dart';
 import 'data/repository/home_repository.dart';
 import 'di/components/service_locator.dart';
@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
             create: (context) => WishListResponseCubit(
                 homeRepository: context.read<HomeRepository>()),
           ),
+
           BlocProvider<CartListResponseCubit>(
             create: (context) => CartListResponseCubit(
                 homeRepository: context.read<HomeRepository>()),

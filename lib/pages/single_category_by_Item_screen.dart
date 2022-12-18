@@ -8,9 +8,10 @@ import 'package:shopeein/pages/product_detail_screen.dart';
 
 import '../constants/constants.dart';
 
-import '../cubit/category_group_cubit.dart';
-import '../cubit/single_category_items_cubit.dart';
-import '../cubit/single_category_items_state.dart';
+
+import '../cubit/cart/single_category_group/single_category_items_cubit.dart';
+
+import '../cubit/cart/single_category_group/single_category_items_state.dart';
 import '../data/network/constants/endpoints.dart';
 import '../data/repository/home_repository.dart';
 import '../data/sharedpref/shared_preference_helper.dart';

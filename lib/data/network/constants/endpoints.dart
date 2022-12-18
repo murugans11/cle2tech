@@ -39,8 +39,15 @@ class Endpoints {
   //CartList
   static const String getCartList = "${baseUrl}cart";
   static const String addAddress = "${baseUrl}customerAddress";
+  static const String getOrderInit = "${baseUrl}order/init";
 
-  static const String getCouPan = "${baseUrl}offer";
+  static const String applyCoupon = "${baseUrl}offer";
+
+  static const String makeOrder = "${baseUrl}order/";
+
+  static const String verifyOtp = "${baseUrl}order/verifyOtp";
+
+
 
 
 

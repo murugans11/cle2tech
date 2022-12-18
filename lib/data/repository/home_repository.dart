@@ -108,6 +108,21 @@ class HomeRepository {
     }
   }
 
+  Future<VerifyWishlist> orderInit(String token) async {
+    try {
+      final VerifyWishlist verifyWishlist =
+          await _homeApi.verifyWishList(token);
+
+      debugPrint('verifyWishlist: $verifyWishlist');
+
+      return verifyWishlist;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+
   Future<WishListResponse> getWishList(String token) async {
     try {
       final WishListResponse wishListResponse =
@@ -153,22 +168,38 @@ class HomeRepository {
     }
   }
 
+  Future<CartResponse> applyCoupon(
+      String token, String couponCode, String orderId) async {
+    try {
+      final CartResponse cartResponse =
+          await _homeApi.applyCoupon(token, couponCode, orderId);
+
+      debugPrint('applyCoupon: $cartResponse');
+
+      return cartResponse;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+
   Future<String> addCustomerAddress(
       String token, AddAddressRequest cartRequest) async {
     try {
-      final String addressResponse = await _homeApi.addCustomerAddress(token, cartRequest);
+      final String addressResponse =
+          await _homeApi.addCustomerAddress(token, cartRequest);
 
       debugPrint('addressResponse: $addressResponse');
 
       return addressResponse;
-
     } catch (e) {
       debugPrint(e.toString());
       throw e;
     }
   }
 
-  Future<CouponResponse> getCouPanList(String token) async {
+  Future<CouponResponse> getCouPonList(String token) async {
     try {
       final CouponResponse cartResponse = await _homeApi.getCouPanList(token);
 
@@ -182,5 +213,46 @@ class HomeRepository {
     }
   }
 
+  Future<String> getOrderInit(String token) async {
+    try {
+      final String orderId = await _homeApi.getOrderInit(token);
 
+      debugPrint('orderId: $orderId');
+
+      return orderId;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+
+  Future<String> verifyOtpOrder(String token, String otp1, String requestId, String id) async {
+    try {
+      final String response = await _homeApi.verifyOtpOrder(token, otp1, requestId, id);
+
+      debugPrint('otp: $response');
+
+      return response;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<String> makeAnOrder(String token, String id, String deliveryAddress,
+      String paymentType) async {
+    try {
+      final String requestId =
+          await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType);
+
+      debugPrint('requestId: $requestId');
+
+      return requestId;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
 }
