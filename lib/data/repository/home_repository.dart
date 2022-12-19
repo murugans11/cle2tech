@@ -4,6 +4,7 @@ import 'package:shopeein/models/banner/banner.dart';
 import 'package:shopeein/models/wishlist/toggle_wishList_request.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
+import '../../models/OrderOnlineResponse.dart';
 import '../../models/address/add_address_request.dart';
 import '../../models/cart/CartRequest.dart';
 import '../../models/cart/CartResponse.dart';
@@ -240,11 +241,10 @@ class HomeRepository {
     }
   }
 
-  Future<String> makeAnOrder(String token, String id, String deliveryAddress,
+  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress,
       String paymentType) async {
     try {
-      final String requestId =
-          await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType);
+      final  requestId = await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType);
 
       debugPrint('requestId: $requestId');
 

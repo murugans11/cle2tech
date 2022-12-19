@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_radio_button/group_radio_button.dart';
@@ -8,7 +10,6 @@ import 'package:shopeein/pages/pin_code_verification_screen.dart';
 import 'package:shopeein/pages/shipping_address.dart';
 import 'package:shopeein/utils/dio/network_call_status_enum.dart';
 import 'package:shopeein/widgets/offer_screen.dart';
-
 
 import '../blocs/make_order/markorder_bloc.dart';
 import '../blocs/make_order/markorder_event.dart';
@@ -26,10 +27,10 @@ import '../models/wishlist/verifywishlist.dart';
 import '../widgets/buttons.dart';
 import '../widgets/cart_cost_section.dart';
 import '../widgets/cart_item_single_view.dart';
-
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class ConfirmOrderScreen extends StatefulWidget {
-
   static const String routeName = "/ConfirmOrderScreen";
 
   const ConfirmOrderScreen({Key? key}) : super(key: key);
@@ -47,7 +48,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
   final _status = ["Cash on Delivery", "Online Payment"];
 
   final _couponController = TextEditingController();
-  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  SharedPreferenceHelper sharedPreferenceHelper =
+      getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
 
   void _initOrder() async {
@@ -114,10 +116,10 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     return response;
   }
 
-  Future<String> makeOnOrder() async {
+  /*Future<String> makeOnOrder() async {
     token = await sharedPreferenceHelper.authToken ?? '';
     return await homeRepository.makeAnOrder(token, orderId, addressId, "COD");
-  }
+  }*/
 
   Widget _postList() {
     return BlocBuilder<CartListResponseCubit, CartListResponseState>(
@@ -283,16 +285,109 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     );
   }
 
+  final _razorpay = Razorpay();
+
   @override
   void initState() {
-    _initOrder();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+      _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+      _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    });
     super.initState();
+    _initOrder();
+    // createOrder();
   }
 
   @override
   void dispose() {
+    _razorpay.clear(); // Removes all listeners
     _couponController.dispose();
     super.dispose();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+    print(response);
+    var order = response.orderId;
+    var paymentId = response.paymentId;
+    var signature = response.signature;
+    var ids = " orderid $order +paymentId $paymentId +signature $signature";
+
+    // Do something when an external wallet is selected
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(ids),
+      ),
+    );
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+    print(response);
+    // Do something when payment fails
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(response.message ?? ''),
+      ),
+    );
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+    print(response);
+    // Do something when an external wallet is selected
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(response.walletName ?? ''),
+      ),
+    );
+  }
+
+  // create order
+  void createOrder(
+      String key, String orderId, String contactNumber, String email) async {
+    /* String username = "rzp_live_MvPwKYplVlFBKd"; key
+    String password = "0jPJM9bLryhb3w1VbYj0hpZB"; secret key
+    String basicAuth = 'Basic ${base64Encode(utf8.encode('$username:$password'))}';
+
+    Map<String, dynamic> body = {
+      "amount": 1,
+      "currency": "INR",
+      "receipt": "rcptid_11"
+    };
+    var res = await http.post(
+      Uri.https("api.razorpay.com", "v1/orders"), //https://api.razorpay.com/v1/orders
+      headers: <String, String>{
+        "Content-Type": "application/json",
+        'authorization': basicAuth,
+      },
+      body: jsonEncode(body),
+    );
+
+    if (res.statusCode == 200) {
+      openGateway(jsonDecode(res.body)['id']);
+    }
+    print(res.body);
+*/
+    openGateway(key, orderId, contactNumber, email);
+  }
+
+  openGateway(String key, String orderId, String contactNumber, String email) {
+    var options = {
+      //'key': "rzp_live_MvPwKYplVlFBKd",
+      'key': key,
+      //'amount': 1, //in the smallest currency sub-unit.
+      //'name': 'Shoppein.com',
+      'order_id': orderId, // Generate order_id using Orders API
+      //'description': 'Fine T-Shirt',
+      // 'timeout': 60 * 5, // in seconds // 5 minutes
+      'prefill': {
+        'contact': contactNumber,
+        'email': email,
+      }
+    };
+    _razorpay.open(options);
   }
 
   @override
@@ -538,8 +633,120 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
                   const SizedBox(height: 20),
 
-                  ///_____________Delivery details______________________________
-                  /* Column(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: const [
+                          MyGoogleText(
+                            text: 'Payment Method',
+                            fontSize: 18,
+                            fontColor: Colors.black,
+                            fontWeight: FontWeight.normal,
+                          ),
+                          SizedBox(width: 5),
+                          Icon(
+                            Icons.check_circle,
+                            color: primaryColor,
+                          )
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          const PaymentMethodScreen().launch(context);
+                        },
+                        child: const MyGoogleText(
+                          text: '',
+                          fontSize: 16,
+                          fontColor: secondaryColor1,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  RadioGroup<String>.builder(
+                    direction: Axis.horizontal,
+                    groupValue: _verticalGroupValue,
+                    horizontalAlignment: MainAxisAlignment.spaceAround,
+                    activeColor: primaryColor,
+                    fillColor: primaryColor,
+                    onChanged: (value) => setState(() {
+                      _verticalGroupValue = value!;
+                    }),
+                    items: _status,
+                    textStyle:
+                        const TextStyle(fontSize: 15, color: Colors.grey),
+                    itemBuilder: (item) => RadioButtonBuilder(
+                      item,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  BlocConsumer<MakeOrderBloc, MakeOrderState>(
+                    builder: (context, state) {
+                      if (state.status == NetworkCallStatusEnum.loading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return Button1(
+                          buttonText: 'Pay Now',
+                          buttonColor: primaryColor,
+                          onPressFunction: () {
+                            var payMentType = 'COD';
+                            if (_verticalGroupValue == "Cash on Delivery") {
+                              payMentType = "COD";
+                            } else {
+                              payMentType = "ONLINE";
+                            }
+                            context.read<MakeOrderBloc>().add(
+                                MakeOrderRequestEvent(
+                                    token: token,
+                                    id: orderId,
+
+                                    deliveryAddress: addressId,
+                                    paymentType: payMentType));
+                          });
+                    },
+                    listener: (context, state) {
+                      if (state.status == NetworkCallStatusEnum.loaded) {
+                        if (state.orderOtpVerify.paymentTypeRes == "ONLINE") {
+                          createOrder(state.orderOtpVerify.key,
+                              state.orderOtpVerify.orderId, '', '');
+                        } else {
+                          var request = OrderOtpVerifyRequest(
+                            token: token,
+                            requestId: state.orderOtpVerify.requestId,
+                            orderId: orderId,
+                          );
+                          Navigator.pushNamed(
+                              context, PinCodeVerificationScreen.routeName,
+                              arguments: request);
+                        }
+                      } else if (state.status == NetworkCallStatusEnum.error) {
+                        Fluttertoast.showToast(
+                            msg: state.error.errMsg,
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+///_____________Delivery details______________________________
+/*  Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -584,115 +791,3 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),*/
-
-                  ///_____________Payment Method______________________________
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: const [
-                              MyGoogleText(
-                                text: 'Payment Method',
-                                fontSize: 18,
-                                fontColor: Colors.black,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              SizedBox(width: 5),
-                              Icon(
-                                Icons.check_circle,
-                                color: primaryColor,
-                              )
-                            ],
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              const PaymentMethodScreen().launch(context);
-                            },
-                            child: const MyGoogleText(
-                              text: '',
-                              fontSize: 16,
-                              fontColor: secondaryColor1,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              RadioGroup<String>.builder(
-                                direction: Axis.horizontal,
-                                groupValue: _verticalGroupValue,
-                                horizontalAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                activeColor: primaryColor,
-                                onChanged: (value) => setState(() {
-                                  _verticalGroupValue = value!;
-                                }),
-                                items: _status,
-                                textStyle: const TextStyle(
-                                    fontSize: 15, color: Colors.grey),
-                                itemBuilder: (item) => RadioButtonBuilder(
-                                  item,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  BlocConsumer<MakeOrderBloc, MakeOrderState>(
-                    builder: (context, state) {
-                      if (state.status == NetworkCallStatusEnum.loading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return Button1(
-                          buttonText: 'Pay Now',
-                          buttonColor: primaryColor,
-                          onPressFunction: () {
-                            context.read<MakeOrderBloc>().add(
-                                MakeOrderRequestEvent(
-                                    token: token,
-                                    id: orderId,
-                                    deliveryAddress: addressId,
-                                    paymentType: "COD"));
-                          });
-                    },
-                    listener: (context, state) {
-                      if (state.status == NetworkCallStatusEnum.loaded) {
-
-                        var request = OrderOtpVerifyRequest(token: token, requestId: state.requestId, orderId: orderId);
-
-                        Navigator.pushNamed(context, PinCodeVerificationScreen.routeName,arguments: request);
-
-                      } else if (state.status == NetworkCallStatusEnum.error) {
-                        Fluttertoast.showToast(
-                            msg: state.error.errMsg,
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      }
-                    },
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

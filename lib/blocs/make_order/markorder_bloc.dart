@@ -1,14 +1,11 @@
 
-
-
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 
 
 
 import '../../data/repository/home_repository.dart';
-
+import '../../models/OrderOnlineResponse.dart';
 import '../../utils/device/custom_error.dart';
 import '../../utils/dio/network_call_status_enum.dart';
 import 'markorder_event.dart';
@@ -36,7 +33,9 @@ class MakeOrderBloc extends Bloc<MakeOrderEvent, MakeOrderState> {
     emit(state.copyWith(status: NetworkCallStatusEnum.loading));
     try {
       final  requestId = await homeRepository.makeAnOrder(event.token, event.id, event.deliveryAddress, event.paymentType);
-      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, requestIdResponse: requestId));
+
+      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, orderOtpVerifyRequest: requestId));
+
     } on CustomError catch (e) {
       emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
     }
@@ -52,7 +51,9 @@ class MakeOrderBloc extends Bloc<MakeOrderEvent, MakeOrderState> {
     emit(state.copyWith(status: NetworkCallStatusEnum.loading));
     try {
       final  requestId = await homeRepository.verifyOtpOrder( event.token, event.otp, event.requestId, event.orderId  );
-      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, requestIdResponse: requestId));
+      final result = OrderOtpVerifyRequest(paymentTypeRes: '', requestId: '', key: '', orderId: '');
+      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, orderOtpVerifyRequest: result));
+
     } on CustomError catch (e) {
       emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
     }

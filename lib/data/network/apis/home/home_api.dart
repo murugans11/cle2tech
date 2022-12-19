@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../../../../di/components/service_locator.dart';
+import '../../../../models/OrderOnlineResponse.dart';
 import '../../../../models/address/add_address_request.dart';
 import '../../../../models/cart/CartRequest.dart';
 import '../../../../models/cart/CartResponse.dart';
@@ -340,8 +341,7 @@ class HomeApi {
     }
   }
 
-  Future<String> makeAnOrder(String token, String id, String deliveryAddress,
-      String paymentType) async {
+  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress, String paymentType) async {
     try {
       final data = <String, String>{};
       data['id'] = id;
@@ -361,15 +361,29 @@ class HomeApi {
         }),
         data: data,
       );
-      var status = response['status'];
-      var message = response['message'];
-      var requestId = response['otpData']['requestId'];
-      debugPrint(requestId.toString());
-      return requestId;
+
+      var paymentTypeRes = response['orderData']['paymentType'];
+      var requestId = "";
+      var key = "";
+      var orderId = "";
+
+
+      if (response['otpData'] != null) {
+        requestId = response['otpData']['requestId'];
+      }
+
+      if (response['paymentData'] != null) {
+        key = response['paymentData']['paymentResponse']['key'];
+        orderId = response['paymentData']['paymentResponse']['id'];
+      }
+
+      return  OrderOtpVerifyRequest(paymentTypeRes: paymentTypeRes, requestId: requestId, key: key, orderId: orderId);
+
     } catch (e) {
       debugPrint(e.toString());
       throw e;
     }
+
   }
 
   Future<String> getOrderInit(String token) async {
@@ -394,7 +408,8 @@ class HomeApi {
     }
   }
 
-  Future<String> verifyOtpOrder(String token, String otp, String requestId, String id) async {
+  Future<String> verifyOtpOrder(
+      String token, String otp, String requestId, String id) async {
     try {
       debugPrint(Endpoints.verifyOtp);
 
