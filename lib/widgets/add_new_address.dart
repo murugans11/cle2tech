@@ -19,6 +19,7 @@ class AddNewAddress extends StatefulWidget {
 }
 
 class _AddNewAddressState extends State<AddNewAddress> {
+
   bool addressSwitch = false;
   String _verticalGroupValue = "Home";
   final List<String> _status = ["Home", "Work"];
@@ -68,9 +69,11 @@ class _AddNewAddressState extends State<AddNewAddress> {
 
   @override
   Widget build(BuildContext context) {
+
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(
+
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -90,6 +93,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
           fontSize: 18,
         ),
       ),
+
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(30),

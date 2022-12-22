@@ -47,6 +47,10 @@ class Endpoints {
 
   static const String verifyOtp = "${baseUrl}order/verifyOtp";
 
+  static const String savePaymentSuccess = "${baseUrl}order/verifyOrder";
+
+  static const String getMyOrder = "${baseUrl}order/listing";
+
 
 
 

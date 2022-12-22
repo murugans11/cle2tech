@@ -18,6 +18,7 @@ import '../../../../models/login/OtpVerifyRequest.dart';
 import '../../../../models/login/RequestOtpResponse.dart';
 import '../../../../models/login/login_requst.dart';
 import '../../../../models/login/login_response.dart';
+import '../../../../models/my_order/my_order_response.dart';
 import '../../../../models/register/RegistrationRequest.dart';
 import '../../../../models/wishlist/toggle_wishList_request.dart';
 import '../../../../models/wishlist/wish_list_response.dart';
@@ -254,6 +255,24 @@ class HomeApi {
       throw e;
     }
   }
+  Future<CartResponse> addToCart(String token) async {
+    try {
+      debugPrint(Endpoints.getCartList);
+      final data = <String, String>{};
+      //data['couponCode'] = couponCode;
+      //data['orderId'] = orderId;
+
+      final response = await _dioClient.put(Endpoints.getCartList,
+          options: Options(headers: {"Content-Type": "application/json", "Authorization": "Bearer $token",}),
+          data: data
+      );
+
+      return CartResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
 
   Future<CartResponse> addUpdateDeleteCart(
       String token, CartRequest cartRequest) async {
@@ -310,6 +329,21 @@ class HomeApi {
           }));
 
       return CouponResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+  Future<MyOrderResponse> getMyOrders(String token) async {
+    try {
+      debugPrint(Endpoints.applyCoupon);
+      final response = await _dioClient.get(Endpoints.getMyOrder,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      return MyOrderResponse.fromJson(response);
     } catch (e) {
       debugPrint(e.toString());
       throw e;
@@ -385,6 +419,33 @@ class HomeApi {
     }
 
   }
+
+
+  Future<String> savePaymentSuccess(String token, String orderId, String paymentId, String signature) async {
+    try {
+      final data = <String, String>{};
+      data['orderId'] = orderId;
+      data['paymentId'] = paymentId;
+      data['signature'] = signature;
+
+      final response = await _dioClient.post(
+        Endpoints.savePaymentSuccess,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+
+      return  response.toString();
+
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+
+  }
+
 
   Future<String> getOrderInit(String token) async {
     try {

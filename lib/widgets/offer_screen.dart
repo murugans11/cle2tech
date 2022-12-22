@@ -19,6 +19,7 @@ class OfferScreen extends StatefulWidget {
 }
 
 class _OfferScreenState extends State<OfferScreen> {
+
   Future<CouponResponse> _getLatest() async {
     SharedPreferenceHelper sharedPreferenceHelper =
         getIt<SharedPreferenceHelper>();
@@ -35,6 +36,7 @@ class _OfferScreenState extends State<OfferScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -54,6 +56,7 @@ class _OfferScreenState extends State<OfferScreen> {
           fontSize: 20,
         ),
       ),
+
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

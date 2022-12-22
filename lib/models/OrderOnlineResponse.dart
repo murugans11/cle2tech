@@ -2,8 +2,14 @@
 
 class OrderOtpVerifyRequest {
 
-  late final String paymentTypeRes;
+
+  //only for COD
   late final String requestId;
+
+  //Type to payment
+  late final String paymentTypeRes;
+
+  //Online
   late final String orderId;
   late final String key;
 

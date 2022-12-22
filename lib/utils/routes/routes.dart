@@ -19,6 +19,7 @@ import '../../pages/cart_screen.dart';
 import '../../pages/category_screen.dart';
 import '../../pages/confirm_order_screen.dart';
 import '../../pages/home_page.dart';
+import '../../pages/my_order.dart';
 import '../../pages/pin_code_verification_screen.dart';
 import '../../pages/product_detail_screen.dart';
 import '../../pages/profile_screen.dart';
@@ -83,14 +84,14 @@ class Router {
           settings: RouteSettings(arguments: dynamicArguments),
         );
 
-        case ConfirmOrderScreen.routeName:
+      case ConfirmOrderScreen.routeName:
         return MaterialPageRoute(
           builder: (context) => BlocProvider<MakeOrderBloc>(
-            create: (context) => MakeOrderBloc(homeRepository: getIt<HomeRepository>()),
+            create: (context) =>
+                MakeOrderBloc(homeRepository: getIt<HomeRepository>()),
             child: const ConfirmOrderScreen(),
           ),
         );
-
 
       case PinCodeVerificationScreen.routeName:
         dynamicArguments as OrderOtpVerifyRequest;
@@ -103,7 +104,6 @@ class Router {
           settings: RouteSettings(arguments: dynamicArguments),
         );
 
-
       case ProductDetailScreen.routeName:
         final args = dynamicArguments as ListingProduct;
         return MaterialPageRoute(
@@ -115,6 +115,12 @@ class Router {
         return MaterialPageRoute(
           builder: (_) {
             return const LogInScreen();
+          },
+        );
+      case MyOrderScreen.routeName:
+        return MaterialPageRoute(
+          builder: (_) {
+            return const MyOrderScreen();
           },
         );
 
@@ -156,7 +162,6 @@ class Router {
         return MaterialPageRoute(builder: (_) {
           return const ProfileScreen();
         });
-
 
       case SearchPage.routeName:
         return MaterialPageRoute(builder: (_) {

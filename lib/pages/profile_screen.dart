@@ -24,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -42,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           fontWeight: FontWeight.normal,
           fontSize: 20,
         ),
-        actions: [
+        /*actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -84,8 +85,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(width: 15),
-        ],
+        ],*/
       ),
+
+
       body: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
@@ -201,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () {
-                        const MyOrderScreen().launch(context);
+                        Navigator.pushNamed(context, MyOrderScreen.routeName);
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -230,9 +233,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
-                      leading: const Icon(IconlyLight.wallet),
+                      leading: const Icon(Icons.card_giftcard),
                       title: const MyGoogleText(
-                          text: 'Payment Method',
+                          text: 'My Gifts',
                           fontSize: 16,
                           fontColor: Colors.black,
                           fontWeight: FontWeight.normal),
@@ -244,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
 
                   ///_________Notification___________________________
-                  Container(
+                  /*Container(
                     decoration: const BoxDecoration(
                         border: Border(
                             bottom:
@@ -266,10 +269,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         size: 16,
                       ),
                     ),
-                  ),
+                  ),*/
 
                   ///_____________Language________________________
-                  Container(
+                /*  Container(
                     decoration: const BoxDecoration(
                         border: Border(
                             bottom:
@@ -289,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         size: 16,
                       ),
                     ),
-                  ),
+                  ),*/
 
                   ///___________________Help___________________________
                   Container(

@@ -6,6 +6,7 @@ import 'package:group_radio_button/group_radio_button.dart';
 
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/payment_method_screen.dart';
+import 'package:shopeein/pages/payment_validation_page.dart';
 import 'package:shopeein/pages/pin_code_verification_screen.dart';
 import 'package:shopeein/pages/shipping_address.dart';
 import 'package:shopeein/utils/dio/network_call_status_enum.dart';
@@ -14,6 +15,9 @@ import 'package:shopeein/widgets/offer_screen.dart';
 import '../blocs/make_order/markorder_bloc.dart';
 import '../blocs/make_order/markorder_event.dart';
 import '../blocs/make_order/markorder_state.dart';
+import '../blocs/payment/payment_success_bloc.dart';
+import '../blocs/payment/payment_success_event.dart';
+import '../blocs/payment/payment_success_state.dart';
 import '../constants/constants.dart';
 import '../cubit/cart/cart_list_response_cubit.dart';
 import '../cubit/cart/cart_list_response_state.dart';
@@ -306,6 +310,12 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     super.dispose();
   }
 
+  final Future<String> _calculation = Future<String>.delayed(
+    const Duration(seconds: 2),
+        () => 'Data Loaded',
+  );
+
+
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     // Do something when payment succeeds
     print(response);
@@ -313,6 +323,53 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     var paymentId = response.paymentId;
     var signature = response.signature;
     var ids = " orderid $order +paymentId $paymentId +signature $signature";
+    debugPrint("payment response $ids");
+
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) {
+        return  PaymentValidationPage(token: token, order: order ?? '', paymentId: paymentId ?? '', signature: signature ?? '',);
+      },
+    ));
+
+   /* context.read<PaymentSuccessBloc>().add(
+      PaymentSuccess(
+        token: token,
+        orderId: order,
+        paymentId: paymentId,
+        signature: signature,
+      ),
+    );
+
+
+    BlocConsumer<PaymentSuccessBloc, PaymentSuccessState>(
+      builder: (context, state) {
+        if (state.status == NetworkCallStatusEnum.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }else{
+          return Container();
+        }
+
+      },
+      listener: (context, state) {
+        if (state.status == NetworkCallStatusEnum.loaded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response.signature ?? ''),
+            ),
+          );
+        }
+        else if (state.status == NetworkCallStatusEnum.error) {
+          Fluttertoast.showToast(
+              msg: state.error.errMsg,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      },
+    );*/
 
     // Do something when an external wallet is selected
     ScaffoldMessenger.of(context).showSnackBar(
@@ -326,11 +383,19 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     // Do something when payment fails
     print(response);
     // Do something when payment fails
+    Navigator.push(context, MaterialPageRoute(
+      builder: (_) {
+        return  PaymentValidationPage(token: token, order:  '', paymentId:  '', signature:  '',);
+      },
+    ));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(response.message ?? ''),
       ),
     );
+
+
+
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -432,8 +497,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   ///____________Shipping_address__________________________
                   FutureBuilder<VerifyWishlist>(
                     future: _getLatest(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<VerifyWishlist> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<VerifyWishlist> snapshot) {
                       if (snapshot.hasData) {
                         addressId =
                             snapshot.data?.user?.addresses?[0].addressId ?? '';

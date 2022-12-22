@@ -8,7 +8,6 @@ import 'package:shopeein/blocs/banner/bannarList_bloc.dart';
 
 import 'blocs/category_groupe/categoryList_bloc.dart';
 import 'blocs/featureproduct/feature_product_list_bloc.dart';
-import 'blocs/make_order/markorder_bloc.dart';
 import 'constants/app_theme.dart';
 import 'constants/strings.dart';
 import 'cubit/cart/cart_list_response_cubit.dart';
@@ -80,6 +79,11 @@ class MyApp extends StatelessWidget {
                 homeRepository: context.read<HomeRepository>()),
           ),
 
+         /* BlocProvider<PaymentSuccessBloc>(
+            create: (context) => PaymentSuccessBloc(
+                homeRepository: context.read<HomeRepository>()),
+          ),
+*/
 
         ],
         child: AppTheme(

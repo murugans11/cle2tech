@@ -136,6 +136,7 @@ class _CartScreenState extends State<CartScreen> {
           padding: const EdgeInsets.all(8),
           itemCount: cartListResponse.cartDetails?.length ?? 0,
           itemBuilder: (BuildContext context, int index) {
+
             String sku = cartListResponse.cartDetails?[index].sku ?? '';
             String qty =
                 cartListResponse.cartDetails?[index].qty.toString() ?? '';
@@ -150,20 +151,15 @@ class _CartScreenState extends State<CartScreen> {
                   'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/500x500/filters:format(png)/$image';
             }
 
-            String sellingPrice =
-                cartListResponse.cartDetails?[index].sellingPrice.toString() ??
+            String sellingPrice = cartListResponse.cartDetails?[index].sellingPrice.toString() ??
                     '0';
 
-            String retailPrice =
-                cartListResponse.cartDetails?[index].retailPrice.toString() ??
+            String retailPrice = cartListResponse.cartDetails?[index].retailPrice.toString() ??
                     '0';
 
-            String mrp =
-                cartListResponse.cartDetails?[index].mrp.toString() ?? '0';
+            String mrp = cartListResponse.cartDetails?[index].mrp.toString() ?? '0';
 
-            int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) /
-                    int.parse(mrp) *
-                    100)
+            int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100)
                 .toInt();
 
             String productTitle =
@@ -205,6 +201,8 @@ class _CartScreenState extends State<CartScreen> {
               },
               qty: qty,
             );
+
+
           });
     });
   }
