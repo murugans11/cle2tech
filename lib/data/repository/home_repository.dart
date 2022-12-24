@@ -12,6 +12,7 @@ import '../../models/categories/category.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/coupan/coupon_response.dart';
 import '../../models/feature/feature_productes.dart';
+import '../../models/gift/gift_response.dart';
 import '../../models/my_order/my_order_response.dart';
 import '../../models/wishlist/wish_list_response.dart';
 import '../../utils/device/custom_error.dart';
@@ -154,21 +155,20 @@ class HomeRepository {
     }
   }
 
-  Future<CartResponse> addUpdateDeleteCart(
-      String token, CartRequest cartRequest) async {
+  Future<CartResponse> addUpdateDeleteCart(String token, CartRequest cartRequest) async {
     try {
-      final CartResponse cartResponse =
-          await _homeApi.addUpdateDeleteCart(token, cartRequest);
+      final CartResponse cartResponse = await _homeApi.addUpdateDeleteCart(token, cartRequest);
 
       debugPrint('cartResponse: $cartResponse');
 
       return cartResponse;
     } catch (e) {
       debugPrint(e.toString());
-
-      throw e;
+      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
+
+
 
   Future<CartResponse> applyCoupon(
       String token, String couponCode, String orderId) async {
@@ -182,7 +182,7 @@ class HomeRepository {
     } catch (e) {
       debugPrint(e.toString());
 
-      throw e;
+      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
 
@@ -214,9 +214,23 @@ class HomeRepository {
       throw e;
     }
   }
+
   Future<MyOrderResponse> getMyOrders(String token) async {
     try {
       final MyOrderResponse cartResponse = await _homeApi.getMyOrders(token);
+
+      debugPrint('cartResponse: $cartResponse');
+
+      return cartResponse;
+    } catch (e) {
+      debugPrint(e.toString());
+
+      throw e;
+    }
+  }
+  Future<GiftResponse> getMyGift(String token) async {
+    try {
+      final GiftResponse cartResponse = await _homeApi.getMyGift(token);
 
       debugPrint('cartResponse: $cartResponse');
 

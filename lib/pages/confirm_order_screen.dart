@@ -44,6 +44,7 @@ class ConfirmOrderScreen extends StatefulWidget {
 }
 
 class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
+
   var token = '';
   var orderId = '';
   var update = true;
@@ -52,17 +53,23 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
   final _status = ["Cash on Delivery", "Online Payment"];
 
   final _couponController = TextEditingController();
-  SharedPreferenceHelper sharedPreferenceHelper =
-      getIt<SharedPreferenceHelper>();
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
 
   void _initOrder() async {
     final tokenValues = await sharedPreferenceHelper.authToken;
+
+    if (tokenValues != null) {
+      BlocProvider.of<CartListResponseCubit>(context).loadCartList(tokenValues);
+    }
+
     final orderInit = await homeRepository.getOrderInit(tokenValues ?? '');
+
     setState(() {
       token = tokenValues ?? '';
       orderId = orderInit ?? '';
     });
+
   }
 
   void deleteAnItemFromCart(
@@ -120,10 +127,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     return response;
   }
 
-  /*Future<String> makeOnOrder() async {
-    token = await sharedPreferenceHelper.authToken ?? '';
-    return await homeRepository.makeAnOrder(token, orderId, addressId, "COD");
-  }*/
 
   Widget _postList() {
     return BlocBuilder<CartListResponseCubit, CartListResponseState>(
@@ -300,7 +303,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     });
     super.initState();
     _initOrder();
-    // createOrder();
+
   }
 
   @override
@@ -310,10 +313,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     super.dispose();
   }
 
-  final Future<String> _calculation = Future<String>.delayed(
-    const Duration(seconds: 2),
-        () => 'Data Loaded',
-  );
 
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
@@ -327,49 +326,15 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
     Navigator.push(context, MaterialPageRoute(
       builder: (_) {
-        return  PaymentValidationPage(token: token, order: order ?? '', paymentId: paymentId ?? '', signature: signature ?? '',);
+        return PaymentValidationPage(
+          token: token,
+          order: order ?? '',
+          paymentId: paymentId ?? '',
+          signature: signature ?? '',
+        );
       },
     ));
 
-   /* context.read<PaymentSuccessBloc>().add(
-      PaymentSuccess(
-        token: token,
-        orderId: order,
-        paymentId: paymentId,
-        signature: signature,
-      ),
-    );
-
-
-    BlocConsumer<PaymentSuccessBloc, PaymentSuccessState>(
-      builder: (context, state) {
-        if (state.status == NetworkCallStatusEnum.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }else{
-          return Container();
-        }
-
-      },
-      listener: (context, state) {
-        if (state.status == NetworkCallStatusEnum.loaded) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response.signature ?? ''),
-            ),
-          );
-        }
-        else if (state.status == NetworkCallStatusEnum.error) {
-          Fluttertoast.showToast(
-              msg: state.error.errMsg,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0);
-        }
-      },
-    );*/
 
     // Do something when an external wallet is selected
     ScaffoldMessenger.of(context).showSnackBar(
@@ -385,7 +350,12 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     // Do something when payment fails
     Navigator.push(context, MaterialPageRoute(
       builder: (_) {
-        return  PaymentValidationPage(token: token, order:  '', paymentId:  '', signature:  '',);
+        return PaymentValidationPage(
+          token: token,
+          order: '',
+          paymentId: '',
+          signature: '',
+        );
       },
     ));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -393,9 +363,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
         content: Text(response.message ?? ''),
       ),
     );
-
-
-
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -410,8 +377,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
   }
 
   // create order
-  void createOrder(
-      String key, String orderId, String contactNumber, String email) async {
+  void createOrder(String key, String orderId, String contactNumber, String email) async {
     /* String username = "rzp_live_MvPwKYplVlFBKd"; key
     String password = "0jPJM9bLryhb3w1VbYj0hpZB"; secret key
     String basicAuth = 'Basic ${base64Encode(utf8.encode('$username:$password'))}';
@@ -457,7 +423,9 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -477,6 +445,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
           fontSize: 18,
         ),
       ),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -497,7 +466,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   ///____________Shipping_address__________________________
                   FutureBuilder<VerifyWishlist>(
                     future: _getLatest(),
-                    builder: (BuildContext context, AsyncSnapshot<VerifyWishlist> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<VerifyWishlist> snapshot) {
                       if (snapshot.hasData) {
                         addressId =
                             snapshot.data?.user?.addresses?[0].addressId ?? '';
@@ -529,8 +499,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(
-                                            context, ShippingAddress.routeName);
+                                        Navigator.pushNamed(context,
+                                            ShippingAddressPage.routeName);
                                       },
                                       child: const MyGoogleText(
                                         text: 'Change',
@@ -579,8 +549,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(
-                                            context, ShippingAddress.routeName);
+                                        Navigator.pushNamed(context,
+                                            ShippingAddressPage.routeName);
                                       },
                                       child: const MyGoogleText(
                                         text: 'Add Address',
@@ -763,20 +733,20 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             } else {
                               payMentType = "ONLINE";
                             }
-                            context.read<MakeOrderBloc>().add(
-                                MakeOrderRequestEvent(
-                                    token: token,
-                                    id: orderId,
-
-                                    deliveryAddress: addressId,
-                                    paymentType: payMentType));
+                            context
+                                .read<MakeOrderBloc>()
+                                .add(MakeOrderRequestEvent(
+                                  token: token,
+                                  id: orderId,
+                                  deliveryAddress: addressId,
+                                  paymentType: payMentType,
+                                ));
                           });
                     },
                     listener: (context, state) {
                       if (state.status == NetworkCallStatusEnum.loaded) {
                         if (state.orderOtpVerify.paymentTypeRes == "ONLINE") {
-                          createOrder(state.orderOtpVerify.key,
-                              state.orderOtpVerify.orderId, '', '');
+                          createOrder(state.orderOtpVerify.key, state.orderOtpVerify.orderId, '', '');
                         } else {
                           var request = OrderOtpVerifyRequest(
                             token: token,

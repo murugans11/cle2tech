@@ -1,4 +1,4 @@
-import 'dart:ffi';
+import 'dart:async';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -14,18 +14,21 @@ import '../constants/constants.dart';
 import '../data/repository/home_repository.dart';
 import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
+import '../models/cart/CartRequest.dart';
+
 import '../models/feature/feature_productes.dart';
 import '../models/wishlist/toggle_wishList_request.dart';
+import '../utils/device/custom_error.dart';
 import '../widgets/buttons.dart';
 import '../widgets/castomar_review_commends.dart';
+import '../widgets/error_dialog.dart';
 import '../widgets/product_greed_view_widget.dart';
 import '../widgets/review_bottom_sheet_1.dart';
 import '../widgets/single_product_total_review.dart';
 import 'auth_screen/log_in_screen.dart';
-import 'cart_screen.dart';
+
 import 'package:string_validator/string_validator.dart';
 
-import 'check_out_screen.dart';
 import 'confirm_order_screen.dart';
 
 final counter = ValueNotifier<bool>(false);
@@ -40,7 +43,6 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-
   SharedPreferenceHelper sharedPreferenceHelper =
       getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
@@ -59,7 +61,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       setState(() {});
     }
   }
-
 
   bool _isLoaderVisible = false;
   bool isFavorite = false;
@@ -129,8 +130,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _navigateAndDisplaySelection(BuildContext context) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
-    final result = await Navigator.push(
-      context,
+    final result = await Navigator.push(context,
       MaterialPageRoute(builder: (context) => const LogInScreen()),
     );
 
@@ -145,12 +145,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ..showSnackBar(SnackBar(content: Text('$result')));
   }
 
+  FutureOr<void> _buyNow(String token, CartRequest cartRequest) async {
+    try {
+      final response = await homeRepository.addUpdateDeleteCart(token, cartRequest);
+
+      navigateLogin();
+    } on CustomError catch (e) {
+      errorDialog(context, e.errMsg);
+    }
+  }
+
+  FutureOr<void> _addToCart(String token, CartRequest cartRequest) async {
+    try {
+      final response = await homeRepository.addUpdateDeleteCart(token, cartRequest);
+
+      Fluttertoast.showToast(
+          msg: "Successfully added",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } on CustomError catch (e) {
+      errorDialog(context, e.errMsg);
+    }
+  }
+
+  void navigateLogin() {
+    Navigator.pushNamed(context, ConfirmOrderScreen.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
-    if(_isLoaderVisible){
+    if (_isLoaderVisible) {
       context.loaderOverlay.hide();
     }
-    final listingProduct = ModalRoute.of(context)!.settings.arguments as ListingProduct;
+
+    final listingProduct =
+        ModalRoute.of(context)!.settings.arguments as ListingProduct;
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
     /// Get the images
@@ -192,6 +225,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     final productId = listingProduct.id;
+
     final sku = listingProduct.keyDetails?.variant?[selectedColorValue].sku;
 
     counter.value = false;
@@ -271,20 +305,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   getIt<HomeRepository>();
 
                               if (!isFavorite) {
-                                var toggleWishListRequest = ToggleWishListRequest(
-                                    productId: productId,
-                                    sku: sku,
-                                    action: "add");
+                                var toggleWishListRequest =
+                                    ToggleWishListRequest(
+                                        productId: productId,
+                                        sku: sku,
+                                        action: "add");
                                 await homeRepository
                                     .toggleWishList(toggleWishListRequest);
 
                                 isFavorite = !isFavorite;
                                 counter.value = true;
                               } else {
-                                var toggleWishListRequest = ToggleWishListRequest(
-                                    productId: productId,
-                                    sku: sku,
-                                    action: "remove");
+                                var toggleWishListRequest =
+                                    ToggleWishListRequest(
+                                        productId: productId,
+                                        sku: sku,
+                                        action: "remove");
                                 await homeRepository
                                     .toggleWishList(toggleWishListRequest);
 
@@ -389,7 +425,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       fontColor: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
+
                     const SizedBox(height: 10),
+
                     Row(
                       children: [
                         MyGoogleText(
@@ -415,7 +453,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           width: 60,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border: Border.all(width: 1, color: secondaryColor3),
+                            border:
+                                Border.all(width: 1, color: secondaryColor3),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(15),
                             ),
@@ -431,7 +470,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -481,7 +522,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -531,7 +574,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
+
                     Row(
                       children: [
                         RatingBarWidget(
@@ -554,6 +599,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 30),
 
                     const MyGoogleText(
@@ -562,6 +608,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       fontColor: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
+
                     const SizedBox(height: 10),
 
                     ///__________Select Size_______________________________
@@ -617,6 +664,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         itemCount: sizeList.length,
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
                     ///__________Select Color Buttons & Quantity button______________________________
@@ -628,6 +676,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
 
                     const SizedBox(height: 10.0),
+
                     HorizontalList(
                       spacing: 10,
                       itemCount: selectColorImage.length,
@@ -656,6 +705,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         );
                       },
                     ),
+
                     const SizedBox(height: 10.0),
 
                     ///__________Select Color Buttons & Quantity button______________________________
@@ -667,7 +717,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       fontColor: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
+
                     const SizedBox(height: 10),
+
                     SizedBox(
                       width: 110,
                       child: Row(
@@ -722,6 +774,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
                     const MyGoogleText(
@@ -730,7 +783,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       fontColor: Colors.black,
                       fontWeight: FontWeight.bold,
                     ),
+
                     const SizedBox(height: 10),
+
                     const TextField(
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -1007,8 +1062,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   child: Row(
                                     children: [
                                       MyGoogleText(
-                                        text: attribute.displayName.toString() ??
-                                            '',
+                                        text:
+                                            attribute.displayName.toString() ??
+                                                '',
                                         fontSize: 12,
                                         fontColor: Colors.grey,
                                         fontWeight: FontWeight.bold,
@@ -1029,13 +1085,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                     ///__________________Related Products____________________________
                     const SizedBox(height: 15),
+
                     const MyGoogleText(
                       text: 'Similar Product',
                       fontSize: 16,
                       fontColor: Colors.black,
                       fontWeight: FontWeight.normal,
                     ),
+
                     const SizedBox(height: 15),
+
                     HorizontalList(
                       spacing: 20,
                       itemCount: 4,
@@ -1076,8 +1135,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
                 color: Colors.white),
             child: Padding(
-              padding:
-                  const EdgeInsets.only(top: 25, bottom: 30, left: 15, right: 15),
+              padding: const EdgeInsets.only(
+                  top: 25, bottom: 30, left: 15, right: 15),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1085,30 +1144,69 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Button1(
                     buttonText: 'Buy now',
                     buttonColor: primaryColor,
-                    onPressFunction: () => Navigator.pushNamed(
-                        context, ConfirmOrderScreen.routeName),
-                  )),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ButtonType2(
-                      buttonText: 'Add to Cart',
-                      buttonColor: primaryColor,
-                      onPressFunction: () async {
-                        context.loaderOverlay.show();
-                        setState(() {
-                          _isLoaderVisible = context.loaderOverlay.visible;
-                        });
-                        await Future.delayed(Duration(seconds: 2));
-                        if (_isLoaderVisible) {
-                          context.loaderOverlay.hide();
-                        }
+                    onPressFunction: () async {
+                      var token = await sharedPreferenceHelper.authToken;
+
+                      if (token != null) {
                         setState(() {
                           _isLoaderVisible = context.loaderOverlay.visible;
                         });
 
-                      //  Navigator.pushNamed(context, CartScreen.routeName,
+                        if (initialValueFromText == 0) {
+                          initialValueFromText = 1;
+                        }
+
+                        List<Items>? items = [];
+                        var item = Items(sku: sku, qty: initialValueFromText);
+                        items.add(item);
+                        var request =
+                            CartRequest(action: "update", items: items);
+
+                        _buyNow(token, request);
+
+                        if (_isLoaderVisible) {
+                          context.loaderOverlay.hide();
+                        }
+                      } else {
+                        Navigator.pushNamed(context, LogInScreen.routeName);
                       }
-                    ),
+                    },
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ButtonType2(
+                        buttonText: 'Add to Cart',
+                        buttonColor: primaryColor,
+                        onPressFunction: () async {
+                          var token = await sharedPreferenceHelper.authToken;
+
+                          if (token != null) {
+                            setState(() {
+                              _isLoaderVisible = context.loaderOverlay.visible;
+                            });
+
+                            if (initialValueFromText == 0) {
+                              initialValueFromText = 1;
+                            }
+
+                            List<Items>? items = [];
+                            var item =
+                                Items(sku: sku, qty: initialValueFromText);
+                            items.add(item);
+                            var request =
+                                CartRequest(action: "update", items: items);
+
+                            _addToCart(token, request);
+
+                            if (_isLoaderVisible) {
+                              context.loaderOverlay.hide();
+                            }
+                          } else {
+                            Navigator.pushNamed(context, LogInScreen.routeName);
+                          }
+
+                          //  Navigator.pushNamed(context, CartScreen.routeName,
+                        }),
                   ),
                 ],
               ),

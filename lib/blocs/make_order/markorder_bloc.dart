@@ -20,7 +20,9 @@ class MakeOrderBloc extends Bloc<MakeOrderEvent, MakeOrderState> {
   MakeOrderBloc({
     required this.homeRepository,
   }) : super(MakeOrderState.initial()) {
+
     on<MakeOrderRequestEvent>(_fetchOrderRequestId);
+
     on<MakeCODOrderOtpVerifyEvent>(_verifyCODOrderVerifyOtp);
   }
 

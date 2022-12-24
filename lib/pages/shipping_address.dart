@@ -10,16 +10,16 @@ import '../models/wishlist/verifywishlist.dart';
 import '../widgets/add_new_address.dart';
 import '../widgets/buttons.dart';
 
-class ShippingAddress extends StatefulWidget {
+class ShippingAddressPage extends StatefulWidget {
   static const String routeName = "/ShippingAddress";
 
-  const ShippingAddress({Key? key}) : super(key: key);
+  const ShippingAddressPage({Key? key}) : super(key: key);
 
   @override
-  State<ShippingAddress> createState() => _ShippingAddressState();
+  State<ShippingAddressPage> createState() => _ShippingAddressPageState();
 }
 
-class _ShippingAddressState extends State<ShippingAddress> {
+class _ShippingAddressPageState extends State<ShippingAddressPage> {
 
   int checked = 0;
 
@@ -40,7 +40,7 @@ class _ShippingAddressState extends State<ShippingAddress> {
     final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNewAddress()),);
     if (!mounted) return;
     if(result == "save"){
-      Navigator.popAndPushNamed(context, ShippingAddress.routeName);
+      Navigator.popAndPushNamed(context, ShippingAddressPage.routeName);
     }
   }
 

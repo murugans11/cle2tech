@@ -52,6 +52,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     if (update) {
+
       if (token != null) {
         BlocProvider.of<CartListResponseCubit>(context).loadCartList(token);
       }

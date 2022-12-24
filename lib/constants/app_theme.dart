@@ -126,6 +126,10 @@ class _Assets {
   String get wishlist => "assets/images/wishlist.png";
 
   String get fourHrDelivery => "assets/images/4HrDelivery.png";
+
+  String get gift1 => "assets/images/gift1.png";
+
+  String get gift2 => "assets/images/gift2.png";
 }
 
 class _Values {

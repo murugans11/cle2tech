@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/models/login/login_response.dart';
-import 'package:shopeein/pages/auth_screen/sign_up.dart';
 
 import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
@@ -15,8 +14,6 @@ import '../../models/register/request_otp.dart';
 import '../../utils/device/custom_error.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/error_dialog.dart';
-import '../initial_page.dart';
-import 'forgot_pass_screen.dart';
 import 'otp_auth_screen.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -325,9 +322,7 @@ class _LogInScreenState extends State<LogInScreen> {
         });
   }
 
-  FutureOr<void> _loginWithCredentials(
-
-      LoginRequest loginRequest, BuildContext buildContext) async {
+  FutureOr<void> _loginWithCredentials(LoginRequest loginRequest, BuildContext buildContext) async {
     try {
       final LoginRepository loginRepository = getIt<LoginRepository>();
 

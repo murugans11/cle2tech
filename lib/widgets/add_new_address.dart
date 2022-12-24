@@ -270,32 +270,24 @@ class _AddNewAddressState extends State<AddNewAddress> {
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RadioGroup<String>.builder(
-                              direction: Axis.horizontal,
-                              groupValue: _verticalGroupValue,
-                              horizontalAlignment:
-                                  MainAxisAlignment.spaceAround,
-                              activeColor: primaryColor,
-                              onChanged: (value) => setState(() {
-                                _verticalGroupValue = value!;
-                              }),
-                              items: _status,
-                              textStyle: const TextStyle(
-                                  fontSize: 15, color: Colors.grey),
-                              itemBuilder: (item) => RadioButtonBuilder(
-                                item,
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
+
+                    RadioGroup<String>.builder(
+                      direction: Axis.horizontal,
+                      groupValue: _verticalGroupValue,
+                      horizontalAlignment:
+                      MainAxisAlignment.spaceAround,
+                      activeColor: primaryColor,
+                      onChanged: (value) => setState(() {
+                        _verticalGroupValue = value!;
+                      }),
+                      items: _status,
+                      textStyle: const TextStyle(
+                          fontSize: 15, color: Colors.grey),
+                      itemBuilder: (item) => RadioButtonBuilder(
+                        item,
+                      ),
                     ),
+
                   ],
                 ),
 

@@ -136,8 +136,7 @@ class _ProductGreedShow1State extends State<ProductGreedShow1> {
                 child: GestureDetector(
                   onTap: () async {
 
-                    SharedPreferenceHelper sharedPreferenceHelper =
-                        getIt<SharedPreferenceHelper>();
+                    SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
                     var token = await sharedPreferenceHelper.authToken;
                     if (token != null) {
                       HomeRepository homeRepository = getIt<HomeRepository>();

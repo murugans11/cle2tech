@@ -7,7 +7,6 @@ import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
 import '../../data/repository/login_repository.dart';
 import '../../di/components/service_locator.dart';
-import '../../models/login/RequestOtpResponse.dart';
 import '../../models/login/login_response.dart';
 import '../../models/register/RegistrationRequest.dart';
 import '../../models/register/request_otp.dart';

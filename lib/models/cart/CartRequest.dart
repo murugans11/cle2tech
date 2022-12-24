@@ -4,7 +4,6 @@ class CartRequest {
 
   CartRequest({this.action, this.items});
 
-
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['action'] = action;

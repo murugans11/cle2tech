@@ -29,6 +29,11 @@ class Endpoints {
   static const String registerNewPhoneNumber = "${baseUrl}customer/newOtp";
   static const String verifyNewRegisterWithOtp = "${baseUrl}customer";
 
+  static const String updateProfile = "${baseUrl}customer/profile";
+  static const String changePassword = "${baseUrl}customer/change-password";
+
+
+
   //Forgot password
   static const String getForgotPasswordOtp = "${baseUrl}customer/forgot";
 
@@ -50,6 +55,8 @@ class Endpoints {
   static const String savePaymentSuccess = "${baseUrl}order/verifyOrder";
 
   static const String getMyOrder = "${baseUrl}order/listing";
+
+  static const String orderGift = "${baseUrl}orderGift";
 
 
 

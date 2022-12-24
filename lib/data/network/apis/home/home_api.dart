@@ -14,6 +14,7 @@ import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
 import '../../../../models/coupan/coupon_response.dart';
 import '../../../../models/feature/feature_productes.dart';
+import '../../../../models/gift/gift_response.dart';
 import '../../../../models/login/OtpVerifyRequest.dart';
 import '../../../../models/login/RequestOtpResponse.dart';
 import '../../../../models/login/login_requst.dart';
@@ -173,6 +174,52 @@ class HomeApi {
     }
   }
 
+  Future<WishListResponse> updateProfile(String token, String firstName, String lastName,String gender,) async {
+    try {
+      debugPrint(Endpoints.updateProfile);
+      final data = <String, String>{};
+      data['firstName'] = firstName;
+      data['lastName'] = lastName;
+      data['gender'] = gender;
+
+      final response = await _dioClient.post(
+        Endpoints.updateProfile,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+      return WishListResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<String> changePassword(String token, String password, String passwordConfirmation) async {
+    try {
+      debugPrint(Endpoints.changePassword);
+      final data = <String, String>{};
+      data['password'] = password;
+      data['passwordConfirmation'] = passwordConfirmation;
+
+
+      final response = await _dioClient.post(
+        Endpoints.changePassword,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+      return response.toString();
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
   Future<void> toggleWishList(
       ToggleWishListRequest toggleWishListRequest) async {
     try {
@@ -195,10 +242,6 @@ class HomeApi {
 
       Map<String, dynamic> json = response;
       debugPrint(json.toString());
-
-      /* if(response.statusCode == 401){
-
-      }*/
 
     } catch (e) {
       debugPrint(e.toString());
@@ -274,13 +317,11 @@ class HomeApi {
     }
   }
 
-  Future<CartResponse> addUpdateDeleteCart(
-      String token, CartRequest cartRequest) async {
+  Future<CartResponse> addUpdateDeleteCart(String token, CartRequest cartRequest) async {
     try {
       debugPrint(Endpoints.getCartList);
 
-      var request =
-          CartRequest(action: cartRequest.action, items: cartRequest.items);
+      var request = CartRequest(action: cartRequest.action, items: cartRequest.items);
 
       final response = await _dioClient.put(
         Endpoints.getCartList,
@@ -350,8 +391,23 @@ class HomeApi {
     }
   }
 
-  Future<CartResponse> applyCoupon(
-      String token, String couponCode, String orderId) async {
+  Future<GiftResponse> getMyGift(String token) async {
+    try {
+      debugPrint(Endpoints.orderGift);
+      final response = await _dioClient.get(Endpoints.orderGift,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      return GiftResponse.fromJson(response);
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<CartResponse> applyCoupon(String token, String couponCode, String orderId) async {
     try {
       debugPrint(Endpoints.applyCoupon);
 

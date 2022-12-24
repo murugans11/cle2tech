@@ -2,33 +2,102 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:iconly/iconly.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:shopeein/data/sharedpref/shared_preference_helper.dart';
+import 'package:shopeein/pages/auth_screen/log_in_screen.dart';
 import 'package:shopeein/pages/payment_method_screen.dart';
 import 'package:shopeein/pages/splash_screen_one.dart';
 import '../constants/app_theme.dart';
 import '../constants/constants.dart';
+import '../data/repository/home_repository.dart';
+import '../di/components/service_locator.dart';
+import '../models/wishlist/verifywishlist.dart';
 import '../widgets/notificition_screen.dart';
 import 'auth_screen/change_pass_screen.dart';
+import 'gift_screen.dart';
 import 'my_order.dart';
 import 'my_profile_screen.dart';
 
-
 class ProfileScreen extends StatefulWidget {
+
   static const String routeName = "/ProfileScreen";
+
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>  {
+
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
+  VerifyWishlist response = VerifyWishlist();
+  String? token = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _asyncMethod();
+  }
+
+
+  // Navigator.pop.
+  Future<void> _navigateToLogin(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(context,
+      MaterialPageRoute(builder: (context) => const LogInScreen()),
+    );
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    _asyncMethod();
+   /* ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$result')));*/
+  }
+
+  // Navigator.pop.
+  Future<void> _navigateToProfileUpdate(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await  Navigator.pushNamed(context, MyProfileScreen.routeName,arguments: response.user?.profile);
+
+    // When a BuildContext is used from a StatefulWidget, the mounted property
+    // must be checked after an asynchronous gap.
+    if (!mounted) return;
+
+    // After the Selection Screen returns a result, hide any previous snackbars
+    // and show the new result.
+    _asyncMethod();
+    /* ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$result')));*/
+  }
+
+
+
+  _asyncMethod() async {
+     token = await sharedPreferenceHelper.authToken;
+    if (token != null) {
+      response = await homeRepository.verifyWishList(token!);
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
 
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
-       /* leading: GestureDetector(
+        /* leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
@@ -88,7 +157,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],*/
       ),
 
-
       body: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
@@ -114,28 +182,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         height: 90,
                         width: 90,
-                        decoration:  BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(50)),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
                           image: DecorationImage(
                             fit: BoxFit.fitWidth,
-                            image: AssetImage(AppTheme.of(context)?.assets.logo1 ?? ''),
+                            image: AssetImage(
+                                AppTheme.of(context)?.assets.logo1 ?? ''),
                           ),
                         ),
                       ),
-
                       Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children:  [
                             MyGoogleText(
-                                text: 'Rajesh',
+                                text: response.user?.profile?.firstName ?? '',
                                 fontSize: 24,
                                 fontColor: Colors.black,
                                 fontWeight: FontWeight.normal),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             MyGoogleText(
-                                text: 'Rajesh@gmail.com',
+                                text: response.user?.profile?.mobileNo ?? '',
                                 fontSize: 14,
                                 fontColor: textColors,
                                 fontWeight: FontWeight.normal),
@@ -146,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  ///_____My_profile_____________________________
+                  ///_____Login_____________________________
                   Container(
                     decoration: const BoxDecoration(
                         border: Border(
@@ -154,7 +223,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () {
-                        const MyProfileScreen().launch(context);
+                        _navigateToLogin(context);
+                      },
+                      shape: const Border(
+                          bottom: BorderSide(width: 1, color: textColors)),
+                      leading: const Icon(IconlyLight.login),
+                      title: const MyGoogleText(
+                          text: 'Login',
+                          fontSize: 16,
+                          fontColor: Colors.black,
+                          fontWeight: FontWeight.normal),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+
+                  ///_____My_profile_____________________________
+                  Container(
+                    decoration: const BoxDecoration(
+                        border: Border(
+                            bottom:
+                                BorderSide(width: 1, color: secondaryColor3))),
+                    child: ListTile(
+                      onTap: () async {
+
+                        if (token != null) {
+                         _navigateToProfileUpdate(context);
+
+                        }else{
+                          _navigateToLogin(context);
+                        }
+
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -178,8 +279,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             bottom:
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
-                      onTap: () {
-                        const ChangePassScreen().launch(context);
+                      onTap: () async {
+
+                        if (token != null) {
+                          const ChangePassScreen().launch(context);
+                        }else{
+                          _navigateToLogin(context);
+                        }
+
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -229,7 +336,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () {
-                        const PaymentMethodScreen().launch(context);
+                        //const PaymentMethodScreen().launch(context);
+                        Navigator.pushNamed(context, GiftPage.routeName);
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -272,7 +380,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),*/
 
                   ///_____________Language________________________
-                /*  Container(
+                  /*  Container(
                     decoration: const BoxDecoration(
                         border: Border(
                             bottom:
@@ -295,7 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),*/
 
                   ///___________________Help___________________________
-                  Container(
+                  /*Container(
                     decoration: const BoxDecoration(
                         border: Border(
                             bottom:
@@ -315,16 +423,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         size: 16,
                       ),
                     ),
-                  ),
+                  ),*/
 
                   ///______________SignOut_________________________
                   Container(
                     decoration: const BoxDecoration(
-                        border: Border(
-                            bottom:
-                                BorderSide(width: 1, color: secondaryColor3))),
+                        border: Border(bottom: BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
-                      onTap: () {
+                      onTap: () async {
+                        await sharedPreferenceHelper.removeAuthToken();
                         const SplashScreenOne().launch(context, isNewTask: true);
                       },
                       shape: const Border(
@@ -348,5 +455,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+
   }
 }

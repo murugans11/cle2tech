@@ -17,8 +17,7 @@ class OtpAuthScreen extends StatefulWidget {
 class _OtpAuthScreenState extends State<OtpAuthScreen> {
   @override
   Widget build(BuildContext context) {
-    RequestOtp requestOtpResponse =
-        ModalRoute.of(context)!.settings.arguments as RequestOtp;
+    RequestOtp requestOtpResponse = ModalRoute.of(context)!.settings.arguments as RequestOtp;
 
     String phone = requestOtpResponse.requestOtpResponse.data.phone;
 
