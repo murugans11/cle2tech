@@ -8,6 +8,7 @@ import 'package:group_radio_button/group_radio_button.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:scratcher/widgets.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
+import 'package:shopeein/pages/shipping_address_gift.dart';
 
 import '../constants/app_theme.dart';
 import '../constants/constants.dart';
@@ -23,6 +24,7 @@ import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
 import '../models/gift/gift_response.dart';
 import '../models/wishlist/verifywishlist.dart';
+import '../widgets/buttons.dart';
 import '../widgets/gift_greed_view_widget.dart';
 import '../widgets/product_greed_view_widget.dart';
 import 'auth_screen/log_in_screen.dart';
@@ -37,27 +39,6 @@ class GiftDetailPage extends StatefulWidget {
 }
 
 class _GiftDetailPageState extends State<GiftDetailPage> {
-  SharedPreferenceHelper sharedPreferenceHelper =
-      getIt<SharedPreferenceHelper>();
-  HomeRepository homeRepository = getIt<HomeRepository>();
-  var token;
-
-  Future<GiftResponse> _getLatest() async {
-    GiftResponse response = GiftResponse();
-    token = await sharedPreferenceHelper.authToken;
-    if (token != null) {
-      response = await homeRepository.getMyGift(token);
-    }
-    return response;
-  }
-
-  _asyncMethod() async {
-    final tokenValues = await sharedPreferenceHelper.authToken;
-    setState(() {
-      token = tokenValues;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -65,9 +46,6 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
   }
 
   double _opacity = 0.0;
-
-  String _verticalGroupValue = "Add this product to my purchase";
-  final List<String> _status = ["Add this product to my purchase", "Ship this product as gift"];
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +74,7 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
           fontSize: 20,
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      body: ListView(
         children: [
           const SizedBox(height: 10),
           const SizedBox(
@@ -123,7 +99,6 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
             ),
           ),
           const SizedBox(height: 10),
-
           Scratcher(
             accuracy: ScratchAccuracy.high,
             threshold: 50,
@@ -167,48 +142,38 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
-          RadioGroup<String>.builder(
-            direction: Axis.vertical,
-            groupValue: _verticalGroupValue,
-            horizontalAlignment:
-            MainAxisAlignment.spaceAround,
-            activeColor: primaryColor,
-            onChanged: (value) => setState(() {
-              _verticalGroupValue = value!;
-            }),
-            items: _status,
-            textStyle: const TextStyle(
-                fontSize: 15, color: Colors.grey),
-            itemBuilder: (item) => RadioButtonBuilder(
-              item,
-            ),
-          ),
-
+          Button1(
+              buttonText: 'Claim',
+              buttonColor: primaryColor,
+              onPressFunction: () {
+                var giftId1 = requestOtpResponse.id ?? "";
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  ShippingGiftAddressPage(
+                        claimType: "SELF",
+                        giftId: giftId1,
+                      ),
+                    ));
+              }),
+          const SizedBox(height: 15),
+          Button1(
+              buttonText: 'Gift to loved one',
+              buttonColor: primaryColor,
+              onPressFunction: () {
+                var giftId1 = requestOtpResponse.id ?? "";
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  ShippingGiftAddressPage(
+                        claimType: "OTHERS",
+                        giftId: giftId1,
+                      ),
+                    ));
+              }),
         ],
       ),
     );
-  }
-
-  // Navigator.pop.
-  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
-    // Navigator.push returns a Future that completes after calling
-    // Navigator.pop on the Selection Screen.
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LogInScreen()),
-    );
-
-    // When a BuildContext is used from a StatefulWidget, the mounted property
-    // must be checked after an asynchronous gap.
-    if (!mounted) return;
-
-    // After the Selection Screen returns a result, hide any previous snackbars
-    // and show the new result.
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$result')));
   }
 }

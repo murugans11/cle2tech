@@ -155,9 +155,11 @@ class HomeRepository {
     }
   }
 
-  Future<CartResponse> addUpdateDeleteCart(String token, CartRequest cartRequest) async {
+  Future<CartResponse> addUpdateDeleteCart(
+      String token, CartRequest cartRequest) async {
     try {
-      final CartResponse cartResponse = await _homeApi.addUpdateDeleteCart(token, cartRequest);
+      final CartResponse cartResponse =
+          await _homeApi.addUpdateDeleteCart(token, cartRequest);
 
       debugPrint('cartResponse: $cartResponse');
 
@@ -168,7 +170,23 @@ class HomeRepository {
     }
   }
 
+  Future<String> updateGift(
+    String token,
+    String id,
+    String deliveryAddress,
+    String claimType,
+  ) async {
+    try {
+      final cartResponse = await _homeApi.updateGift(token, id, deliveryAddress, claimType);
 
+      debugPrint('cartResponse: $cartResponse');
+
+      return cartResponse;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+    }
+  }
 
   Future<CartResponse> applyCoupon(
       String token, String couponCode, String orderId) async {
@@ -228,6 +246,7 @@ class HomeRepository {
       throw e;
     }
   }
+
   Future<GiftResponse> getMyGift(String token) async {
     try {
       final GiftResponse cartResponse = await _homeApi.getMyGift(token);
@@ -256,9 +275,11 @@ class HomeRepository {
     }
   }
 
-  Future<String> verifyOtpOrder(String token, String otp1, String requestId, String id) async {
+  Future<String> verifyOtpOrder(
+      String token, String otp1, String requestId, String id) async {
     try {
-      final String response = await _homeApi.verifyOtpOrder(token, otp1, requestId, id);
+      final String response =
+          await _homeApi.verifyOtpOrder(token, otp1, requestId, id);
 
       debugPrint('otp: $response');
 
@@ -269,10 +290,11 @@ class HomeRepository {
     }
   }
 
-  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress,
-      String paymentType) async {
+  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id,
+      String deliveryAddress, String paymentType) async {
     try {
-      final  requestId = await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType);
+      final requestId =
+          await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType);
 
       debugPrint('requestId: $requestId');
 
@@ -284,11 +306,11 @@ class HomeRepository {
     }
   }
 
-
-
-  Future<String> savePaymentSuccess(String token, String orderId, String paymentId, String signature) async {
+  Future<String> savePaymentSuccess(
+      String token, String orderId, String paymentId, String signature) async {
     try {
-      final  requestId = await _homeApi.savePaymentSuccess(token, orderId, paymentId, signature);
+      final requestId = await _homeApi.savePaymentSuccess(
+          token, orderId, paymentId, signature);
 
       var result = requestId.toString();
       debugPrint('requestId: $result');
@@ -297,7 +319,6 @@ class HomeRepository {
     } catch (e) {
       debugPrint(e.toString());
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
-
     }
   }
 }

@@ -16,6 +16,7 @@ import '../di/components/service_locator.dart';
 import '../models/otp_verify/OrderOtpVerifyRequest.dart';
 import '../utils/dio/network_call_status_enum.dart';
 import '../widgets/confirmation_popup.dart';
+import 'gift_screen.dart';
 
 class PinCodeVerificationScreen extends StatefulWidget {
 
@@ -193,19 +194,8 @@ class PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                 listener: (context, state) {
                   if (state.status == NetworkCallStatusEnum.loaded) {
                     //{status: 200, success: true, message: Payment has been verified, orderGiftData: {orderGiftId: 639e02429e46977080534d88}}
-                    Navigator.of(context).push(
-                      PageRouteBuilder(
-                        opaque: false,
-                        pageBuilder: (BuildContext context, _, __) =>
-                            const RedeemConfirmationScreen(
-                          image: 'images/confirm_order_pupup.png',
-                          mainText: 'Order successfully!',
-                          subText:
-                              'Your order will be delivered soon. Thank you.',
-                          buttonText: 'Back to Home',
-                        ),
-                      ),
-                    );
+                    Navigator.pushNamed(context, GiftPage.routeName);
+
                   } else if (state.status == NetworkCallStatusEnum.error) {
                     Fluttertoast.showToast(
                         msg: state.error.errMsg,

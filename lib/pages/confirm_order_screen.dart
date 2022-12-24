@@ -348,16 +348,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     // Do something when payment fails
     print(response);
     // Do something when payment fails
-    Navigator.push(context, MaterialPageRoute(
-      builder: (_) {
-        return PaymentValidationPage(
-          token: token,
-          order: '',
-          paymentId: '',
-          signature: '',
-        );
-      },
-    ));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(response.message ?? ''),

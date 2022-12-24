@@ -66,7 +66,9 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
           fontSize: 18,
         ),
       ),
+
       body: ListView(children: [
+
         FutureBuilder<VerifyWishlist>(
           future: _getLatest(),
           builder:
@@ -233,6 +235,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
                   );
           },
         ),
+
         Button1(
             buttonText: 'Add New Address',
             buttonColor: primaryColor,

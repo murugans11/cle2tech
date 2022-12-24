@@ -5,6 +5,7 @@ import '../constants/constants.dart';
 import '../data/repository/home_repository.dart';
 import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
+import 'gift_screen.dart';
 
 class PaymentValidationPage extends StatefulWidget {
 
@@ -72,8 +73,9 @@ class _PaymentValidationPageState extends State<PaymentValidationPage> {
             builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
               List<Widget> children;
               if (snapshot.hasData) {
+                Navigator.pushNamed(context, GiftPage.routeName);
                 children = <Widget>[
-                  const Icon(
+                 /* const Icon(
                     Icons.check_circle_outline,
                     color: Colors.green,
                     size: 60,
@@ -81,11 +83,13 @@ class _PaymentValidationPageState extends State<PaymentValidationPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: Text('Result: ${snapshot.data}'),
-                  ),
+                  ),*/
+                  Container()
                 ];
               } else if (snapshot.hasError) {
+                Navigator.pushNamed(context, GiftPage.routeName);
                 children = <Widget>[
-                  const Icon(
+                 /* const Icon(
                     Icons.error_outline,
                     color: Colors.red,
                     size: 60,
@@ -93,7 +97,10 @@ class _PaymentValidationPageState extends State<PaymentValidationPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: Text('Error: ${snapshot.error}'),
-                  ),
+                  ),*/
+
+                  Container()
+
                 ];
               } else {
                 children = const <Widget>[

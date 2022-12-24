@@ -48,6 +48,8 @@ class Endpoints {
 
   static const String applyCoupon = "${baseUrl}offer";
 
+  static const String giftUpdate = "${baseUrl}orderGift/giftUpdate";
+
   static const String makeOrder = "${baseUrl}order/";
 
   static const String verifyOtp = "${baseUrl}order/verifyOtp";

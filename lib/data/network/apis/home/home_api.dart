@@ -431,6 +431,32 @@ class HomeApi {
     }
   }
 
+  Future<String> updateGift(String token, String id, String deliveryAddress, String claimType, ) async {
+    try {
+      debugPrint(Endpoints.giftUpdate);
+
+      final data = <String, String>{};
+      data['id'] = id;
+      data['deliveryAddress'] = deliveryAddress;
+      data['claimType'] = claimType;
+
+      final response = await _dioClient.post(
+        Endpoints.giftUpdate,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+
+      return response.toString();
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+
   Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress, String paymentType) async {
     try {
       final data = <String, String>{};

@@ -82,7 +82,7 @@ class _GiftPageState extends State<GiftPage> {
           ),
         ),
         title: const MyGoogleText(
-          text: 'My Order',
+          text: 'Gift',
           fontColor: Colors.white,
           fontWeight: FontWeight.normal,
           fontSize: 20,
@@ -121,7 +121,8 @@ class _GiftPageState extends State<GiftPage> {
                     childAspectRatio: 0.55,
                   ),
                   itemBuilder: (context, index) {
-                    return getItem(snapshot.data?.gift, index, context);
+
+                    return getItem(snapshot.data?.orderGift,snapshot.data?.gift, index, context);
                   },
                 ),
               ) : Center(child: Column(
@@ -151,14 +152,43 @@ class _GiftPageState extends State<GiftPage> {
   }
 
 
-  GiftGreedView getItem(List<Gift>? gift, int index, BuildContext context) {
+  GiftGreedView getItem( List<OrderGift>? orderGift,List<Gift>? gift, int index, BuildContext context) {
 
+
+    bool isClaim1 = false;
+    bool isOpen1 = false;
+    String imageurl = '';
+    var id = gift?[index].id;
+    orderGift?.forEach((element) {
+
+      if(element.giftId == id){
+        isClaim1 = element.isClaim ?? false;
+        isOpen1 = element.isOpen ?? false;
+        if(!isClaim1 && !isOpen1){
+         // imageurl = gift?[index].resourcePath ?? '';
+        }
+      }
+    });
     return GiftGreedView(
       productTitle: "",
       isSingleView: false,
       callCat: () {
-        Navigator.pushNamed(context, GiftDetailPage.routeName, arguments: gift?[index]);
+        if(!isClaim1){
+          Navigator.pushNamed(context, GiftDetailPage.routeName, arguments: gift?[index]);
+        }else{
+          Fluttertoast.showToast(
+              msg: "Gift already claimed",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        }
+
       },
+      imageurl:imageurl ,
 
     );
   }
