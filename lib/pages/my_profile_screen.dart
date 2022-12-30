@@ -17,6 +17,7 @@ import '../models/wishlist/wish_list_response.dart';
 import '../utils/device/custom_error.dart';
 
 class MyProfileScreen extends StatefulWidget {
+
   static const String routeName = "/MyProfileScreen";
 
   const MyProfileScreen({Key? key}) : super(key: key);
@@ -50,7 +51,7 @@ class _MyProfileScreen extends State<MyProfileScreen> {
   Widget build(BuildContext context) {
     Profile profile = ModalRoute.of(context)!.settings.arguments as Profile;
 
-    _verticalGroupValue = profile.gender ?? 'Male' ;
+   // _verticalGroupValue = profile.gender ?? 'Male' ;
     userFirstNameController.text = profile.firstName ?? '' ;
     userLastNameController.text = profile.lastName ?? '' ;
     passwordController.text = profile.mobileNo ?? '' ;
@@ -162,10 +163,8 @@ class _MyProfileScreen extends State<MyProfileScreen> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                final firstName =
-                                    userFirstNameController.value.text;
-                                final lastName =
-                                    userLastNameController.value.text;
+                                final firstName = userFirstNameController.value.text;
+                                final lastName = userLastNameController.value.text;
                                 final password = passwordController.value.text;
                                 updateProfile(firstName, lastName,_verticalGroupValue);
                               }
@@ -182,6 +181,11 @@ class _MyProfileScreen extends State<MyProfileScreen> {
 
   FutureOr<void> updateProfile( String firstName, String lastName,String gender,) async {
     try {
+
+     /* showDialog(context: context, builder: (context){
+        return const Center(child: CircularProgressIndicator(),);
+      });
+      */
       final LoginRepository loginRepository = getIt<LoginRepository>();
 
       final WishListResponse response = await loginRepository.updateProfile(firstName ,lastName ,gender);
@@ -200,6 +204,7 @@ class _MyProfileScreen extends State<MyProfileScreen> {
       });
 
       navigateToOtpScreen();
+
     } on CustomError catch (e) {
       setState(() {
         _isLoading = false;

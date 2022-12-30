@@ -29,6 +29,7 @@ import 'auth_screen/log_in_screen.dart';
 
 import 'package:string_validator/string_validator.dart';
 
+import 'cart_screen.dart';
 import 'confirm_order_screen.dart';
 
 final counter = ValueNotifier<bool>(false);
@@ -86,12 +87,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     'Marvin McKinney',
     'Jenny Wilson',
   ];
+
   List<String> peopleReviewCommends = [
     'Nibh nibh quis dolor in. Etiam cras nisi, turpis quisque diam',
     'Nibh nibh quis dolor in. Etiam cras nisi, turpis quisque diam',
     'Nibh nibh quis dolor in. Etiam cras nisi, turpis quisque diam'
   ];
+
   List<int> peopleReviewRatings = [3, 4, 2];
+
   List<String> peopleReviewPhoto = [
     'images/profilePic.jpg',
     'images/profilePic.jpg',
@@ -130,7 +134,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _navigateAndDisplaySelection(BuildContext context) async {
     // Navigator.push returns a Future that completes after calling
     // Navigator.pop on the Selection Screen.
-    final result = await Navigator.push(context,
+    final result = await Navigator.push(
+      context,
       MaterialPageRoute(builder: (context) => const LogInScreen()),
     );
 
@@ -147,7 +152,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   FutureOr<void> _buyNow(String token, CartRequest cartRequest) async {
     try {
-      final response = await homeRepository.addUpdateDeleteCart(token, cartRequest);
+      final response =
+          await homeRepository.addUpdateDeleteCart(token, cartRequest);
 
       navigateLogin();
     } on CustomError catch (e) {
@@ -167,6 +173,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+      Navigator.pushNamed(context, CartScreen.routeName);
     } on CustomError catch (e) {
       errorDialog(context, e.errMsg);
     }
@@ -184,6 +191,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     final listingProduct =
         ModalRoute.of(context)!.settings.arguments as ListingProduct;
+
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
     /// Get the images
@@ -197,21 +205,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     final title = listingProduct.keyDetails?.productTitle;
+
     final sellingPrice =
         listingProduct.keyDetails?.variant?[selectedColorValue].sellingPrice;
+
     final retailPrice =
         listingProduct.keyDetails?.variant?[selectedColorValue].retailPrice;
+
     final description =
         listingProduct.keyDetails?.description.replaceAll(exp, '');
+
     List<Attributes> attributes =
         listingProduct.attributeGroup?[0].attributes ?? [];
+
     int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
             int.parse(retailPrice) *
             100)
         .toInt();
 
     final highlights = listingProduct.keyDetails?.highlights;
+
     var selectColorImage = [];
+
     var selectSize = [];
 
     listingProduct.keyDetails?.variant?.forEach((variant) {
@@ -220,8 +235,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           .sublist(1)
           .join('.com')
           .trim();
-      selectColorImage.add(
-          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/212x212/filters:format(png)/$image');
+      selectColorImage.add('https://dvlt0mtg4c3zr.cloudfront.net/fit-in/212x212/filters:format(png)/$image');
     });
 
     final productId = listingProduct.id;
@@ -229,6 +243,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final sku = listingProduct.keyDetails?.variant?[selectedColorValue].sku;
 
     counter.value = false;
+
     if (response.user != null) {
       response.user?.wishlist?.forEach((element) {
         if (sku == element.sku || productId == element.listingId) {
@@ -401,10 +416,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                   ),
+
                 ],
               ),
 
               const SizedBox(height: 5),
+
               Container(
                 padding: const EdgeInsets.only(
                     left: 20, top: 20, bottom: 20, right: 20),
@@ -1215,5 +1232,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       ),
     );
+
   }
 }
