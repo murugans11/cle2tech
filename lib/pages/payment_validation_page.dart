@@ -30,15 +30,14 @@ class PaymentValidationPage extends StatefulWidget {
 
 class _PaymentValidationPageState extends State<PaymentValidationPage> {
 
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  HomeRepository homeRepository = getIt<HomeRepository>();
 
   Future<String> _fetchUserInfo(String token,String order, String paymentId,String signature,) async {
     final tokenValues = await sharedPreferenceHelper.authToken;
     final orderInit = await homeRepository.savePaymentSuccess(tokenValues ?? '', order, paymentId, signature);
     return orderInit;
   }
-
-  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
-  HomeRepository homeRepository = getIt<HomeRepository>();
 
 
   @override

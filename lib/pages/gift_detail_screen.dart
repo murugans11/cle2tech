@@ -22,6 +22,7 @@ import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/gift/GiftDetailRequest.dart';
 import '../models/gift/gift_response.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../widgets/buttons.dart';
@@ -49,10 +50,9 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    Gift requestOtpResponse =
-        ModalRoute.of(context)!.settings.arguments as Gift;
+    GiftDetailRequest requestOtpResponse = ModalRoute.of(context)!.settings.arguments as GiftDetailRequest;
 
-    String imageURL = requestOtpResponse.resourcePath ?? '';
+    String imageURL = requestOtpResponse.requestPath ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -147,7 +147,7 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
               buttonText: 'Claim',
               buttonColor: primaryColor,
               onPressFunction: () {
-                var giftId1 = requestOtpResponse.id ?? "";
+                var giftId1 = requestOtpResponse.orderId ?? "";
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -162,7 +162,7 @@ class _GiftDetailPageState extends State<GiftDetailPage> {
               buttonText: 'Gift to loved one',
               buttonColor: primaryColor,
               onPressFunction: () {
-                var giftId1 = requestOtpResponse.id ?? "";
+                var giftId1 = requestOtpResponse.orderId ?? "";
                 Navigator.push(
                     context,
                     MaterialPageRoute(

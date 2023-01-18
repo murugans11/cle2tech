@@ -43,7 +43,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
-        actions: [
+        /*actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -62,7 +62,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
             ),
           ),
-        ],
+        ],*/
         title: const MyGoogleText(
           text: 'Categories',
           fontColor: secondaryColor2,

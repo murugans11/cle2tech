@@ -34,6 +34,8 @@ import '../widgets/cart_item_single_view.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
 
+import 'gift_screen.dart';
+
 class ConfirmOrderScreen extends StatefulWidget {
   static const String routeName = "/ConfirmOrderScreen";
 
@@ -47,10 +49,12 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   var token = '';
   var orderId = '';
+  var walletBalance = '';
   var update = true;
   var addressId = '';
-  var _verticalGroupValue = "Cash on Delivery";
-  final _status = ["Cash on Delivery", "Online Payment"];
+  int paymantType  = 1 ;
+  String? gender;
+  bool useShopeeinWallet = false ;
 
   final _couponController = TextEditingController();
   SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
@@ -64,10 +68,17 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     }
 
     final orderInit = await homeRepository.getOrderInit(tokenValues ?? '');
+    var parts = orderInit.split(':');
+    var _orderId = parts[0].trim();                 // prefix: "date"
+    var walletBal = parts[1].trim(); // prefix: "date"
+
+    debugPrint("orderId$orderId");
+    debugPrint("walletBal$walletBal");
 
     setState(() {
       token = tokenValues ?? '';
-      orderId = orderInit ?? '';
+      orderId = _orderId ;
+      walletBalance = walletBal ;
     });
 
   }
@@ -655,8 +666,35 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                     ),
                   ),
 
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Material(
+                        child: Checkbox(
+                          value: useShopeeinWallet,
+                          onChanged: (value) {
+                            setState(() {
+                              useShopeeinWallet = value ?? false;
+                              paymantType = 1;
+                            });
+                          },
+                        ),
+                      ),
+                      const Text(
+                        'Pay Using Shopeein E-Wallet',
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                    MyGoogleTextWhitAli(
+                    text: 'Your current E-Wallet balance is ₹$walletBalance',
+                    fontSize: 14,
+                    fontColor: Colors.black,
+                    fontWeight: FontWeight.normal, textAlign: TextAlign.center,
+                  ),
+                  
                   const SizedBox(height: 20),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -688,23 +726,29 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                       ),
                     ],
                   ),
-
-                  RadioGroup<String>.builder(
-                    direction: Axis.horizontal,
-                    groupValue: _verticalGroupValue,
-                    horizontalAlignment: MainAxisAlignment.spaceAround,
-                    activeColor: primaryColor,
-                    fillColor: primaryColor,
-                    onChanged: (value) => setState(() {
-                      _verticalGroupValue = value!;
-                    }),
-                    items: _status,
-                    textStyle:
-                        const TextStyle(fontSize: 15, color: Colors.grey),
-                    itemBuilder: (item) => RadioButtonBuilder(
-                      item,
-                    ),
+                  RadioListTile(
+                    title: const Text("Cash on Delivery"),
+                    value: "Cash on Delivery",
+                    groupValue: gender,
+                    onChanged: useShopeeinWallet ? null : (value){
+                      setState(() {
+                        paymantType = 0;
+                        gender = value.toString();
+                      });
+                    },
                   ),
+                  RadioListTile(
+                    title: const Text("Online Payment"),
+                    value: "Online Payment",
+                    groupValue: gender,
+                    onChanged: (value){
+                      setState(() {
+                        paymantType = 1;
+                        gender = value.toString();
+                      });
+                    },
+                  ),
+
 
                   const SizedBox(height: 10),
 
@@ -718,7 +762,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                           buttonColor: primaryColor,
                           onPressFunction: () {
                             var payMentType = 'COD';
-                            if (_verticalGroupValue == "Cash on Delivery") {
+                            if (paymantType == 0) {
                               payMentType = "COD";
                             } else {
                               payMentType = "ONLINE";
@@ -730,24 +774,34 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                   id: orderId,
                                   deliveryAddress: addressId,
                                   paymentType: payMentType,
+                                  canUseWallet: useShopeeinWallet
                                 ));
                           });
                     },
                     listener: (context, state) {
                       if (state.status == NetworkCallStatusEnum.loaded) {
                         if (state.orderOtpVerify.paymentTypeRes == "ONLINE") {
-                          createOrder(state.orderOtpVerify.key, state.orderOtpVerify.orderId, '', '');
+
+                          if(state.orderOtpVerify.isFullWalletPay) {
+
+                            Navigator.pushNamed(context, GiftPage.routeName);
+
+                          } else {
+
+                            createOrder(state.orderOtpVerify.key, state.orderOtpVerify.orderId, '', '');
+
+                          }
+
                         } else {
                           var request = OrderOtpVerifyRequest(
                             token: token,
                             requestId: state.orderOtpVerify.requestId,
                             orderId: orderId,
                           );
-                          Navigator.pushNamed(
-                              context, PinCodeVerificationScreen.routeName,
-                              arguments: request);
+                          Navigator.pushNamed(context, PinCodeVerificationScreen.routeName, arguments: request);
                         }
-                      } else if (state.status == NetworkCallStatusEnum.error) {
+                      }
+                      else if (state.status == NetworkCallStatusEnum.error) {
                         Fluttertoast.showToast(
                             msg: state.error.errMsg,
                             toastLength: Toast.LENGTH_SHORT,

@@ -18,6 +18,7 @@ import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/categoriesbyname/categorieItems.dart';
 import '../models/feature/feature_productes.dart';
+import '../models/gift/GiftDetailRequest.dart';
 import '../models/gift/gift_response.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../widgets/gift_greed_view_widget.dart';
@@ -94,12 +95,7 @@ class _GiftPageState extends State<GiftPage> {
           ? const Center(
         child: Text('MyGift is empty'),
       ) :
-      ListView(
-        scrollDirection: Axis.vertical,
-        children: [
-          const SizedBox(height: 10),
-
-          FutureBuilder<GiftResponse>(
+      FutureBuilder<GiftResponse>(
             future: _getLatest(),
             builder: (BuildContext context, AsyncSnapshot<GiftResponse> snapshot) {
               return snapshot.hasData ? Container(padding: const EdgeInsets.only(left: 20, top: 20, bottom: 20, right: 10),
@@ -113,7 +109,7 @@ class _GiftPageState extends State<GiftPage> {
                 ),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  itemCount: snapshot.data?.gift?.length ,
+                  itemCount: snapshot.data?.orderGift?.length ,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 10.0,
@@ -122,7 +118,40 @@ class _GiftPageState extends State<GiftPage> {
                   ),
                   itemBuilder: (context, index) {
 
-                    return getItem(snapshot.data?.orderGift,snapshot.data?.gift, index, context);
+                    return GestureDetector(
+                        onTap: () {
+
+                          bool? isClaim1 = snapshot.data?.orderGift?[index].isClaim;;
+
+                          if(!isClaim1!) {
+
+                            String imageurl = '';
+
+                            var giftId = snapshot.data?.orderGift?[index].giftId;
+
+                            snapshot.data?.gift?.forEach((element) {
+                              if(element.id == giftId){
+                                imageurl = element.resourcePath ?? '';
+                              }
+                            });
+                            var arg = GiftDetailRequest(requestPath: imageurl, orderId: giftId?? '');
+                            Navigator.pushNamed(context, GiftDetailPage.routeName, arguments: arg);
+
+                          }else{
+                            Fluttertoast.showToast(
+                                msg: "Gift already claimed",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0
+                            );
+                          }
+
+                        },
+                        child: getItem(snapshot.data?.orderGift,snapshot.data?.gift, index, context)
+                    );
                   },
                 ),
               ) : Center(child: Column(
@@ -143,74 +172,32 @@ class _GiftPageState extends State<GiftPage> {
             },
           ),
 
-        ],
-      ),
-
-
-
     );
   }
 
 
-  GiftGreedView getItem( List<OrderGift>? orderGift,List<Gift>? gift, int index, BuildContext context) {
+  GiftGreedView getItem( List<OrderGift>? orderGift, List<Gift>? gift, int index, BuildContext context) {
 
 
-    bool isClaim1 = false;
-    bool isOpen1 = false;
     String imageurl = '';
-    var id = gift?[index].id;
-    orderGift?.forEach((element) {
-
-      if(element.giftId == id){
-        isClaim1 = element.isClaim ?? false;
-        isOpen1 = element.isOpen ?? false;
-        if(!isClaim1 && !isOpen1){
-         // imageurl = gift?[index].resourcePath ?? '';
+    var giftId = orderGift?[index].giftId;
+    gift?.forEach((element) {
+      if(element.id == giftId){
+        bool? claim = orderGift?[index].isClaim;
+        bool? open = orderGift?[index].isOpen;
+        if(claim! && open!) {
+           imageurl = element.resourcePath ?? '';
         }
       }
     });
+
     return GiftGreedView(
       productTitle: "",
       isSingleView: false,
-      callCat: () {
-        if(!isClaim1){
-          Navigator.pushNamed(context, GiftDetailPage.routeName, arguments: gift?[index]);
-        }else{
-          Fluttertoast.showToast(
-              msg: "Gift already claimed",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0
-          );
-        }
-
-      },
       imageurl:imageurl ,
 
     );
   }
 
 
-
-  // Navigator.pop.
-  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
-    // Navigator.push returns a Future that completes after calling
-    // Navigator.pop on the Selection Screen.
-    final result = await Navigator.push(context,
-      MaterialPageRoute(builder: (context) => const LogInScreen()),
-    );
-
-    // When a BuildContext is used from a StatefulWidget, the mounted property
-    // must be checked after an asynchronous gap.
-    if (!mounted) return;
-
-    // After the Selection Screen returns a result, hide any previous snackbars
-    // and show the new result.
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$result')));
-  }
 }

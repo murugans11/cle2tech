@@ -6,7 +6,6 @@ import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
@@ -17,14 +16,12 @@ import '../di/components/service_locator.dart';
 import '../models/cart/CartRequest.dart';
 
 import '../models/feature/feature_productes.dart';
+import '../models/optionallist/optionallistmodel.dart';
 import '../models/wishlist/toggle_wishList_request.dart';
 import '../utils/device/custom_error.dart';
 import '../widgets/buttons.dart';
-import '../widgets/castomar_review_commends.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/product_greed_view_widget.dart';
-import '../widgets/review_bottom_sheet_1.dart';
-import '../widgets/single_product_total_review.dart';
 import 'auth_screen/log_in_screen.dart';
 
 import 'package:string_validator/string_validator.dart';
@@ -44,15 +41,23 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  SharedPreferenceHelper sharedPreferenceHelper =
-      getIt<SharedPreferenceHelper>();
+
+  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
   VerifyWishlist response = VerifyWishlist();
+
+  final myController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _asyncMethod();
+  }
+
+  @override
+  void dispose() {
+    myController.dispose();
+    super.dispose();
   }
 
   _asyncMethod() async {
@@ -64,23 +69,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   bool _isLoaderVisible = false;
+
   bool isFavorite = false;
+
   double initialRating = 0;
+
   late double rating;
-
-  String selectedSize = '';
-
-  final sizeList = [
-    'S',
-    'M',
-    'L',
-    'XL',
-    'XXL',
-  ];
 
   int selectedColorValue = 0;
 
-  int initialValueFromText = 0;
+  int initialValueFromText = 1;
+
+  bool sizeOptionChanged = false;
+
+  String? initialSku = '';
 
   List<String> peopleReviewName = [
     'Abdul Korim',
@@ -102,13 +104,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     'images/profilePic.jpg',
   ];
 
-  Container chooseColorWidget(List<dynamic> images, int index, Color color) {
+  Container chooseColorWidget(String images, int index, Color color) {
     return Container(
       height: 120,
       width: 120,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage(images[index]),
+          image: NetworkImage(images),
           fit: BoxFit.cover,
         ),
         borderRadius: const BorderRadius.all(Radius.zero),
@@ -163,7 +165,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   FutureOr<void> _addToCart(String token, CartRequest cartRequest) async {
     try {
-      final response = await homeRepository.addUpdateDeleteCart(token, cartRequest);
+      final response =
+          await homeRepository.addUpdateDeleteCart(token, cartRequest);
 
       Fluttertoast.showToast(
           msg: "Successfully added",
@@ -183,6 +186,114 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     Navigator.pushNamed(context, ConfirmOrderScreen.routeName);
   }
 
+  Map<String, dynamic> getOptionList(List<Variant>? productVariant) {
+    try {
+      final availableCombination = {};
+
+      productVariant?.forEachIndexed((element, indexValue) {
+        final firstAttriOptionValue =
+            element.optionalAttributes?[0].attributeOptionValue?[0];
+
+        if (!availableCombination.containsKey(firstAttriOptionValue?.sId)) {
+          final data = <String, String>{};
+          data['type'] = element.media?[0].type;
+          data['resourcePath'] = element.media?[0].resourcePath;
+          data['_id'] = element.media?[0].sId;
+
+          availableCombination[firstAttriOptionValue?.sId] = {
+            'sku': element.sku,
+            'inventory': element.inventory,
+            'attributeStyle':
+                element.optionalAttributes?[0].attributeStyle ?? 'rectangle',
+            'label': firstAttriOptionValue?.displayName,
+            'attributeLabel': element.optionalAttributes?[0].displayName,
+            'media': data,
+            'level2': [],
+          };
+        }
+
+        element.optionalAttributes?.forEachIndexed((optAttr, optAttrindex) {
+          if (optAttrindex > 0) {
+            final firstOptionValue = optAttr.attributeOptionValue?[0];
+
+            /* option2.add({
+              'name': optAttr.name,
+              'attributeValueId': firstOptionValue?.sId,
+              'sku': element.sku,
+              'inventory': element.inventory,
+              'attributeStyle': element.optionalAttributes?[0].attributeStyle ?? 'rectangle',
+              'label': firstAttriOptionValue?.displayName,
+              'attributeLabel': element.optionalAttributes?[0].displayName,
+              'media': element.media?.asMap(),
+
+            });*/
+
+            /* final size = element.optionalAttributes?[optAttrindex].attributeOptionValue?[0].displayName;
+
+            List<String> color1 = [];
+            List<String> size1 = [];
+
+            element.optionalAttributes?.forEach((sizeElement) {
+              if(sizeElement.displayName == 'Color') {
+                if(!color1.contains(sizeElement.attributeOptionValue?[0].displayName)){
+                  color1.add(sizeElement.attributeOptionValue?[0].displayName);
+                }
+              } else if(sizeElement.displayName == 'Size') {
+                if (!size1.contains(
+                    sizeElement.attributeOptionValue?[0].displayName)) {
+                  size1.add(sizeElement.attributeOptionValue?[0].displayName);
+                }
+              }
+            });
+
+            debugPrint(color1.toString());
+            debugPrint(size1.toString());*/
+
+            final data = <String, String>{};
+            data['type'] = element.media?[0].type;
+            data['resourcePath'] = element.media?[0].resourcePath;
+            data['_id'] = element.media?[0].sId;
+
+            availableCombination[firstAttriOptionValue?.sId]['level2'].add({
+              'name': optAttr.name,
+              'attributeValueId': firstOptionValue?.sId,
+              'sku': element.sku,
+              'inventory': element.inventory,
+              'attributeStyle':
+                  element.optionalAttributes?[0].attributeStyle ?? 'rectangle',
+              'label': element.optionalAttributes?[optAttrindex]
+                  .attributeOptionValue?[0].displayName,
+              'attributeLabel': element.optionalAttributes?[0].displayName,
+              'media': data,
+            });
+          }
+        });
+      });
+
+      /* final option2Consolidate = {};
+      option2.forEach((item) {
+        if (!option2Consolidate.containsKey(item['attributeValueId'])) {
+          option2Consolidate[item['attributeValueId']] = {
+            ...item,
+            'sku': [item['sku']],
+          };
+        } else {
+          option2Consolidate[item['attributeValueId']]['sku'].add(item['sku']);
+        }
+      });*/
+
+      return {
+        'option1': List.from(availableCombination.values),
+        //'option2': List.from(option2Consolidate.values),
+      };
+    } catch (error) {
+      return {
+        'option1': [],
+        //'option2': [],
+      };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoaderVisible) {
@@ -194,64 +305,99 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
 
+    var result = OptionalList.fromJson(
+        getOptionList(listingProduct.keyDetails?.variant));
+
+    if (!sizeOptionChanged) {
+      initialSku = result.option1?[selectedColorValue].sku ?? '';
+    }
+
     /// Get the images
     var images = [];
-    listingProduct.keyDetails?.variant?[selectedColorValue].media
-        ?.forEach((imageUrl) {
-      var image =
-          imageUrl.resourcePath.split('.com').sublist(1).join('.com').trim();
-      images.add(
-          'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/612x612/filters:format(png)/$image');
-    });
 
-    final title = listingProduct.keyDetails?.productTitle;
+    dynamic sellingPrice;
 
-    final sellingPrice =
-        listingProduct.keyDetails?.variant?[selectedColorValue].sellingPrice;
+    dynamic retailPrice;
 
-    final retailPrice =
-        listingProduct.keyDetails?.variant?[selectedColorValue].retailPrice;
+    int percent = 0;
 
-    final description =
-        listingProduct.keyDetails?.description.replaceAll(exp, '');
+    dynamic title;
 
-    List<Attributes> attributes =
-        listingProduct.attributeGroup?[0].attributes ?? [];
+    dynamic description;
 
-    int percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
-            int.parse(retailPrice) *
-            100)
-        .toInt();
+    List<Attributes> attributes = [];
 
-    final highlights = listingProduct.keyDetails?.highlights;
+    dynamic highlights;
 
-    var selectColorImage = [];
+    dynamic productId;
 
-    var selectSize = [];
+    listingProduct.keyDetails?.variant?.forEachIndexed((element, indexValue) {
+      if (initialSku == element.sku) {
+        listingProduct.keyDetails?.variant?[indexValue].media
+            ?.forEach((imageUrl) {
+          var image = imageUrl.resourcePath
+              .split('.com')
+              .sublist(1)
+              .join('.com')
+              .trim();
+          images.add(
+              'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/612x612/filters:format(png)/$image');
+        });
 
-    listingProduct.keyDetails?.variant?.forEach((variant) {
-      var image = variant.media?[0].resourcePath
-          .split('.com')
-          .sublist(1)
-          .join('.com')
-          .trim();
-      selectColorImage.add('https://dvlt0mtg4c3zr.cloudfront.net/fit-in/212x212/filters:format(png)/$image');
-    });
+        sellingPrice =
+            listingProduct.keyDetails?.variant?[indexValue].sellingPrice;
 
-    final productId = listingProduct.id;
+        retailPrice =
+            listingProduct.keyDetails?.variant?[indexValue].retailPrice;
 
-    final sku = listingProduct.keyDetails?.variant?[selectedColorValue].sku;
+        percent = ((int.parse(retailPrice) - int.parse(sellingPrice)) /
+                int.parse(retailPrice) *
+                100)
+            .toInt();
 
-    counter.value = false;
+        title = listingProduct.keyDetails?.productTitle;
 
-    if (response.user != null) {
-      response.user?.wishlist?.forEach((element) {
-        if (sku == element.sku || productId == element.listingId) {
-          isFavorite = true;
-          counter.value = true;
+        //final sku = listingProduct.keyDetails?.variant?[selectedColorValue].sku;
+
+        description =
+            listingProduct.keyDetails?.description.replaceAll(exp, '');
+
+        attributes = listingProduct.attributeGroup?[0].attributes ?? [];
+
+        highlights = listingProduct.keyDetails?.highlights;
+
+        productId = listingProduct.id;
+
+        counter.value = false;
+
+        if (response.user != null) {
+          response.user?.wishlist?.forEach((element) {
+            if (initialSku == element.sku || productId == element.listingId) {
+              isFavorite = true;
+              counter.value = true;
+            }
+          });
         }
+      }
+    });
+
+    var productGroupImage = [];
+
+    result.option1?.forEach((element) {
+      debugPrint(element.label.toString());
+
+      productGroupImage.add(element.media);
+
+      element.media?.forEach((media) {
+        debugPrint(media.resourcePath);
       });
-    }
+
+      element.level2?.forEach((level2) {
+        debugPrint(level2.label.toString());
+      });
+    });
+
+    var sizeObject = result.option1?.elementAt(selectedColorValue).level2;
 
     return LoaderOverlay(
       useDefaultLoading: false,
@@ -323,7 +469,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 var toggleWishListRequest =
                                     ToggleWishListRequest(
                                         productId: productId,
-                                        sku: sku,
+                                        sku: initialSku ?? '',
                                         action: "add");
                                 await homeRepository
                                     .toggleWishList(toggleWishListRequest);
@@ -334,7 +480,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 var toggleWishListRequest =
                                     ToggleWishListRequest(
                                         productId: productId,
-                                        sku: sku,
+                                        sku: initialSku ?? '',
                                         action: "remove");
                                 await homeRepository
                                     .toggleWishList(toggleWishListRequest);
@@ -416,7 +562,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                   ),
-
                 ],
               ),
 
@@ -594,7 +739,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                     const SizedBox(height: 10),
 
-                    Row(
+                    // Rating
+                    /*Row(
                       children: [
                         RatingBarWidget(
                           rating: initialRating,
@@ -615,9 +761,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           fontWeight: FontWeight.normal,
                         ),
                       ],
-                    ),
+                    ),*/
 
-                    const SizedBox(height: 30),
+
+                    ///__________Select Size_______________________________
+
+
+                    const SizedBox(height: 20),
 
                     const MyGoogleText(
                       text: 'Select Your Size',
@@ -628,59 +778,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                     const SizedBox(height: 10),
 
-                    ///__________Select Size_______________________________
                     SizedBox(
                       height: 55,
                       child: ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
+                        itemCount: sizeObject?.length,
                         itemBuilder: (context, i) => GestureDetector(
                           onTap: () {
                             setState(() {
-                              selectedSize = sizeList[i];
+                              debugPrint('initialSku$initialSku');
+                              debugPrint('initialSku${sizeObject?[i].sku}');
+                              sizeOptionChanged = true;
+                              initialSku = sizeObject?[i].sku!;
                             });
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: selectedSize == sizeList[i]
+                            child: initialSku == sizeObject?[i].sku
                                 ? Container(
-                                    width: 40,
-                                    decoration: const BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(30)),
-                                      color: primaryColor,
-                                    ),
-                                    child: Center(
-                                      child: MyGoogleText(
-                                        text: sizeList[i],
-                                        fontSize: 18,
-                                        fontColor: Colors.white,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                  )
+                              width: 40,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(30)),
+                                color: primaryColor,
+                              ),
+                              child: Center(
+                                child: MyGoogleText(
+                                  text: sizeObject?[i].label ?? '',
+                                  fontSize: 18,
+                                  fontColor: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            )
                                 : Container(
-                                    width: 40,
-                                    decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(30),
-                                      ),
-                                      color: secondaryColor3,
-                                    ),
-                                    child: Center(
-                                      child: MyGoogleText(
-                                        text: sizeList[i],
-                                        fontSize: 18,
-                                        fontColor: textColors,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                  ),
+                              width: 40,
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30),
+                                ),
+                                color: secondaryColor3,
+                              ),
+                              child: Center(
+                                child: MyGoogleText(
+                                  text: sizeObject?[i].label ?? '',
+                                  fontSize: 18,
+                                  fontColor: textColors,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        itemCount: sizeList.length,
                       ),
                     ),
+
 
                     const SizedBox(height: 20),
 
@@ -696,8 +849,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                     HorizontalList(
                       spacing: 10,
-                      itemCount: selectColorImage.length,
+                      itemCount: productGroupImage.length,
                       itemBuilder: (BuildContext context, int index) {
+                        var image = result.option1
+                            ?.elementAt(index)
+                            .media?[0]
+                            .resourcePath
+                            ?.split('.com')
+                            .sublist(1)
+                            .join('.com')
+                            .trim();
+                        var imageUrl =
+                            'https://dvlt0mtg4c3zr.cloudfront.net/fit-in/212x212/filters:format(png)/$image';
+
                         return Column(
                           children: [
                             GestureDetector(
@@ -708,12 +872,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               },
                               child: selectedColorValue == index
                                   ? chooseColorWidget(
-                                      selectColorImage,
+                                      imageUrl,
                                       index,
                                       primaryColor,
                                     )
                                   : chooseColorWidget(
-                                      selectColorImage,
+                                      imageUrl,
                                       index,
                                       secondaryColor3,
                                     ),
@@ -803,11 +967,53 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                     const SizedBox(height: 10),
 
-                    const TextField(
-                      decoration: InputDecoration(
+                     TextField(
+                       controller: myController,
+                      keyboardType: TextInputType.phone,
+                      maxLength: 6,
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Enter Pincode',
                       ),
+                      onChanged: (text) async {
+                        if(text.length == 6) {
+                          showDialog(context: context, builder: (context){
+                            return const Center(child: CircularProgressIndicator(),);
+                          });
+                          try{
+                            final result = await homeRepository.checkPinCode(myController.value.text);
+                            Navigator.pop(context);
+                            bool isdelivery = result.result?.isDelivery ?? false;
+                            if(isdelivery){
+                              Fluttertoast.showToast(
+                                  msg: "We are delivery to your location",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
+                            }else{
+                              Fluttertoast.showToast(
+                                  msg: "This location is currently not available for delivery ",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
+                            }
+
+                          }catch(e){
+                            Navigator.pop(context);
+                            debugPrint(e.toString());
+                          }
+
+                        }
+
+                      },
                     ),
 
                     ///_____________Description________________________________
@@ -856,7 +1062,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
 
                     ///____________Reviews_______________________________
-                    Container(
+                 /*   Container(
                       width: double.infinity,
                       decoration: const BoxDecoration(
                         border: Border(
@@ -894,7 +1100,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                         ],
                       ),
-                    ),
+                    ),*/
+
                     const SizedBox(
                       height: 20,
                     ),
@@ -1128,7 +1335,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             _navigateAndDisplaySelection(context);
                           },
                           productId: productId,
-                          sku: sku,
+                          sku: initialSku ?? '',
                         );
                       },
                     ),
@@ -1174,7 +1381,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         }
 
                         List<Items>? items = [];
-                        var item = Items(sku: sku, qty: initialValueFromText);
+                        var item = Items(
+                            sku: initialSku ?? '', qty: initialValueFromText);
                         items.add(item);
                         var request =
                             CartRequest(action: "update", items: items);
@@ -1207,8 +1415,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             }
 
                             List<Items>? items = [];
-                            var item =
-                                Items(sku: sku, qty: initialValueFromText);
+                            var item = Items(
+                                sku: initialSku ?? '',
+                                qty: initialValueFromText);
                             items.add(item);
                             var request =
                                 CartRequest(action: "update", items: items);
@@ -1232,6 +1441,5 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       ),
     );
-
   }
 }

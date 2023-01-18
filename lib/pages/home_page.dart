@@ -32,6 +32,8 @@ import '../widgets/notificition_screen.dart';
 import '../widgets/product_greed_view_widget.dart';
 import 'auth_screen/log_in_screen.dart';
 import 'best_seller_screen.dart';
+import 'event/event_intro_screen.dart';
+import 'my_wallet_screen.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = "/HomePage";
@@ -50,6 +52,8 @@ class _HomePageState extends State<HomePage> {
   HomeRepository homeRepository = getIt<HomeRepository>();
   VerifyWishlist response = VerifyWishlist();
 
+  var token = '';
+
   @override
   void initState() {
     super.initState();
@@ -60,13 +64,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   _asyncMethod() async {
-    var token = await sharedPreferenceHelper.authToken;
-    if (token != null) {
-      response = await homeRepository.verifyWishList(token);
-      setState(() {});
-    }
+     token = await sharedPreferenceHelper.authToken ?? '';
+     if(!token.isEmptyOrNull){
+       response = await homeRepository.verifyWishList(token);
+     }
+    setState(() {});
   }
-
 
 
   @override
@@ -110,8 +113,59 @@ class _HomePageState extends State<HomePage> {
           ),
         ),*/
 
-        actions: [
+        actions:  [
+
           Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white, textStyle: const TextStyle(fontSize: 15,),
+                ),
+                onPressed: () async {
+                  var token1 = await sharedPreferenceHelper.authToken ?? '';
+                  if(!token1.isEmptyOrNull){
+                    Navigator.pushNamed(context, EventIntroScreen.routeName);
+                  }else{
+                    Navigator.pushNamed(context, LogInScreen.routeName);
+                  }
+                },
+                child: const Text('Event'),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: const BoxDecoration(
+                color: secondaryColor2,
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
+              child: IconButton(
+                onPressed: () async {
+                  var token1 = await sharedPreferenceHelper.authToken ?? '';
+                  if(!token1.isEmptyOrNull){
+                    Navigator.pushNamed(context, MyWallet.routeName);
+                  }else{
+                    Navigator.pushNamed(context, LogInScreen.routeName);
+                  }
+                },
+                icon: const Icon(
+                  Icons.wallet,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+
+           /*  Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
               height: 40,
@@ -131,26 +185,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: const BoxDecoration(
-                color: secondaryColor2,
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  const NotificationsScreen().launch(context);
-                },
-                icon: const Icon(
-                  FeatherIcons.bell,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
+
+
+          */
+
           const SizedBox(width: 8.0),
         ],
       ),

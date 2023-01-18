@@ -12,15 +12,17 @@ class MakeOrderRequestEvent extends MakeOrderEvent {
   final id;
   final deliveryAddress;
   final paymentType;
+  final bool canUseWallet;
 
   @override
-  List<Object> get props => [token, id, deliveryAddress, paymentType];
+  List<Object> get props => [token, id, deliveryAddress, paymentType,canUseWallet];
 
   const MakeOrderRequestEvent({
     required this.token,
     required this.id,
     required this.paymentType,
     required this.deliveryAddress,
+    required this.canUseWallet,
   });
 }
 

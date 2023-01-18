@@ -9,14 +9,13 @@ class GiftGreedView extends StatefulWidget {
     Key? key,
     required this.productTitle,
     required this.isSingleView,
-    required this.callCat,
     required this.imageurl,
   }) : super(key: key);
 
   final String productTitle;
   final String imageurl;
   final bool isSingleView;
-  final Function callCat;
+
 
   @override
   State<GiftGreedView> createState() => _GiftGreedViewState();
@@ -48,45 +47,40 @@ class _GiftGreedViewState extends State<GiftGreedView> {
           Stack(
             alignment: Alignment.topRight,
             children: [
-              GestureDetector(
-                onTap: () {
-                  widget.callCat();
-                },
-                child: widget.imageurl.isEmpty
-                    ? Container(
+              widget.imageurl.isEmpty
+                  ? Container(
+                      height: 221,
+                      width: 187,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.fitHeight,
+                          image: AssetImage(
+                              AppTheme.of(context)?.assets.gift1 ?? ''),
+                        ),
+                      ),
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: widget.imageurl,
+                      imageBuilder: (context, imageProvider) => Container(
                         height: 221,
                         width: 187,
                         decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(8),
+                            topLeft: Radius.circular(8),
+                          ),
+                          color: secondaryColor3,
                           image: DecorationImage(
-                            fit: BoxFit.fitHeight,
-                            image: AssetImage(
-                                AppTheme.of(context)?.assets.gift1 ?? ''),
+                            image: imageProvider,
+                            fit: BoxFit.fill,
                           ),
                         ),
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: widget.imageurl,
-                        imageBuilder: (context, imageProvider) => Container(
-                          height: 221,
-                          width: 187,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(8),
-                              topLeft: Radius.circular(8),
-                            ),
-                            color: secondaryColor3,
-                            image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        ),
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
                       ),
-              ),
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
             ],
           ),
           Padding(

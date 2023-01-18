@@ -11,9 +11,11 @@ import '../../models/cart/CartResponse.dart';
 import '../../models/categories/category.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/coupan/coupon_response.dart';
+import '../../models/event/studenteventrequest.dart';
 import '../../models/feature/feature_productes.dart';
 import '../../models/gift/gift_response.dart';
 import '../../models/my_order/my_order_response.dart';
+import '../../models/my_order/pincoderesponse.dart';
 import '../../models/wishlist/wish_list_response.dart';
 import '../../utils/device/custom_error.dart';
 import '../../utils/dio/dio_error_util.dart';
@@ -256,7 +258,20 @@ class HomeRepository {
       return cartResponse;
     } catch (e) {
       debugPrint(e.toString());
+      throw e;
+    }
+  }
 
+  Future<String> getMyWallet(String token) async {
+    try {
+      final String walletBalance = await _homeApi.getMyWallet(token);
+
+      debugPrint('walletBalance: $walletBalance');
+
+      return walletBalance;
+
+    } catch (e) {
+      debugPrint(e.toString());
       throw e;
     }
   }
@@ -290,11 +305,9 @@ class HomeRepository {
     }
   }
 
-  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id,
-      String deliveryAddress, String paymentType) async {
+  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress, String paymentType,bool canUseWallet,) async {
     try {
-      final requestId =
-          await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType);
+      final requestId = await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType,canUseWallet);
 
       debugPrint('requestId: $requestId');
 
@@ -305,12 +318,36 @@ class HomeRepository {
       throw e;
     }
   }
+  Future<PincodeResponse> checkPinCode(String pincode, ) async {
+    try {
+      final requestId = await _homeApi.checkPinCode(pincode);
+
+      debugPrint('requestId: $requestId');
+
+      return requestId;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+  Future<OrderOtpVerifyRequest> eventPayment(Map<String, dynamic> studentEventRequest) async {
+    try {
+      final requestId = await _homeApi.eventPayment(studentEventRequest);
+
+      debugPrint('requestId: $requestId');
+
+      return requestId;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
 
   Future<String> savePaymentSuccess(
       String token, String orderId, String paymentId, String signature) async {
     try {
-      final requestId = await _homeApi.savePaymentSuccess(
-          token, orderId, paymentId, signature);
+      final requestId = await _homeApi.savePaymentSuccess(token, orderId, paymentId, signature);
 
       var result = requestId.toString();
       debugPrint('requestId: $result');
@@ -321,4 +358,20 @@ class HomeRepository {
       throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
+  Future<String> savePaymentSuccessEvent(
+      String token, String orderId, String paymentId, String signature) async {
+    try {
+      final requestId = await _homeApi.savePaymentSuccessEvent(token, orderId, paymentId, signature);
+
+      var result = requestId.toString();
+      debugPrint('requestId: $result');
+
+      return requestId.toString();
+    } catch (e) {
+      debugPrint(e.toString());
+      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+    }
+  }
+
+
 }

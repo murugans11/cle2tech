@@ -13,11 +13,15 @@ class OrderOtpVerifyRequest {
   late final String orderId;
   late final String key;
 
+  //Wallet money
+  late final bool isFullWalletPay;
+
   OrderOtpVerifyRequest({
     required this.paymentTypeRes,
     required this.requestId,
     required this.orderId,
     required this.key,
+    required this.isFullWalletPay,
   });
 
 

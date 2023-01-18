@@ -16,7 +16,7 @@ import '../utils/device/custom_error.dart';
 import '../widgets/add_new_address.dart';
 import '../widgets/buttons.dart';
 import '../widgets/confirmation_popup.dart';
-import '../widgets/error_dialog.dart';
+
 
 class ShippingGiftAddressPage extends StatefulWidget {
   static const String routeName = "/ShippingGiftAddressPage";
@@ -83,7 +83,20 @@ class _ShippingGiftAddressPageState extends State<ShippingGiftAddressPage> {
         ),
       );
     } on CustomError catch (e) {
-      errorDialog(context, e.errMsg);
+      //errorDialog(context, e.errMsg);
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          opaque: false,
+          pageBuilder: (BuildContext context, _, __) =>
+          const RedeemConfirmationScreen(
+            image: 'images/confirm_order_pupup.png',
+            mainText: 'Order successfully!',
+            subText:
+            'Your order will be delivered soon. Thank you.',
+            buttonText: 'Back to Home',
+          ),
+        ),
+      );
     }
   }
 

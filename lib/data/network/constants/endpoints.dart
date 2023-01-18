@@ -52,13 +52,21 @@ class Endpoints {
 
   static const String makeOrder = "${baseUrl}order/";
 
+  static const String pincode = "${baseUrl}delivery/";
+
+  static const String eventPayment = "${baseUrl}eventOrder";
+
   static const String verifyOtp = "${baseUrl}order/verifyOtp";
 
   static const String savePaymentSuccess = "${baseUrl}order/verifyOrder";
 
+  static const String savePaymentSuccessEvent = "${baseUrl}eventOrder/verifyOrder";
+
   static const String getMyOrder = "${baseUrl}order/listing";
 
   static const String orderGift = "${baseUrl}orderGift";
+
+  static const String wallet = "${baseUrl}wallet";
 
 
 

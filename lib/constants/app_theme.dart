@@ -130,6 +130,12 @@ class _Assets {
   String get gift1 => "assets/images/gift1.png";
 
   String get gift2 => "assets/images/gift2.png";
+
+  String get wallet_Img => "assets/images/wallet_Img.png";
+
+  String get talent_show => "assets/images/Talent_Show.png";
+
+  String get success_bg => "assets/images/Success_Bg.png";
 }
 
 class _Values {

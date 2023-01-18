@@ -62,7 +62,8 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
-        actions: [
+
+        /*actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -82,6 +83,7 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
             ),
           ),
         ],
+        */
         leading: GestureDetector(
           onTap: () {
             finish(context);
@@ -104,7 +106,7 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
           //mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ///__________filter ToolBar________________________________________________
-            Row(
+         /*   Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ///____________Sort Section________________________________________________
@@ -161,6 +163,7 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
                   ),
                 ),
 
+
                 Row(
                   children: [
                     IconButton(
@@ -198,8 +201,10 @@ class _BestSellerScreenState extends State<BestSellerScreen> {
                   ],
                 ),
               ],
-            ),
+            ),*/
+
             const SizedBox(height: 20),
+
             Container(
               padding: isSingleView
                   ? const EdgeInsets.all(40)

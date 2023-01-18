@@ -20,7 +20,7 @@ class MakeOrderState extends Equatable {
   factory MakeOrderState.initial() {
     return  MakeOrderState(
       status: NetworkCallStatusEnum.initial,
-      orderOtpVerify: OrderOtpVerifyRequest(paymentTypeRes: '', requestId: '', key: '', orderId: ''),
+      orderOtpVerify: OrderOtpVerifyRequest(paymentTypeRes: '', requestId: '', key: '', orderId: '', isFullWalletPay: false),
       error: const CustomError(),
     );
   }

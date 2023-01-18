@@ -13,6 +13,7 @@ import '../../../../models/cart/CartResponse.dart';
 import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
 import '../../../../models/coupan/coupon_response.dart';
+import '../../../../models/event/studenteventrequest.dart';
 import '../../../../models/feature/feature_productes.dart';
 import '../../../../models/gift/gift_response.dart';
 import '../../../../models/login/OtpVerifyRequest.dart';
@@ -20,6 +21,7 @@ import '../../../../models/login/RequestOtpResponse.dart';
 import '../../../../models/login/login_requst.dart';
 import '../../../../models/login/login_response.dart';
 import '../../../../models/my_order/my_order_response.dart';
+import '../../../../models/my_order/pincoderesponse.dart';
 import '../../../../models/register/RegistrationRequest.dart';
 import '../../../../models/wishlist/toggle_wishList_request.dart';
 import '../../../../models/wishlist/wish_list_response.dart';
@@ -38,8 +40,7 @@ class HomeApi {
 
   Future<BannerList> getBannerList() async {
     try {
-      final categoryGroupResponse =
-          await _dioClient.get(Endpoints.getHomePageBanner);
+      final categoryGroupResponse = await _dioClient.get(Endpoints.getHomePageBanner);
 
       return BannerList.fromJson(categoryGroupResponse);
     } catch (e) {
@@ -228,8 +229,7 @@ class HomeApi {
       debugPrint(toggleWishListRequest.toJson().toString());
 
       //  final loginResponse = await _dioClient.post(Endpoints.toggleWishList, data: toggleWishListRequest.toJson());
-      SharedPreferenceHelper sharedPreferenceHelper =
-          getIt<SharedPreferenceHelper>();
+      SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
       // getting token
       var token = await sharedPreferenceHelper.authToken;
 
@@ -407,6 +407,25 @@ class HomeApi {
     }
   }
 
+  Future<String> getMyWallet(String token) async {
+    try {
+      debugPrint(Endpoints.orderGift);
+      final response = await _dioClient.get(Endpoints.wallet,
+          options: Options(headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          }));
+
+      var walletBalance = response['walletBalance'];
+
+      return walletBalance.toString();
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+  }
+
+
   Future<CartResponse> applyCoupon(String token, String couponCode, String orderId) async {
     try {
       debugPrint(Endpoints.applyCoupon);
@@ -433,12 +452,15 @@ class HomeApi {
 
   Future<String> updateGift(String token, String id, String deliveryAddress, String claimType, ) async {
     try {
-      debugPrint(Endpoints.giftUpdate);
+
 
       final data = <String, String>{};
       data['id'] = id;
       data['deliveryAddress'] = deliveryAddress;
       data['claimType'] = claimType;
+
+      debugPrint(Endpoints.giftUpdate);
+      debugPrint(data.toString());
 
       final response = await _dioClient.post(
         Endpoints.giftUpdate,
@@ -457,12 +479,13 @@ class HomeApi {
   }
 
 
-  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress, String paymentType) async {
+  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress, String paymentType, bool canUseWallet,) async {
     try {
-      final data = <String, String>{};
+      final data = <String, dynamic>{};
       data['id'] = id;
       data['deliveryAddress'] = deliveryAddress;
       data['paymentType'] = paymentType;
+      data['canUseWallet'] = canUseWallet;
 
       String gfg1 = Endpoints.makeOrder;
       String gfg2 = id;
@@ -482,6 +505,7 @@ class HomeApi {
       var requestId = "";
       var key = "";
       var orderId = "";
+      dynamic isFullWalletPay = false;
 
 
       if (response['otpData'] != null) {
@@ -491,9 +515,51 @@ class HomeApi {
       if (response['paymentData'] != null) {
         key = response['paymentData']['paymentResponse']['key'];
         orderId = response['paymentData']['paymentResponse']['id'];
+        isFullWalletPay = response['paymentData']['isFullWalletPay'];
       }
 
-      return  OrderOtpVerifyRequest(paymentTypeRes: paymentTypeRes, requestId: requestId, key: key, orderId: orderId);
+      return  OrderOtpVerifyRequest(paymentTypeRes: paymentTypeRes, requestId: requestId, key: key, orderId: orderId, isFullWalletPay: isFullWalletPay );
+
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+
+  }
+
+
+  Future<OrderOtpVerifyRequest> eventPayment( Map<String, dynamic> studentEventRequest) async {
+    try {
+
+      String url = Endpoints.eventPayment;
+      debugPrint(url);
+
+      debugPrint('testevent ${studentEventRequest.toString()}');
+
+      SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+      // getting token
+      var token = await sharedPreferenceHelper.authToken;
+
+      final response = await _dioClient.post(
+        url,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: studentEventRequest,
+      );
+
+      var paymentTypeRes = response['paymentData']['paymentType'];
+      var requestId = "";
+      var key = "";
+      var orderId = "";
+
+      if (response['paymentData'] != null) {
+        key = response['paymentData']['paymentResponse']['key'];
+        orderId = response['paymentData']['paymentResponse']['id'];
+      }
+
+      return  OrderOtpVerifyRequest(paymentTypeRes: paymentTypeRes, requestId: requestId, key: key, orderId: orderId, isFullWalletPay: false);
 
     } catch (e) {
       debugPrint(e.toString());
@@ -506,12 +572,38 @@ class HomeApi {
   Future<String> savePaymentSuccess(String token, String orderId, String paymentId, String signature) async {
     try {
       final data = <String, String>{};
-      data['orderId'] = orderId;
-      data['paymentId'] = paymentId;
-      data['signature'] = signature;
+      data['razorpay_order_id'] = orderId;
+      data['razorpay_payment_id'] = paymentId;
+      data['razorpay_signature'] = signature;
 
+      debugPrint(Endpoints.savePaymentSuccess);
       final response = await _dioClient.post(
         Endpoints.savePaymentSuccess,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }),
+        data: data,
+      );
+
+      return  response.toString();
+
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+
+  }
+  Future<String> savePaymentSuccessEvent(String token, String orderId, String paymentId, String signature) async {
+    try {
+      final data = <String, String>{};
+      data['razorpay_order_id'] = orderId;
+      data['razorpay_payment_id'] = paymentId;
+      data['razorpay_signature'] = signature;
+
+      debugPrint(Endpoints.savePaymentSuccessEvent);
+      final response = await _dioClient.post(
+        Endpoints.savePaymentSuccessEvent,
         options: Options(headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -541,10 +633,11 @@ class HomeApi {
 
       var status = response['status'];
       var message = response['message'];
+      var walletBalance = response['walletBalance'];
       var orderId = response['orderData']['orderId'];
       debugPrint(orderId.toString());
 
-      return orderId;
+      return orderId+":"+walletBalance.toString();
     } catch (e) {
       debugPrint(e.toString());
       throw e;
@@ -577,6 +670,33 @@ class HomeApi {
       debugPrint(e.toString());
       throw e;
     }
+  }
+
+
+  Future<PincodeResponse> checkPinCode(String pincode, ) async {
+    try {
+
+      String gfg1 = Endpoints.pincode;
+      String gfg2 = pincode;
+      var url = gfg1 + gfg2;
+      debugPrint(url);
+
+      final response = await _dioClient.get(
+        url,
+        options: Options(headers: {
+          "Content-Type": "application/json",
+
+        }),
+
+      );
+
+      return  PincodeResponse.fromJson(response);
+
+    } catch (e) {
+      debugPrint(e.toString());
+      throw e;
+    }
+
   }
 
   Map<String, String> toJson1(String loginid) {

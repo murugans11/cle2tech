@@ -10,7 +10,7 @@ import '../../data/repository/home_repository.dart';
 import '../../di/components/service_locator.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/feature/feature_productes.dart';
-import '../../models/gift/gift_response.dart';
+import '../../models/gift/GiftDetailRequest.dart';
 import '../../models/otp_verify/OrderOtpVerifyRequest.dart';
 import '../../models/register/request_otp.dart';
 import '../../models/wishlist/verifywishlist.dart';
@@ -21,11 +21,15 @@ import '../../pages/best_seller_screen.dart';
 import '../../pages/cart_screen.dart';
 import '../../pages/category_screen.dart';
 import '../../pages/confirm_order_screen.dart';
+import '../../pages/event/event_form_other_screen.dart';
+import '../../pages/event/event_form_screen.dart';
+import '../../pages/event/event_intro_screen.dart';
 import '../../pages/gift_detail_screen.dart';
 import '../../pages/gift_screen.dart';
 import '../../pages/home_page.dart';
 import '../../pages/my_order.dart';
 import '../../pages/my_profile_screen.dart';
+import '../../pages/my_wallet_screen.dart';
 import '../../pages/pin_code_verification_screen.dart';
 import '../../pages/product_detail_screen.dart';
 import '../../pages/profile_screen.dart';
@@ -60,6 +64,25 @@ class Router {
         return MaterialPageRoute(
           builder: (context) => const CategoryScreen(),
         );
+      case EventIntroScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) => const EventIntroScreen(),
+        );
+
+      case EventFormScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) => EventFormScreen(),
+        );
+
+        case MyWallet.routeName:
+        return MaterialPageRoute(
+          builder: (context) => const MyWallet(),
+        );
+
+        case EventFormOtherScreen.routeName:
+        return MaterialPageRoute(
+          builder: (context) => EventFormOtherScreen(),
+        );
 
       case BestSellerScreen.routeName:
         final args = dynamicArguments as ListingItem;
@@ -93,7 +116,8 @@ class Router {
       case ConfirmOrderScreen.routeName:
         return MaterialPageRoute(
           builder: (context) => BlocProvider<MakeOrderBloc>(
-            create: (context) => MakeOrderBloc(homeRepository: getIt<HomeRepository>()),
+            create: (context) =>
+                MakeOrderBloc(homeRepository: getIt<HomeRepository>()),
             child: const ConfirmOrderScreen(),
           ),
         );
@@ -123,13 +147,10 @@ class Router {
           settings: RouteSettings(arguments: args),
         );
 
-
       case GiftPage.routeName:
         return MaterialPageRoute(
           builder: (context) => const GiftPage(),
         );
-
-
 
       case LogInScreen.routeName:
         return MaterialPageRoute(
@@ -152,7 +173,7 @@ class Router {
         );
 
       case GiftDetailPage.routeName:
-        final args = dynamicArguments as Gift;
+        final args = dynamicArguments as GiftDetailRequest;
         return MaterialPageRoute(
           builder: (context) => const GiftDetailPage(),
           settings: RouteSettings(arguments: args),
@@ -174,7 +195,6 @@ class Router {
           ),
           settings: RouteSettings(arguments: dynamicArguments),
         );
-
 
       case ShippingAddressPage.routeName:
         return MaterialPageRoute(

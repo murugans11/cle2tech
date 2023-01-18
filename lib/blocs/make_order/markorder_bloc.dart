@@ -34,7 +34,7 @@ class MakeOrderBloc extends Bloc<MakeOrderEvent, MakeOrderState> {
 
     emit(state.copyWith(status: NetworkCallStatusEnum.loading));
     try {
-      final  requestId = await homeRepository.makeAnOrder(event.token, event.id, event.deliveryAddress, event.paymentType);
+      final  requestId = await homeRepository.makeAnOrder(event.token, event.id, event.deliveryAddress, event.paymentType,event.canUseWallet);
 
       emit(state.copyWith(status: NetworkCallStatusEnum.loaded, orderOtpVerifyRequest: requestId));
 
@@ -53,7 +53,7 @@ class MakeOrderBloc extends Bloc<MakeOrderEvent, MakeOrderState> {
     emit(state.copyWith(status: NetworkCallStatusEnum.loading));
     try {
       final  requestId = await homeRepository.verifyOtpOrder( event.token, event.otp, event.requestId, event.orderId  );
-      final result = OrderOtpVerifyRequest(paymentTypeRes: '', requestId: '', key: '', orderId: '');
+      final result = OrderOtpVerifyRequest(paymentTypeRes: '', requestId: '', key: '', orderId: '', isFullWalletPay: false);
       emit(state.copyWith(status: NetworkCallStatusEnum.loaded, orderOtpVerifyRequest: result));
 
     } on CustomError catch (e) {
