@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/models/login/login_response.dart';
 
@@ -217,7 +217,7 @@ class _LogInScreenState extends State<LogInScreen> {
                             ),
                             const SizedBox(height: 10),
                             Button1(
-                              buttonText: 'SingIn With Otp',
+                              buttonText: 'SignIn With Otp',
                               buttonColor: primaryColor,
                               onPressFunction: () {
                                 _displayTextInputDialog(
@@ -293,7 +293,7 @@ class _LogInScreenState extends State<LogInScreen> {
               TextButton(
                 onPressed: () {
                   final value = otpController.value.text;
-                  if (RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$').hasMatch(value)) {
+                  if (RegExp(r'^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$').hasMatch(value) && value.length == 10 ) {
                     Navigator.pop(context);
                     setState(() {
                       _isLoading = true;
@@ -385,7 +385,8 @@ class _LogInScreenState extends State<LogInScreen> {
         _isLoading = false;
       });
 
-      errorDialog(context, e.errMsg);
+      errorDialog(context, e.errMsg.toString());
+     // errorDialog(context, "Already number taken");
     }
   }
 

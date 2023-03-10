@@ -1,11 +1,11 @@
-import 'dart:convert';
 
-import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:group_radio_button/group_radio_button.dart';
+
 
 import 'package:nb_utils/nb_utils.dart';
-import 'package:shopeein/pages/payment_method_screen.dart';
+
 import 'package:shopeein/pages/payment_validation_page.dart';
 import 'package:shopeein/pages/pin_code_verification_screen.dart';
 import 'package:shopeein/pages/shipping_address.dart';
@@ -15,9 +15,7 @@ import 'package:shopeein/widgets/offer_screen.dart';
 import '../blocs/make_order/markorder_bloc.dart';
 import '../blocs/make_order/markorder_event.dart';
 import '../blocs/make_order/markorder_state.dart';
-import '../blocs/payment/payment_success_bloc.dart';
-import '../blocs/payment/payment_success_event.dart';
-import '../blocs/payment/payment_success_state.dart';
+
 import '../constants/constants.dart';
 import '../cubit/cart/cart_list_response_cubit.dart';
 import '../cubit/cart/cart_list_response_state.dart';
@@ -46,18 +44,19 @@ class ConfirmOrderScreen extends StatefulWidget {
 }
 
 class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
-
   var token = '';
   var orderId = '';
   var walletBalance = '';
   var update = true;
   var addressId = '';
-  int paymantType  = 1 ;
+  int paymantType = -1;
+
   String? gender;
-  bool useShopeeinWallet = false ;
+  bool useShopeeinWallet = false;
 
   final _couponController = TextEditingController();
-  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+  SharedPreferenceHelper sharedPreferenceHelper =
+      getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
 
   void _initOrder() async {
@@ -69,7 +68,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
     final orderInit = await homeRepository.getOrderInit(tokenValues ?? '');
     var parts = orderInit.split(':');
-    var _orderId = parts[0].trim();                 // prefix: "date"
+    var _orderId = parts[0].trim(); // prefix: "date"
     var walletBal = parts[1].trim(); // prefix: "date"
 
     debugPrint("orderId$orderId");
@@ -77,10 +76,9 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
     setState(() {
       token = tokenValues ?? '';
-      orderId = _orderId ;
-      walletBalance = walletBal ;
+      orderId = _orderId;
+      walletBalance = walletBal;
     });
-
   }
 
   void deleteAnItemFromCart(
@@ -137,7 +135,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     }
     return response;
   }
-
 
   Widget _postList() {
     return BlocBuilder<CartListResponseCubit, CartListResponseState>(
@@ -314,7 +311,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     });
     super.initState();
     _initOrder();
-
   }
 
   @override
@@ -323,8 +319,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     _couponController.dispose();
     super.dispose();
   }
-
-
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     // Do something when payment succeeds
@@ -345,7 +339,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
         );
       },
     ));
-
 
     // Do something when an external wallet is selected
     ScaffoldMessenger.of(context).showSnackBar(
@@ -378,7 +371,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
   }
 
   // create order
-  void createOrder(String key, String orderId, String contactNumber, String email) async {
+  void createOrder(
+      String key, String orderId, String contactNumber, String email) async {
     /* String username = "rzp_live_MvPwKYplVlFBKd"; key
     String password = "0jPJM9bLryhb3w1VbYj0hpZB"; secret key
     String basicAuth = 'Basic ${base64Encode(utf8.encode('$username:$password'))}';
@@ -425,8 +419,9 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
+    var addressList = [];
 
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
@@ -446,7 +441,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
           fontSize: 18,
         ),
       ),
-
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -467,14 +461,17 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   ///____________Shipping_address__________________________
                   FutureBuilder<VerifyWishlist>(
                     future: _getLatest(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<VerifyWishlist> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<VerifyWishlist> snapshot) {
+                      var address = '';
                       if (snapshot.hasData) {
-                        addressId =
-                            snapshot.data?.user?.addresses?[0].addressId ?? '';
+                         addressList = snapshot.data?.user?.addresses ?? [];
+                        if(addressList.isNotEmpty){
+                          addressId = snapshot.data?.user?.addresses?[0].addressId ?? '';
+                          address = snapshot.data?.user?.addresses?[0].address ?? '';
+                        }
                       }
 
-                      return snapshot.hasData
+                      return addressList.isNotEmpty
                           ? Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,11 +509,9 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     ),
                                   ],
                                 ),
-                                Flexible(
+                                 Flexible(
                                   child: MyGoogleText(
-                                    text: snapshot.data?.user?.addresses?[0]
-                                            .address ??
-                                        '',
+                                    text: address ,
                                     fontSize: 16,
                                     fontColor: textColors,
                                     fontWeight: FontWeight.normal,
@@ -550,8 +545,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(context,
-                                            ShippingAddressPage.routeName);
+                                        Navigator.pushNamed(context, ShippingAddressPage.routeName);
                                       },
                                       child: const MyGoogleText(
                                         text: 'Add Address',
@@ -687,13 +681,14 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                     ],
                   ),
                   const SizedBox(height: 5),
-                    MyGoogleTextWhitAli(
+                  MyGoogleTextWhitAli(
                     text: 'Your current E-Wallet balance is ₹$walletBalance',
                     fontSize: 14,
                     fontColor: Colors.black,
-                    fontWeight: FontWeight.normal, textAlign: TextAlign.center,
+                    fontWeight: FontWeight.normal,
+                    textAlign: TextAlign.center,
                   ),
-                  
+
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -715,7 +710,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          const PaymentMethodScreen().launch(context);
+                          //const PaymentMethodScreen().launch(context);
                         },
                         child: const MyGoogleText(
                           text: '',
@@ -730,25 +725,26 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                     title: const Text("Cash on Delivery"),
                     value: "Cash on Delivery",
                     groupValue: gender,
-                    onChanged: useShopeeinWallet ? null : (value){
-                      setState(() {
-                        paymantType = 0;
-                        gender = value.toString();
-                      });
-                    },
+                    onChanged: useShopeeinWallet
+                        ? null
+                        : (value) {
+                            setState(() {
+                              paymantType = 0;
+                              gender = value.toString();
+                            });
+                          },
                   ),
                   RadioListTile(
                     title: const Text("Online Payment"),
                     value: "Online Payment",
                     groupValue: gender,
-                    onChanged: (value){
+                    onChanged: (value) {
                       setState(() {
                         paymantType = 1;
                         gender = value.toString();
                       });
                     },
                   ),
-
 
                   const SizedBox(height: 10),
 
@@ -758,50 +754,69 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                         return const Center(child: CircularProgressIndicator());
                       }
                       return Button1(
-                          buttonText: 'Pay Now',
-                          buttonColor: primaryColor,
-                          onPressFunction: () {
-                            var payMentType = 'COD';
-                            if (paymantType == 0) {
-                              payMentType = "COD";
-                            } else {
-                              payMentType = "ONLINE";
-                            }
-                            context
-                                .read<MakeOrderBloc>()
-                                .add(MakeOrderRequestEvent(
-                                  token: token,
-                                  id: orderId,
-                                  deliveryAddress: addressId,
-                                  paymentType: payMentType,
-                                  canUseWallet: useShopeeinWallet
-                                ));
-                          });
+                        buttonText: 'Pay Now',
+                        buttonColor: primaryColor,
+                        onPressFunction: () {
+
+                          var payMentType = '';
+                          if (paymantType == 0) {
+                            payMentType = "COD";
+                          } else if (paymantType == 1){
+                            payMentType = "ONLINE";
+                          }
+
+                          if(addressId.isEmptyOrNull) {
+                            Fluttertoast.showToast(
+                                msg: "Please add delivery address",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0
+                            );
+                          }else if(payMentType.isEmptyOrNull) {
+                            Fluttertoast.showToast(
+                                msg: "Please select payment type",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0
+                            );
+                          } else{
+                            context.read<MakeOrderBloc>().add(
+                                MakeOrderRequestEvent(
+                                    token: token,
+                                    id: orderId,
+                                    deliveryAddress: addressId,
+                                    paymentType: payMentType,
+                                    canUseWallet: useShopeeinWallet));
+                          }
+                        },
+                      );
                     },
                     listener: (context, state) {
                       if (state.status == NetworkCallStatusEnum.loaded) {
                         if (state.orderOtpVerify.paymentTypeRes == "ONLINE") {
-
-                          if(state.orderOtpVerify.isFullWalletPay) {
-
+                          if (state.orderOtpVerify.isFullWalletPay) {
                             Navigator.pushNamed(context, GiftPage.routeName);
-
                           } else {
-
-                            createOrder(state.orderOtpVerify.key, state.orderOtpVerify.orderId, '', '');
-
+                            createOrder(state.orderOtpVerify.key,
+                                state.orderOtpVerify.orderId, '', '');
                           }
-
                         } else {
                           var request = OrderOtpVerifyRequest(
                             token: token,
                             requestId: state.orderOtpVerify.requestId,
                             orderId: orderId,
                           );
-                          Navigator.pushNamed(context, PinCodeVerificationScreen.routeName, arguments: request);
+                          Navigator.pushNamed(
+                              context, PinCodeVerificationScreen.routeName,
+                              arguments: request);
                         }
-                      }
-                      else if (state.status == NetworkCallStatusEnum.error) {
+                      } else if (state.status == NetworkCallStatusEnum.error) {
                         Fluttertoast.showToast(
                             msg: state.error.errMsg,
                             toastLength: Toast.LENGTH_SHORT,

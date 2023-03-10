@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 
 void errorDialog(BuildContext context, String errorMessage) {
   if (Platform.isIOS) {

@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:iconly/iconly.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
 
@@ -13,10 +12,10 @@ import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/feature/feature_productes.dart';
 import '../models/wishlist/verifywishlist.dart';
-import '../widgets/filter_widget.dart';
+
 import '../widgets/product_greed_view_widget.dart';
 
-import '../widgets/sort_widget.dart';
+
 import 'auth_screen/log_in_screen.dart';
 
 class BestSellerScreen extends StatefulWidget {

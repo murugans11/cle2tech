@@ -5,8 +5,7 @@ import 'package:shopeein/data/network/constants/endpoints.dart';
 import 'package:shopeein/data/sharedpref/shared_preference_helper.dart';
 
 abstract class NetworkModule {
-  /// A singleton dio provider.
-  /// Calling it multiple times will return the same instance.
+
   static Dio provideDio(SharedPreferenceHelper sharedPreferenceHelper) {
     final dio = Dio();
     dio
@@ -14,13 +13,13 @@ abstract class NetworkModule {
       ..options.connectTimeout = Endpoints.connectionTimeout
       ..options.receiveTimeout = Endpoints.receiveTimeout
       ..options.headers = {'Content-Type': 'application/json; charset=utf-8'}
-     /* ..interceptors.add(LogInterceptor(
+      ..interceptors.add(LogInterceptor(
         request: true,
         responseBody: true,
         requestBody: true,
         requestHeader: true,
         responseHeader: true,
-      ))*/
+      ))
       ..interceptors.add(InterceptorsWrapper(
           onRequest: (RequestOptions options, RequestInterceptorHandler handler) async {
           // getting token
@@ -78,7 +77,7 @@ abstract class NetworkModule {
           return handler.next(response);
         }),
       );
-    return Dio();
+    return dio;
   }
 
   static printKV(String key, Object v) {

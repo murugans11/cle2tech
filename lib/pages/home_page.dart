@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/blocs/banner/bannerList_event.dart';
 import 'package:shopeein/blocs/banner/bannerList_state.dart';
@@ -12,7 +11,7 @@ import 'package:shopeein/pages/initial_page.dart';
 import 'package:shopeein/pages/product_detail_screen.dart';
 import 'package:shopeein/pages/single_category_by_Item_screen.dart';
 import 'package:shopeein/pages/single_category_group_screen.dart';
-import 'package:shopeein/pages/splash_screen_one.dart';
+
 
 import '../blocs/banner/bannarList_bloc.dart';
 import '../blocs/category_groupe/categoryList_bloc.dart';
@@ -28,7 +27,7 @@ import '../models/wishlist/verifywishlist.dart';
 import '../utils/dio/network_call_status_enum.dart';
 import '../widgets/error_dialog.dart';
 
-import '../widgets/notificition_screen.dart';
+
 import '../widgets/product_greed_view_widget.dart';
 import 'auth_screen/log_in_screen.dart';
 import 'best_seller_screen.dart';
@@ -124,7 +123,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: TextButton(
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.white, textStyle: const TextStyle(fontSize: 15,),
+                  foregroundColor: Colors.white, textStyle: const TextStyle(fontSize: 12,),
                 ),
                 onPressed: () async {
                   var token1 = await sharedPreferenceHelper.authToken ?? '';

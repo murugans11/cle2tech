@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 
 import 'package:nb_utils/nb_utils.dart';
-import 'package:shopeein/pages/payment_method_screen.dart';
+
 import 'package:shopeein/pages/shipping_address.dart';
 
 
@@ -86,7 +86,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const MyGoogleText(
-                              text: 'Shaidul Islam',
+                              text: 'Murugan',
                               fontSize: 16,
                               fontColor: Colors.black,
                               fontWeight: FontWeight.normal,
@@ -106,7 +106,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         ),
                         const Flexible(
                           child: MyGoogleText(
-                            text: '8 Bukit Batok Street 41, Bangladesh,361025',
+                            text: '',
                             fontSize: 16,
                             fontColor: textColors,
                             fontWeight: FontWeight.normal,
@@ -129,7 +129,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          const PaymentMethodScreen().launch(context);
+                          //const PaymentMethodScreen().launch(context);
                         },
                         child: const MyGoogleText(
                           text: 'Change',

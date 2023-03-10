@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+
 
 import 'package:nb_utils/nb_utils.dart';
-import 'package:shopeein/pages/product_detail_screen.dart';
+
 
 import '../constants/constants.dart';
 
@@ -134,7 +134,7 @@ class _GiftPageState extends State<GiftPage> {
                                 imageurl = element.resourcePath ?? '';
                               }
                             });
-                            var arg = GiftDetailRequest(requestPath: imageurl, orderId: giftId?? '');
+                            var arg = GiftDetailRequest(requestPath: imageurl, orderId: snapshot.data?.orderGift?[index].id?? '');
                             Navigator.pushNamed(context, GiftDetailPage.routeName, arguments: arg);
 
                           }else{

@@ -1,5 +1,5 @@
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -560,6 +560,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
                     isActive: _currentStep >= 0,
                     state: _currentStep >= 2 ? StepState.complete : StepState.disabled,
                   ),
+
                 ],
               ),
             ),
@@ -580,6 +581,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
   }
 
   continued() async {
+
     if (formKey.currentState!.validate()) {
 
       final firstName = userFirstNameController.value.text;
@@ -605,7 +607,8 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
             fontSize: 16.0
         );
       }
-      else if (_verticalGroupValue2 == "Others"){
+
+      else if (_verticalGroupValue2 == "Others") {
         if(otherTalent.isEmptyOrNull) {
           Fluttertoast.showToast(
               msg: "Please Enter your Telent",
@@ -621,10 +624,13 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
           await sendToServer(emailId, mobileNo, address, city, state, pinCode, otherTalent, firstName, lastName, dob);
         }
       }
-      else{
+
+      else {
         await sendToServer(emailId, mobileNo, address, city, state, pinCode, otherTalent, firstName, lastName, dob);
       }
+
     }
+
   }
 
   Future<void> sendToServer(String emailId, String mobileNo, String address, String city, String state, String pinCode, String otherTalent, String firstName, String lastName, String dob) async {

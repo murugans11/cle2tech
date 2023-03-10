@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:iconly/iconly.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+
 
 import '../constants/constants.dart';
 

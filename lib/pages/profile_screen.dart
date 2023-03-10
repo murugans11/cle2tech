@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+
 import 'package:iconly/iconly.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/data/sharedpref/shared_preference_helper.dart';
 import 'package:shopeein/pages/auth_screen/log_in_screen.dart';
-import 'package:shopeein/pages/payment_method_screen.dart';
+
 import 'package:shopeein/pages/splash_screen_one.dart';
 import '../constants/app_theme.dart';
 import '../constants/constants.dart';
 import '../data/repository/home_repository.dart';
 import '../di/components/service_locator.dart';
 import '../models/wishlist/verifywishlist.dart';
-import '../widgets/notificition_screen.dart';
+
 import 'auth_screen/change_pass_screen.dart';
 import 'gift_screen.dart';
 import 'my_order.dart';

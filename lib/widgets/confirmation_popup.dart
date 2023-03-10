@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/pages/initial_page.dart';
 
@@ -50,7 +50,7 @@ class RedeemConfirmationScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: MyGoogleText(
-                          fontSize: 26,
+                          fontSize: 12,
                           fontColor: Colors.black,
                           text: mainText,
                           fontWeight: FontWeight.bold,

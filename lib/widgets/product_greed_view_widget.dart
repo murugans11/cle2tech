@@ -1,19 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconly/iconly.dart';
+
 
 import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/data/repository/home_repository.dart';
-import 'package:shopeein/data/repository/login_repository.dart';
-import 'package:shopeein/pages/auth_screen/log_in_screen.dart';
+
 
 import '../constants/constants.dart';
 import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
 import '../models/wishlist/toggle_wishList_request.dart';
 import '../models/wishlist/verifywishlist.dart';
-import '../pages/product_detail_screen.dart';
+
 
 class ProductGreedShow1 extends StatefulWidget {
   const ProductGreedShow1(

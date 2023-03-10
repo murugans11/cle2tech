@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:nb_utils/nb_utils.dart';
+
 
 import '../constants/constants.dart';
 import '../cubit/cart/cart_list_response_cubit.dart';
@@ -14,7 +13,6 @@ import '../models/cart/CartResponse.dart';
 import '../widgets/buttons.dart';
 import '../widgets/cart_cost_section.dart';
 import '../widgets/cart_item_single_view.dart';
-import 'check_out_screen.dart';
 import 'confirm_order_screen.dart';
 
 class CartScreen extends StatefulWidget {

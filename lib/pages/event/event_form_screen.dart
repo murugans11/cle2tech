@@ -1,5 +1,5 @@
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -691,15 +691,16 @@ class EventFormScreenState extends State<EventFormScreen> {
                 textColor: Colors.white,
                 fontSize: 16.0
             );
-          }else{
+          }
+          else{
             _currentStep < 2 ? setState(() => _currentStep = 2) : null;
           }
         }
-        else{
-          if(!agree){
-            _currentStep < 2 ? setState(() => _currentStep = 2) : null;
-          }else{
+        else {
 
+          if(!agree) {
+            _currentStep < 2 ? setState(() => _currentStep = 2) : null;
+          } else {
 
             final Map<String, dynamic> contactDetail = <String, dynamic>{};
             contactDetail['emailId'] = emailId;
@@ -769,7 +770,8 @@ class EventFormScreenState extends State<EventFormScreen> {
           }
         }
 
-      }else{
+      }
+      else {
         if(dob.isEmptyOrNull){
           Fluttertoast.showToast(
               msg: "Please Enter your DOB",
@@ -780,8 +782,9 @@ class EventFormScreenState extends State<EventFormScreen> {
               textColor: Colors.white,
               fontSize: 16.0
           );
-        }else{
-          formKey1.currentState!.validate();
+        }
+        else{
+           formKey1.currentState!.validate();
           _currentStep < 2 ? setState(() => _currentStep = 1) : null;
         }
       }

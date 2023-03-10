@@ -13,7 +13,6 @@ import '../../../../models/cart/CartResponse.dart';
 import '../../../../models/categories/category.dart';
 import '../../../../models/categoriesbyname/categorieItems.dart';
 import '../../../../models/coupan/coupon_response.dart';
-import '../../../../models/event/studenteventrequest.dart';
 import '../../../../models/feature/feature_productes.dart';
 import '../../../../models/gift/gift_response.dart';
 import '../../../../models/login/OtpVerifyRequest.dart';
