@@ -1,47 +1,60 @@
 part of 'categoryList_bloc.dart';
 
+// Define states
+abstract class CategoryState extends Equatable {
+  const CategoryState();
 
+  @override
+  List<Object> get props => [];
+}
 
-class CategoryState extends Equatable {
+class CategoryInitial extends CategoryState {
+  const CategoryInitial();
 
-  final NetworkCallStatusEnum status;
+  factory CategoryInitial.initial() {
+    return const CategoryInitial();
+  }
+}
+
+class CategoryLoading extends CategoryState {
+  const CategoryLoading();
+
+  @override
+  List<Object> get props => [];
+}
+
+class CategoryLoaded extends CategoryState {
   final CategoryList categoryList;
-  final CustomError error;
 
-  const CategoryState({
-    required this.status,
+  const CategoryLoaded({
     required this.categoryList,
-    required this.error,
   });
 
-  factory CategoryState.initial() {
-    return CategoryState(
-      status: NetworkCallStatusEnum.initial,
-      categoryList: CategoryList.initial(),
-      error: CustomError(),
+  CategoryLoaded copyWith({
+    CategoryList? categoryLi,
+  }) {
+    return CategoryLoaded(
+      categoryList: categoryLi ?? categoryList,
     );
   }
 
   @override
-  List<Object> get props => [status, categoryList, error];
+  List<Object> get props => [categoryList];
 
   @override
   bool get stringify => true;
 
   @override
   String toString() {
-    return 'CategoryState{status: $status, categoryList: $categoryList, error: $error}';
+    return 'CategoryLoaded{categoryList: $categoryList, }';
   }
+}
 
-  CategoryState copyWith({
-    NetworkCallStatusEnum? status,
-    CategoryList? categoryList,
-    CustomError? error,
-  }) {
-    return CategoryState(
-      status: status ?? this.status,
-      categoryList: categoryList ?? this.categoryList,
-      error: error ?? this.error,
-    );
-  }
+class CategoryError extends CategoryState {
+  final String message;
+
+  const CategoryError({required this.message});
+
+  @override
+  List<Object> get props => [message];
 }

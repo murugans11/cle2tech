@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../constants/app_theme.dart';
@@ -12,12 +12,12 @@ import '../../widgets/buttons.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 
 import '../../widgets/error_dialog.dart';
+import '../data/exceptions/network_exceptions.dart';
 import '../models/wishlist/verifywishlist.dart';
 import '../models/wishlist/wish_list_response.dart';
-import '../utils/device/custom_error.dart';
+
 
 class MyProfileScreen extends StatefulWidget {
-
   static const String routeName = "/MyProfileScreen";
 
   const MyProfileScreen({Key? key}) : super(key: key);
@@ -39,6 +39,8 @@ class _MyProfileScreen extends State<MyProfileScreen> {
   String _verticalGroupValue = "Male";
   final List<String> _status = ["Male", "Female", "Other"];
 
+
+
   @override
   void dispose() {
     userFirstNameController.dispose();
@@ -51,10 +53,23 @@ class _MyProfileScreen extends State<MyProfileScreen> {
   Widget build(BuildContext context) {
     Profile profile = ModalRoute.of(context)!.settings.arguments as Profile;
 
-   // _verticalGroupValue = profile.gender ?? 'Male' ;
-    userFirstNameController.text = profile.firstName ?? '' ;
-    userLastNameController.text = profile.lastName ?? '' ;
-    passwordController.text = profile.mobileNo ?? '' ;
+    if (profile.gender?.isEmpty ?? true) {
+      _verticalGroupValue = "Male";
+    } else {
+      if (profile.gender == "Female") {
+
+        _verticalGroupValue = "Female";
+      } else if (profile.gender == "Male") {
+        _verticalGroupValue = "Male";
+      } else {
+        _verticalGroupValue = "Other";
+      }
+    }
+
+    // _verticalGroupValue = profile.gender ?? 'Male' ;
+    userFirstNameController.text = profile.firstName ?? '';
+    userLastNameController.text = profile.lastName ?? '';
+    passwordController.text = profile.mobileNo ?? '';
 
     final formKey = GlobalKey<FormState>();
     return Scaffold(
@@ -138,14 +153,15 @@ class _MyProfileScreen extends State<MyProfileScreen> {
                             controller: userLastNameController,
                           ),
                           const SizedBox(height: 20),
-
                           RadioGroup<String>.builder(
                             direction: Axis.horizontal,
                             groupValue: _verticalGroupValue,
                             horizontalAlignment: MainAxisAlignment.spaceAround,
                             activeColor: primaryColor,
                             onChanged: (value) => setState(() {
+                              profile.gender = value ;
                               _verticalGroupValue = value!;
+
                             }),
                             items: _status,
                             textStyle: const TextStyle(
@@ -163,10 +179,13 @@ class _MyProfileScreen extends State<MyProfileScreen> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                final firstName = userFirstNameController.value.text;
-                                final lastName = userLastNameController.value.text;
+                                final firstName =
+                                    userFirstNameController.value.text;
+                                final lastName =
+                                    userLastNameController.value.text;
                                 final password = passwordController.value.text;
-                                updateProfile(firstName, lastName,_verticalGroupValue);
+                                updateProfile(
+                                    firstName, lastName, _verticalGroupValue);
                               }
                             },
                           ),
@@ -179,16 +198,18 @@ class _MyProfileScreen extends State<MyProfileScreen> {
             : loader());
   }
 
-  FutureOr<void> updateProfile( String firstName, String lastName,String gender,) async {
-    try {
 
-     /* showDialog(context: context, builder: (context){
-        return const Center(child: CircularProgressIndicator(),);
-      });
-      */
+
+  FutureOr<void> updateProfile(
+    String firstName,
+    String lastName,
+    String gender,
+  ) async {
+    try {
       final LoginRepository loginRepository = getIt<LoginRepository>();
 
-      final WishListResponse response = await loginRepository.updateProfile(firstName ,lastName ,gender);
+      final WishListResponse response =
+          await loginRepository.updateProfile(firstName, lastName, gender);
 
       Fluttertoast.showToast(
           msg: "Profile updated successfully",
@@ -204,13 +225,17 @@ class _MyProfileScreen extends State<MyProfileScreen> {
       });
 
       navigateToOtpScreen();
-
-    } on CustomError catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      errorDialog(context, e.errMsg);
+    }catch (e) {
+      if (e is CustomException) {
+        setState(() {
+          _isLoading = false;
+        });
+        errorDialog(context, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
+
   }
 
   void navigateToOtpScreen() {

@@ -3,14 +3,13 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-
+import '../../data/exceptions/network_exceptions.dart';
 import '../../data/repository/home_repository.dart';
 import '../../models/categories/category.dart';
 
-import '../../utils/device/custom_error.dart';
-import '../../utils/dio/network_call_status_enum.dart';
 
 part 'categoryList_event.dart';
+
 part 'categoryList_state.dart';
 
 class CategoriesBloc extends Bloc<CategoriesEvent, CategoryState> {
@@ -18,27 +17,34 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoryState> {
 
   CategoriesBloc({
     required this.homeRepository,
-  }) : super(CategoryState.initial()) {
-    on<FetchCategoriesItemsEvent>(_fetchWeather);
+  }) : super(CategoryInitial.initial()) {
+    on<CategoriesEvent>(_fetchWeather);
   }
 
   FutureOr<void> _fetchWeather(
-    FetchCategoriesItemsEvent event,
+    CategoriesEvent event,
     Emitter<CategoryState> emit,
   ) async {
-    if(state.categoryList.categoryGroup?.length ==0){
-      emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+    if (event is FetchCategoriesItemsEvent) {
+      if (state is CategoryLoaded &&
+          (state as CategoryLoaded).categoryList.categoryGroup?.length == 0) {
+        emit((state as CategoryLoaded)
+            .copyWith(categoryLi: (state as CategoryLoaded).categoryList));
+        return;
+      }
+
+      emit(const CategoryLoading());
 
       try {
         final CategoryList weather = await homeRepository.getCategoryGroup();
-
-        emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: weather));
-      } on CustomError catch (e) {
-        emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+        emit(CategoryLoaded(categoryList: weather));
+      } catch (e) {
+        if (e is CustomException) {
+          emit(CategoryError(message: e.toString()));
+        } else {
+          emit(const CategoryError(message: 'Unknown error'));
+        }
       }
-    }else{
-      emit(state.copyWith(status: NetworkCallStatusEnum.loaded, categoryList: state.categoryList));
     }
-
   }
 }

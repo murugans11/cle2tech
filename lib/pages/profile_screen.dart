@@ -1,11 +1,14 @@
-import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 
 import 'package:iconly/iconly.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shopeein/data/sharedpref/shared_preference_helper.dart';
 import 'package:shopeein/pages/auth_screen/log_in_screen.dart';
+import 'package:shopeein/pages/shipping_address.dart';
 
 import 'package:shopeein/pages/splash_screen_one.dart';
+import 'package:shopeein/widgets/add_new_address.dart';
 import '../constants/app_theme.dart';
 import '../constants/constants.dart';
 import '../data/repository/home_repository.dart';
@@ -18,7 +21,6 @@ import 'my_order.dart';
 import 'my_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-
   static const String routeName = "/ProfileScreen";
 
   const ProfileScreen({Key? key}) : super(key: key);
@@ -27,9 +29,9 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>  {
-
-  SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
+class _ProfileScreenState extends State<ProfileScreen> {
+  SharedPreferenceHelper sharedPreferenceHelper =
+      getIt<SharedPreferenceHelper>();
   HomeRepository homeRepository = getIt<HomeRepository>();
   VerifyWishlist response = VerifyWishlist();
   String? token = "";
@@ -40,49 +42,79 @@ class _ProfileScreenState extends State<ProfileScreen>  {
     _asyncMethod();
   }
 
+  _onAlertButtonsPressed(context) {
+    var alertStyle = AlertStyle(
+        isCloseButton: false,
+        isOverlayTapDismiss: false,
+        descStyle: const TextStyle(fontWeight: FontWeight.bold),
+        animationDuration: const Duration(milliseconds: 400),
+        alertBorder: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0.0),
+          side: const BorderSide(
+            color: Colors.grey,
+          ),
+        ),
+        titleStyle: const TextStyle(
+          color: Colors.red,
+        ),
+        constraints: BoxConstraints.expand(width: 300),
+        //First to chars "55" represents transparency of color
+        overlayColor: Color(0x55000000),
+        alertElevation: 0,
+        alertAlignment: Alignment.center);
+    Alert(
+      context: context,
+      style: alertStyle,
+      type: AlertType.warning,
+      title: "Shopeein",
+      desc: "Are you sure you want to logout?",
+      buttons: [
+        DialogButton(
+          child: const Text(
+            "No",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        DialogButton(
+          onPressed: () async {
+            await sharedPreferenceHelper.removeAuthToken();
+            const SplashScreenOne()
+                .launch(context, isNewTask: true);
+          },
+          child: const Text(
+            "Yes",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        )
+      ],
+    ).show();
+  }
 
   // Navigator.pop.
   Future<void> _navigateToLogin(BuildContext context) async {
-    // Navigator.push returns a Future that completes after calling
-    // Navigator.pop on the Selection Screen.
-    final result = await Navigator.push(context,
+    final result = await Navigator.push(
+      context,
       MaterialPageRoute(builder: (context) => const LogInScreen()),
     );
 
-    // When a BuildContext is used from a StatefulWidget, the mounted property
-    // must be checked after an asynchronous gap.
     if (!mounted) return;
 
-    // After the Selection Screen returns a result, hide any previous snackbars
-    // and show the new result.
     _asyncMethod();
-   /* ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$result')));*/
   }
 
   // Navigator.pop.
   Future<void> _navigateToProfileUpdate(BuildContext context) async {
-    // Navigator.push returns a Future that completes after calling
-    // Navigator.pop on the Selection Screen.
-    final result = await  Navigator.pushNamed(context, MyProfileScreen.routeName,arguments: response.user?.profile);
+    final result = await Navigator.pushNamed(context, MyProfileScreen.routeName,
+        arguments: response.user?.profile);
 
-    // When a BuildContext is used from a StatefulWidget, the mounted property
-    // must be checked after an asynchronous gap.
     if (!mounted) return;
 
-    // After the Selection Screen returns a result, hide any previous snackbars
-    // and show the new result.
     _asyncMethod();
-    /* ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$result')));*/
   }
 
-
-
   _asyncMethod() async {
-     token = await sharedPreferenceHelper.authToken;
+    token = await sharedPreferenceHelper.authToken;
     if (token != null) {
       response = await homeRepository.verifyWishList(token!);
       setState(() {});
@@ -91,72 +123,17 @@ class _ProfileScreenState extends State<ProfileScreen>  {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: primaryColor,
         elevation: 0.0,
-        /* leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-        ),*/
         title: const MyGoogleText(
           text: 'Profile',
           fontColor: Colors.white,
           fontWeight: FontWeight.normal,
           fontSize: 20,
         ),
-        /*actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: const BoxDecoration(
-                color: secondaryColor2,
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-              ),
-              child: IconButton(
-                onPressed: () {
-                 // const SearchProductScreen().launch(context);
-                },
-                icon: const Icon(
-                  FeatherIcons.search,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: const BoxDecoration(
-                color: secondaryColor2,
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  const NotificationsScreen().launch(context);
-                },
-                icon: const Icon(
-                  FeatherIcons.bell,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 15),
-        ],*/
       ),
-
       body: SingleChildScrollView(
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
@@ -196,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                         padding: const EdgeInsets.all(10.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children:  [
+                          children: [
                             MyGoogleText(
                                 text: response.user?.profile?.firstName ?? '',
                                 fontSize: 24,
@@ -213,6 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 20),
 
                   ///_____Login_____________________________
@@ -248,14 +226,11 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () async {
-
                         if (token != null) {
-                         _navigateToProfileUpdate(context);
-
-                        }else{
+                          _navigateToProfileUpdate(context);
+                        } else {
                           _navigateToLogin(context);
                         }
-
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -280,13 +255,11 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () async {
-
                         if (token != null) {
                           const ChangePassScreen().launch(context);
-                        }else{
+                        } else {
                           _navigateToLogin(context);
                         }
-
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -311,7 +284,11 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () {
-                        Navigator.pushNamed(context, MyOrderScreen.routeName);
+                        if (token != null) {
+                          Navigator.pushNamed(context, MyOrderScreen.routeName);
+                        } else {
+                          _navigateToLogin(context);
+                        }
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -336,8 +313,11 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () {
-                        //const PaymentMethodScreen().launch(context);
-                        Navigator.pushNamed(context, GiftPage.routeName);
+                        if (token != null) {
+                          Navigator.pushNamed(context, GiftPage.routeName);
+                        } else {
+                          _navigateToLogin(context);
+                        }
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -354,21 +334,26 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                     ),
                   ),
 
-                  ///_________Notification___________________________
-                  /*Container(
+                  ///______________Manage Address_________________________
+                  Container(
                     decoration: const BoxDecoration(
                         border: Border(
                             bottom:
                                 BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
-                      onTap: () {
-                        const NotificationsScreen().launch(context);
+                      onTap: () async {
+                        if (token != null) {
+                          Navigator.pushNamed(
+                              context, ShippingAddressPage.routeName);
+                        } else {
+                          _navigateToLogin(context);
+                        }
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
-                      leading: const Icon(IconlyLight.notification),
+                      leading: const Icon(IconlyLight.bookmark),
                       title: const MyGoogleText(
-                          text: 'Notification',
+                          text: 'Manage Address',
                           fontSize: 16,
                           fontColor: Colors.black,
                           fontWeight: FontWeight.normal),
@@ -377,62 +362,21 @@ class _ProfileScreenState extends State<ProfileScreen>  {
                         size: 16,
                       ),
                     ),
-                  ),*/
-
-                  ///_____________Language________________________
-                  /*  Container(
-                    decoration: const BoxDecoration(
-                        border: Border(
-                            bottom:
-                                BorderSide(width: 1, color: secondaryColor3))),
-                    child: const ListTile(
-                      onTap: null,
-                      shape: Border(
-                          bottom: BorderSide(width: 1, color: textColors)),
-                      leading: Icon(IconlyLight.location),
-                      title: MyGoogleText(
-                          text: 'Language',
-                          fontSize: 16,
-                          fontColor: Colors.black,
-                          fontWeight: FontWeight.normal),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                      ),
-                    ),
-                  ),*/
-
-                  ///___________________Help___________________________
-                  /*Container(
-                    decoration: const BoxDecoration(
-                        border: Border(
-                            bottom:
-                                BorderSide(width: 1, color: secondaryColor3))),
-                    child: const ListTile(
-                      onTap: null,
-                      shape: Border(
-                          bottom: BorderSide(width: 1, color: textColors)),
-                      leading: Icon(IconlyLight.danger),
-                      title: MyGoogleText(
-                          text: 'Help & Info',
-                          fontSize: 16,
-                          fontColor: Colors.black,
-                          fontWeight: FontWeight.normal),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                      ),
-                    ),
-                  ),*/
+                  ),
 
                   ///______________SignOut_________________________
                   Container(
                     decoration: const BoxDecoration(
-                        border: Border(bottom: BorderSide(width: 1, color: secondaryColor3))),
+                        border: Border(
+                            bottom:
+                                BorderSide(width: 1, color: secondaryColor3))),
                     child: ListTile(
                       onTap: () async {
-                        await sharedPreferenceHelper.removeAuthToken();
-                        const SplashScreenOne().launch(context, isNewTask: true);
+                        if (token != null) {
+                          _onAlertButtonsPressed(context);
+                        } else {
+                          _navigateToLogin(context);
+                        }
                       },
                       shape: const Border(
                           bottom: BorderSide(width: 1, color: textColors)),
@@ -455,6 +399,5 @@ class _ProfileScreenState extends State<ProfileScreen>  {
         ),
       ),
     );
-
   }
 }

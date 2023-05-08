@@ -1,12 +1,10 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:shopeein/pages/single_category_by_Item_screen.dart';
-
-
 
 import '../blocs/category_groupe/categoryList_bloc.dart';
 import '../constants/constants.dart';
@@ -72,70 +70,80 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
       body: BlocBuilder<CategoriesBloc, CategoryState>(
         builder: (context, state) {
-          var cound = state.categoryList.categoryGroup?.length ?? 0;
-          return CustomScrollView(
-            slivers: [
-              for (var i = 0; i < cound; i++) buildListView(state, context, i)
-            ],
-          );
+          if (state is CategoryLoaded) {
+            var cound = state.categoryList.categoryGroup?.length ?? 0;
+            return CustomScrollView(
+              slivers: [
+                for (var i = 0; i < cound; i++) buildListView(state, context, i)
+              ],
+            );
+          }else{
+            return Container();
+          }
         },
       ),
     );
   }
 
   Widget buildListView(CategoryState state, BuildContext context, int index) {
-    final random = Random();
+    if (state is CategoryLoaded) {
+      final random = Random();
 
-    List list = state.categoryList.categoryGroup?[index].category;
-    List<CategoryItemDisplay> category = [];
-    for (var element in list) {
-      List e1 = element;
-      for (var element1 in e1) {
-        category.add(
-          CategoryItemDisplay(
-            name: element1['name'],
-            displayName: element1['displayName'],
-            path: element1['path'],
-          ),
-        );
+      List list = state.categoryList.categoryGroup?[index].category;
+      List<CategoryItemDisplay> category = [];
+      for (var element in list) {
+        List e1 = element;
+        for (var element1 in e1) {
+          category.add(
+            CategoryItemDisplay(
+              name: element1['name'],
+              displayName: element1['displayName'],
+              path: element1['path'],
+            ),
+          );
+        }
       }
-    }
 
-    return SliverStickyHeader(
-      header: Container(
-        padding: const EdgeInsets.all(5),
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(30),
-            topLeft: Radius.circular(30),
+      return SliverStickyHeader(
+        header: Container(
+          padding: const EdgeInsets.all(5),
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(30),
+              topLeft: Radius.circular(30),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 0.0),
+            child: CategoryView(
+              name: state.categoryList.categoryGroup?[index].title ?? '',
+              items: '10',
+              color: colors[random.nextInt(colors.length)],
+              image: state.categoryList.categoryGroup?[index].image ?? '',
+              onTabFunction: () {
+                //const SingleCategoryScreen().launch(context);
+              },
+            ),
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 0.0),
-          child: CategoryView(
-            name: state.categoryList.categoryGroup?[index].title ?? '',
-            items: '10',
-            color: colors[random.nextInt(colors.length)],
-            image: state.categoryList.categoryGroup?[index].image ?? '',
-            onTabFunction: () {
-              //const SingleCategoryScreen().launch(context);
-            },
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, i) => ListTile(
+              onTap: () {
+                Navigator.pushNamed(
+                    context, SingleCategoryByItemScreen.routeName,
+                    arguments: category[i]);
+              },
+              title: Text(category[i].displayName ?? ''),
+            ),
+            childCount: category.length,
           ),
         ),
-      ),
-      sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, i) => ListTile(
-            onTap: () {
-              Navigator.pushNamed(context, SingleCategoryByItemScreen.routeName, arguments: category[i]);
-            },
-            title: Text(category[i].displayName ?? ''),
-          ),
-          childCount: category.length,
-        ),
-      ),
-    );
+      );
+    } else {
+      return Container();
+    }
   }
 }

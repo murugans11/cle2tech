@@ -6,12 +6,13 @@ import 'package:shopeein/models/login/login_response.dart';
 
 import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
+import '../../data/exceptions/network_exceptions.dart';
 import '../../data/repository/login_repository.dart';
 import '../../di/components/service_locator.dart';
 import '../../models/login/RequestOtpResponse.dart';
 import '../../models/login/login_requst.dart';
 import '../../models/register/request_otp.dart';
-import '../../utils/device/custom_error.dart';
+
 import '../../widgets/buttons.dart';
 import '../../widgets/error_dialog.dart';
 import 'otp_auth_screen.dart';
@@ -345,12 +346,17 @@ class _LogInScreenState extends State<LogInScreen> {
 
       navigateLogin();
 
-    } on CustomError catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      errorDialog(buildContext, e.errMsg);
+    } catch (e) {
+      if (e is CustomException) {
+        setState(() {
+          _isLoading = false;
+        });
+        errorDialog(buildContext, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
+
   }
 
   void navigateLogin() {
@@ -379,14 +385,16 @@ class _LogInScreenState extends State<LogInScreen> {
 
       navigateToOtpScreen(res);
 
-    } on CustomError catch (e) {
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      errorDialog(context, e.errMsg.toString());
-     // errorDialog(context, "Already number taken");
+    }
+    catch (e) {
+      if (e is CustomException) {
+        setState(() {
+          _isLoading = false;
+        });
+        errorDialog(buildContext, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
   }
 

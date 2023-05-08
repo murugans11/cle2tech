@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:shopeein/data/exceptions/network_exceptions.dart';
 
 
 import '../../data/repository/home_repository.dart';
@@ -12,51 +13,64 @@ class CartListResponseCubit extends Cubit<CartListResponseState> {
   CartListResponseCubit({required this.homeRepository})
       : super(CartListResponseInitial());
 
-  void loadCartList(String token) {
+
+  Future<void> loadCartList(String token) async {
     if (state is CartListResponseInitial) {
       emit(CartListResponseInitial());
     }
-    homeRepository
-        .getCartList(token)
-        .then(
-          (cartListResponse) =>
-      {
-        if (cartListResponse.cartDetails == null)
-          {emit(CartListResponseEmpty())}
-        else
-          {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
-      },
-    );
+    try {
+      final cartListResponse = await homeRepository.getCartList(token);
+      if (cartListResponse.cartDetails == null) {
+        emit(CartListResponseEmpty());
+      } else {
+        emit(CartListResponseLoaded(cartResponse: cartListResponse));
+      }
+    } catch (error) {
+      if(error is CustomException){
+        emit(CartListResponseError(errorMessage: error.message));
+      }else{
+        emit(CartListResponseError(errorMessage: error.toString()));
+      }
+    }
   }
 
-  void addUpdateDeleteCart(String token, CartRequest cartRequest) {
+  Future<void> addUpdateDeleteCart(String token, CartRequest cartRequest) async {
     emit(CartListResponseLoaded(cartResponse: CartResponse()));
 
-    homeRepository.addUpdateDeleteCart(token, cartRequest).then(
-          (cartListResponse) =>
-      {
-        if (cartListResponse.cartDetails == null)
-          {emit(CartListResponseEmpty())}
-        else
-          {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
-      },
-    );
+    try {
+      final cartListResponse = await homeRepository.addUpdateDeleteCart(token, cartRequest);
+      if (cartListResponse.cartDetails == null) {
+        emit(CartListResponseEmpty());
+      } else {
+        emit(CartListResponseLoaded(cartResponse: cartListResponse));
+      }
+    } catch (error) {
+      if(error is CustomException){
+        emit(CartListResponseError(errorMessage: error.message));
+      }else{
+        emit(CartListResponseError(errorMessage: error.toString()));
+      }
+    }
   }
 
-  void applyCoupon(String token, String couponCode, String orderId) {
-
+  Future<void> applyCoupon(String token, String couponCode, String orderId) async {
     emit(CartListResponseLoaded(cartResponse: CartResponse()));
 
-    homeRepository.applyCoupon(token, couponCode, orderId).then(
-          (cartListResponse) =>
-      {
-        if (cartListResponse.cartDetails == null)
-          {emit(CartListResponseEmpty())}
-        else
-          {emit(CartListResponseLoaded(cartResponse: cartListResponse))}
-      },
-    ).onError((error, stackTrace) => {{emit(CartListResponseError(errorMessage: error.toString()))}})
-        .whenComplete(() => {});
-
+    try {
+      final cartListResponse = await homeRepository.applyCoupon(token, couponCode, orderId);
+      if (cartListResponse.cartDetails == null) {
+        emit(CartListResponseEmpty());
+      } else {
+        emit(CartListResponseLoaded(cartResponse: cartListResponse));
+      }
+    } catch (error) {
+      if(error is CustomException){
+        emit(CartListResponseError(errorMessage: error.message));
+      }else{
+        emit(CartListResponseError(errorMessage: error.toString()));
+      }
+    }
   }
+
+
 }

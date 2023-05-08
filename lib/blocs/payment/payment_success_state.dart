@@ -1,50 +1,60 @@
-
-
 import 'package:equatable/equatable.dart';
 
-import '../../utils/device/custom_error.dart';
-import '../../utils/dio/network_call_status_enum.dart';
-
-class PaymentSuccessState extends Equatable {
-
-  final NetworkCallStatusEnum status;
-  final String response;
-  final CustomError error;
-
-  const PaymentSuccessState({
-    required this.status,
-    required this.response,
-    required this.error,
-  });
-
-  factory PaymentSuccessState.initial() {
-    return  const PaymentSuccessState(
-      status: NetworkCallStatusEnum.initial,
-      response: '',
-      error: CustomError(),
-    );
-  }
+// Define states
+abstract class PaymentSuccessState extends Equatable {
+  const PaymentSuccessState();
 
   @override
-  List<Object> get props => [status, response, error];
+  List<Object> get props => [];
+}
+
+class PaymentSuccessInitial extends PaymentSuccessState {
+  const PaymentSuccessInitial();
+
+  factory PaymentSuccessInitial.initial() {
+    return const PaymentSuccessInitial();
+  }
+}
+
+class PaymentSuccessLoading extends PaymentSuccessState {
+  const PaymentSuccessLoading();
+
+  @override
+  List<Object> get props => [];
+}
+
+class PaymentSuccessLoaded extends PaymentSuccessState {
+  final String response;
+
+  const PaymentSuccessLoaded({
+    required this.response,
+  });
+
+  @override
+  List<Object> get props => [response];
 
   @override
   bool get stringify => true;
 
   @override
   String toString() {
-    return 'PaymentSuccessState{status: $status, response: $response, error: $error}';
+    return 'PaymentSuccessState{ response: $response, }';
   }
 
   PaymentSuccessState copyWith({
-    NetworkCallStatusEnum? status,
     String? response1,
-    CustomError? error,
   }) {
-    return PaymentSuccessState(
-      status: status ?? this.status,
+    return PaymentSuccessLoaded(
       response: response1 ?? response,
-      error: error ?? this.error,
     );
   }
+}
+
+class PaymentSuccessError extends PaymentSuccessState {
+  final String message;
+
+  const PaymentSuccessError({required this.message});
+
+  @override
+  List<Object> get props => [message];
 }

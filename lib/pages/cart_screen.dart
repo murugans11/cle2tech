@@ -158,8 +158,14 @@ class _CartScreenState extends State<CartScreen> {
 
             String mrp = cartListResponse.cartDetails?[index].mrp.toString() ?? '0';
 
-            int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100)
-                .toInt();
+            //int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100).toInt();
+            int percentage = 0;
+
+            if (((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100).isFinite) {
+              percentage = ((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100).toInt();
+            } else {
+              percentage = 0; // Or any other default value
+            }
 
             String productTitle =
                 cartListResponse.cartDetails?[index].productTitle ?? '';

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shopeein/models/login/login_response.dart';
 import 'package:shopeein/models/register/RegistrationRequest.dart';
@@ -9,8 +8,8 @@ import '../../models/login/OtpVerifyRequest.dart';
 import '../../models/login/RequestOtpResponse.dart';
 import '../../models/login/login_requst.dart';
 import '../../models/wishlist/wish_list_response.dart';
-import '../../utils/device/custom_error.dart';
-import '../../utils/dio/dio_error_util.dart';
+
+
 import '../network/apis/home/home_api.dart';
 import '../sharedpref/shared_preference_helper.dart';
 
@@ -39,8 +38,7 @@ class LoginRepository {
       return loginResponse;
     } catch (e) {
       debugPrint(e.toString());
-
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -56,7 +54,7 @@ class LoginRepository {
     } catch (e) {
       debugPrint(e.toString());
 
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -75,7 +73,7 @@ class LoginRepository {
       return loginResponse;
     } catch (e) {
       debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -94,7 +92,7 @@ class LoginRepository {
       return loginResponse;
     } catch (e) {
       debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -113,7 +111,7 @@ class LoginRepository {
       return profileResponse;
     } catch (e) {
       debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -130,7 +128,7 @@ class LoginRepository {
       return profileResponse;
     } catch (e) {
       debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 }

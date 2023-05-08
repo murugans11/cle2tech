@@ -2,6 +2,7 @@ import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
 import '../../widgets/buttons.dart';
 import 'event_form_other_screen.dart';
@@ -47,7 +48,7 @@ class _EventIntroScreenState extends State<EventIntroScreen> {
         Container(
           margin: const EdgeInsets.only(top: 8),
           child: const Text(
-            "Jan 2023",
+            "May 2023",
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -115,9 +116,9 @@ class _EventIntroScreenState extends State<EventIntroScreen> {
                   Container(
                       height: 300,
                       width: double.infinity,
-                      decoration: const BoxDecoration(
+                      decoration:  BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage("assets/images/Talent_Show.png"),
+                            image: AssetImage(AppTheme.of(context)?.assets.ots ?? ''),
                             fit: BoxFit.cover),
                       ),
                       child: const Text('') // Foreground widget here
@@ -159,7 +160,7 @@ class _EventIntroScreenState extends State<EventIntroScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const MyGoogleText(
-                      text: 'Join Shopeein Talent Show',
+                      text: 'Join Shopeein Online Talent Show',
                       fontSize: 20,
                       fontColor: Colors.black,
                       fontWeight: FontWeight.bold,

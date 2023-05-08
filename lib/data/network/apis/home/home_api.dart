@@ -44,8 +44,7 @@ class HomeApi {
       return BannerList.fromJson(categoryGroupResponse);
     } catch (e) {
       debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -58,7 +57,7 @@ class HomeApi {
     } catch (e) {
       debugPrint(e.toString());
 
-      throw e;
+      rethrow;
     }
   }
 
@@ -69,9 +68,7 @@ class HomeApi {
 
       return FeatureProductList.fromJson(featureProductResponse);
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -81,9 +78,8 @@ class HomeApi {
 
       return CategorieItems.fromJson(viewAllCategoryProductListResponse);
     } catch (e) {
-      debugPrint(e.toString());
 
-      throw e;
+      rethrow;
     }
   }
 
@@ -94,9 +90,7 @@ class HomeApi {
 
       return LoginResponse.fromJson(loginResponse);
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -132,9 +126,7 @@ class HomeApi {
         return RequestOtpResponse.fromJson(requestOtpResponse);
       }
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -150,8 +142,7 @@ class HomeApi {
 
       return LoginResponse.fromJson(loginResponse);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -168,9 +159,7 @@ class HomeApi {
 
       return LoginResponse.fromJson(loginResponse);
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -192,8 +181,7 @@ class HomeApi {
       );
       return WishListResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -215,19 +203,15 @@ class HomeApi {
       );
       return response.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
   }
 
   Future<void> toggleWishList(
       ToggleWishListRequest toggleWishListRequest) async {
     try {
-      debugPrint(Endpoints.toggleWishList);
 
-      debugPrint(toggleWishListRequest.toJson().toString());
-
-      //  final loginResponse = await _dioClient.post(Endpoints.toggleWishList, data: toggleWishListRequest.toJson());
       SharedPreferenceHelper sharedPreferenceHelper = getIt<SharedPreferenceHelper>();
       // getting token
       var token = await sharedPreferenceHelper.authToken;
@@ -243,8 +227,7 @@ class HomeApi {
       debugPrint(json.toString());
 
     } catch (e) {
-      debugPrint(e.toString());
-      // throw e;
+       rethrow;
     }
   }
 
@@ -259,8 +242,7 @@ class HomeApi {
 
       return WishListResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -276,9 +258,7 @@ class HomeApi {
       debugPrint(response.toString());
       return VerifyWishlist.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -293,16 +273,14 @@ class HomeApi {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
   }
   Future<CartResponse> addToCart(String token) async {
     try {
-      debugPrint(Endpoints.getCartList);
+
       final data = <String, String>{};
-      //data['couponCode'] = couponCode;
-      //data['orderId'] = orderId;
 
       final response = await _dioClient.put(Endpoints.getCartList,
           options: Options(headers: {"Content-Type": "application/json", "Authorization": "Bearer $token",}),
@@ -311,8 +289,7 @@ class HomeApi {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -333,8 +310,7 @@ class HomeApi {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -354,8 +330,7 @@ class HomeApi {
 
       return response.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -370,8 +345,7 @@ class HomeApi {
 
       return CouponResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
   Future<MyOrderResponse> getMyOrders(String token) async {
@@ -385,8 +359,7 @@ class HomeApi {
 
       return MyOrderResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -401,8 +374,7 @@ class HomeApi {
 
       return GiftResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -419,8 +391,7 @@ class HomeApi {
 
       return walletBalance.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -444,8 +415,7 @@ class HomeApi {
 
       return CartResponse.fromJson(response);
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -472,8 +442,7 @@ class HomeApi {
 
       return response.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -520,8 +489,8 @@ class HomeApi {
       return  OrderOtpVerifyRequest(paymentTypeRes: paymentTypeRes, requestId: requestId, key: key, orderId: orderId, isFullWalletPay: isFullWalletPay );
 
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
 
   }
@@ -561,8 +530,8 @@ class HomeApi {
       return  OrderOtpVerifyRequest(paymentTypeRes: paymentTypeRes, requestId: requestId, key: key, orderId: orderId, isFullWalletPay: false);
 
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
 
   }
@@ -588,8 +557,8 @@ class HomeApi {
       return  response.toString();
 
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
 
   }
@@ -613,8 +582,8 @@ class HomeApi {
       return  response.toString();
 
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
 
   }
@@ -638,8 +607,8 @@ class HomeApi {
 
       return orderId+":"+walletBalance.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
   }
 
@@ -666,8 +635,8 @@ class HomeApi {
 
       return response.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+
+      rethrow;
     }
   }
 
@@ -692,8 +661,7 @@ class HomeApi {
       return  PincodeResponse.fromJson(response);
 
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
 
   }

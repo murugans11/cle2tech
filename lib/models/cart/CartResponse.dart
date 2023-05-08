@@ -73,7 +73,9 @@ class CartDetails {
     retailPrice = json['retailPrice'];
     productId = json['productId'];
     resourcePath = json['resourcePath'] != null
+        ? json['resourcePath'] is Map
         ? ResourcePath.fromJson(json['resourcePath'])
+        : null
         : null;
     if (json['optionalAttributes'] != null) {
       optionalAttributes = <OptionalAttributes>[];

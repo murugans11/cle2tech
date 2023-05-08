@@ -1,8 +1,5 @@
-
-
-import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 
 import 'package:nb_utils/nb_utils.dart';
 
@@ -26,6 +23,7 @@ import '../models/cart/CartRequest.dart';
 import '../models/cart/CartResponse.dart';
 import '../models/otp_verify/OrderOtpVerifyRequest.dart';
 import '../models/wishlist/verifywishlist.dart';
+import '../widgets/add_new_address.dart';
 import '../widgets/buttons.dart';
 import '../widgets/cart_cost_section.dart';
 import '../widgets/cart_item_single_view.dart';
@@ -53,6 +51,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   String? gender;
   bool useShopeeinWallet = false;
+  var payMentType = '';
 
   final _couponController = TextEditingController();
   SharedPreferenceHelper sharedPreferenceHelper =
@@ -113,8 +112,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   void applyCoupon(BuildContext context, String couponCode, String orderId) {
     setState(() {
-      BlocProvider.of<CartListResponseCubit>(context)
-          .applyCoupon(token, couponCode, orderId);
+      BlocProvider.of<CartListResponseCubit>(context).applyCoupon(token, couponCode, orderId);
       update = false;
     });
   }
@@ -125,6 +123,15 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
     setState(() {
       _couponController.text = result.toString();
     });
+  }
+
+  Future<void> _navigateAndDisplayAddress(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddNewAddress()),
+    );
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<VerifyWishlist> _getLatest() async {
@@ -194,10 +201,14 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
             String mrp =
                 cartListResponse.cartDetails?[index].mrp.toString() ?? '0';
 
-            int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) /
-                    int.parse(mrp) *
-                    100)
-                .toInt();
+           // int percentage = ((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100).toInt();
+            int percentage = 0;
+
+            if (((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100).isFinite) {
+              percentage = ((int.parse(mrp) - int.parse(sellingPrice)) / int.parse(mrp) * 100).toInt();
+            } else {
+              percentage = 0; // Or any other default value
+            }
 
             String productTitle =
                 cartListResponse.cartDetails?[index].productTitle ?? '';
@@ -418,7 +429,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     var addressList = [];
 
     return Scaffold(
@@ -461,13 +471,17 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   ///____________Shipping_address__________________________
                   FutureBuilder<VerifyWishlist>(
                     future: _getLatest(),
-                    builder: (BuildContext context, AsyncSnapshot<VerifyWishlist> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<VerifyWishlist> snapshot) {
                       var address = '';
                       if (snapshot.hasData) {
-                         addressList = snapshot.data?.user?.addresses ?? [];
-                        if(addressList.isNotEmpty){
-                          addressId = snapshot.data?.user?.addresses?[0].addressId ?? '';
-                          address = snapshot.data?.user?.addresses?[0].address ?? '';
+                        addressList = snapshot.data?.user?.addresses ?? [];
+                        if (addressList.isNotEmpty) {
+                          addressId =
+                              snapshot.data?.user?.addresses?[0].addressId ??
+                                  '';
+                          address =
+                              snapshot.data?.user?.addresses?[0].address ?? '';
                         }
                       }
 
@@ -509,9 +523,9 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     ),
                                   ],
                                 ),
-                                 Flexible(
+                                Flexible(
                                   child: MyGoogleText(
-                                    text: address ,
+                                    text: address,
                                     fontSize: 16,
                                     fontColor: textColors,
                                     fontWeight: FontWeight.normal,
@@ -545,7 +559,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.pushNamed(context, ShippingAddressPage.routeName);
+                                        //Navigator.pushNamed(context, ShippingAddressPage.routeName);
+                                        _navigateAndDisplayAddress(context);
                                       },
                                       child: const MyGoogleText(
                                         text: 'Add Address',
@@ -668,8 +683,10 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                           value: useShopeeinWallet,
                           onChanged: (value) {
                             setState(() {
-                              useShopeeinWallet = value ?? false;
-                              paymantType = 1;
+                              if (value!) {
+                                paymantType = 1;
+                              }
+                              useShopeeinWallet = value;
                             });
                           },
                         ),
@@ -721,51 +738,68 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                       ),
                     ],
                   ),
-                  RadioListTile(
-                    title: const Text("Cash on Delivery"),
-                    value: "Cash on Delivery",
-                    groupValue: gender,
-                    onChanged: useShopeeinWallet
-                        ? null
-                        : (value) {
-                            setState(() {
-                              paymantType = 0;
-                              gender = value.toString();
-                            });
-                          },
-                  ),
-                  RadioListTile(
-                    title: const Text("Online Payment"),
-                    value: "Online Payment",
-                    groupValue: gender,
-                    onChanged: (value) {
-                      setState(() {
-                        paymantType = 1;
-                        gender = value.toString();
-                      });
-                    },
-                  ),
+
+                  if (useShopeeinWallet) ...[
+                    RadioListTile(
+                      title: const Text("Online Payment"),
+                      value: "Online Payment",
+                      groupValue: gender,
+                      onChanged: (value) {
+                        setState(() {
+                          paymantType = 1;
+                          payMentType = "ONLINE";
+                          gender = value.toString();
+                        });
+                      },
+                    ),
+                  ] else...[
+                    RadioListTile(
+                      title: const Text("Cash on Delivery"),
+                      value: "Cash on Delivery",
+                      groupValue: gender,
+                      onChanged: useShopeeinWallet
+                          ? null
+                          : (value) {
+                        setState(() {
+                          paymantType = 0;
+                          payMentType = "COD";
+                          gender = value.toString();
+                        });
+                      },
+                    ),
+                    RadioListTile(
+                      title: const Text("Online Payment"),
+                      value: "Online Payment",
+                      groupValue: gender,
+                      onChanged: (value) {
+                        setState(() {
+                          paymantType = 1;
+                          payMentType = "ONLINE";
+                          gender = value.toString();
+                        });
+                      },
+                    ),
+                  ],
 
                   const SizedBox(height: 10),
 
                   BlocConsumer<MakeOrderBloc, MakeOrderState>(
                     builder: (context, state) {
-                      if (state.status == NetworkCallStatusEnum.loading) {
+                      if(state is MakeOrderLoading){
                         return const Center(child: CircularProgressIndicator());
                       }
+
                       return Button1(
                         buttonText: 'Pay Now',
                         buttonColor: primaryColor,
                         onPressFunction: () {
-
-                          var payMentType = '';
-                          if (paymantType == 0) {
+                          /* if (paymantType == 0) {
                             payMentType = "COD";
-                          } else if (paymantType == 1){
+                          } else if (paymantType == 1) {
                             payMentType = "ONLINE";
-                          }
+                          }*/
 
-                          if(addressId.isEmptyOrNull) {
+                          if (addressId.isEmptyOrNull) {
                             Fluttertoast.showToast(
                                 msg: "Please add delivery address",
                                 toastLength: Toast.LENGTH_SHORT,
@@ -773,9 +807,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                 timeInSecForIosWeb: 1,
                                 backgroundColor: Colors.red,
                                 textColor: Colors.white,
-                                fontSize: 16.0
-                            );
-                          }else if(payMentType.isEmptyOrNull) {
+                                fontSize: 16.0);
+                          } else if (payMentType.isEmptyOrNull) {
                             Fluttertoast.showToast(
                                 msg: "Please select payment type",
                                 toastLength: Toast.LENGTH_SHORT,
@@ -783,9 +816,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                                 timeInSecForIosWeb: 1,
                                 backgroundColor: Colors.red,
                                 textColor: Colors.white,
-                                fontSize: 16.0
-                            );
-                          } else{
+                                fontSize: 16.0);
+                          } else {
                             context.read<MakeOrderBloc>().add(
                                 MakeOrderRequestEvent(
                                     token: token,
@@ -798,7 +830,8 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                       );
                     },
                     listener: (context, state) {
-                      if (state.status == NetworkCallStatusEnum.loaded) {
+
+                      if(state is MakeOrderLoaded){
                         if (state.orderOtpVerify.paymentTypeRes == "ONLINE") {
                           if (state.orderOtpVerify.isFullWalletPay) {
                             Navigator.pushNamed(context, GiftPage.routeName);
@@ -816,9 +849,11 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                               context, PinCodeVerificationScreen.routeName,
                               arguments: request);
                         }
-                      } else if (state.status == NetworkCallStatusEnum.error) {
+                      }
+
+                      else if (state is MakeOrderError) {
                         Fluttertoast.showToast(
-                            msg: state.error.errMsg,
+                            msg: state.message,
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.CENTER,
                             timeInSecForIosWeb: 1,

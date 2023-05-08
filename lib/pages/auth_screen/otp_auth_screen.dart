@@ -101,7 +101,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                       text: 'Code sent',
                       fontWeight: FontWeight.w500,
                     ),
-                    TextButton(
+                    /*TextButton(
                       onPressed: () {},
                       child: const MyGoogleText(
                         text: ' Resend code',
@@ -109,7 +109,7 @@ class _OtpAuthScreenState extends State<OtpAuthScreen> {
                         fontColor: primaryColor,
                         fontWeight: FontWeight.w500,
                       ),
-                    )
+                    )*/
                   ],
                 ),
 

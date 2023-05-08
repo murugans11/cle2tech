@@ -5,10 +5,11 @@ import 'package:nb_utils/nb_utils.dart';
 
 import '../../constants/app_theme.dart';
 import '../../constants/constants.dart';
+import '../../data/exceptions/network_exceptions.dart';
 import '../../data/repository/login_repository.dart';
 import '../../di/components/service_locator.dart';
 
-import '../../utils/device/custom_error.dart';
+
 import '../../widgets/buttons.dart';
 
 import '../../widgets/error_dialog.dart';
@@ -219,11 +220,15 @@ class _ChangePassScreen extends State<ChangePassScreen> {
       });
 
       navigateToOtpScreen();
-    } on CustomError catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      errorDialog(context, e.errMsg);
+    }catch (e) {
+      if (e is CustomException) {
+        setState(() {
+          _isLoading = false;
+        });
+        errorDialog(context, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
   }
 

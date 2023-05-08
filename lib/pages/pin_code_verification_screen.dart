@@ -15,7 +15,7 @@ import '../data/repository/home_repository.dart';
 import '../di/components/service_locator.dart';
 import '../models/otp_verify/OrderOtpVerifyRequest.dart';
 import '../utils/dio/network_call_status_enum.dart';
-import '../widgets/confirmation_popup.dart';
+
 import 'gift_screen.dart';
 
 class PinCodeVerificationScreen extends StatefulWidget {
@@ -192,13 +192,11 @@ class PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
               ),
               BlocConsumer<MakeOrderBloc, MakeOrderState>(
                 listener: (context, state) {
-                  if (state.status == NetworkCallStatusEnum.loaded) {
-                    //{status: 200, success: true, message: Payment has been verified, orderGiftData: {orderGiftId: 639e02429e46977080534d88}}
+                  if(state is MakeOrderLoaded){
                     Navigator.pushNamed(context, GiftPage.routeName);
-
-                  } else if (state.status == NetworkCallStatusEnum.error) {
+                  }else if(state is MakeOrderError){
                     Fluttertoast.showToast(
-                        msg: state.error.errMsg,
+                        msg: state.message,
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.CENTER,
                         timeInSecForIosWeb: 1,
@@ -206,9 +204,11 @@ class PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                         textColor: Colors.white,
                         fontSize: 16.0);
                   }
+
                 },
                 builder: (context, state) {
-                  if (state.status == NetworkCallStatusEnum.loading) {
+
+                  if(state is MakeOrderLoading){
                     return const Center(child: CircularProgressIndicator());
                   }
                   return Container(

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:shopeein/pages/auth_screen/sign_up.dart';
 
 import '../../constants/constants.dart';
+import '../../data/exceptions/network_exceptions.dart';
 import '../../data/repository/login_repository.dart';
 import '../../di/components/service_locator.dart';
 import '../../models/login/OtpVerifyRequest.dart';
 import '../../models/login/login_response.dart';
 import '../../models/register/request_otp.dart';
-import '../../utils/device/custom_error.dart';
 import '../../widgets/error_dialog.dart';
 
 class OtpForm extends StatefulWidget {
@@ -199,11 +199,16 @@ class _OtpFormState extends State<OtpForm> {
       debugPrint(response.user.token);
       navigateToOtpScreen();
 
-    } on CustomError catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      errorDialog(buildContext, e.errMsg);
+    }
+    catch (e) {
+      if (e is CustomException) {
+        setState(() {
+          _isLoading = false;
+        });
+        errorDialog(buildContext, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
   }
 

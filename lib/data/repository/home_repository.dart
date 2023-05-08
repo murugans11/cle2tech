@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:shopeein/models/banner/banner.dart';
 import 'package:shopeein/models/wishlist/toggle_wishList_request.dart';
@@ -11,14 +11,11 @@ import '../../models/cart/CartResponse.dart';
 import '../../models/categories/category.dart';
 import '../../models/categoriesbyname/categorieItems.dart';
 import '../../models/coupan/coupon_response.dart';
-import '../../models/event/studenteventrequest.dart';
 import '../../models/feature/feature_productes.dart';
 import '../../models/gift/gift_response.dart';
 import '../../models/my_order/my_order_response.dart';
 import '../../models/my_order/pincoderesponse.dart';
 import '../../models/wishlist/wish_list_response.dart';
-import '../../utils/device/custom_error.dart';
-import '../../utils/dio/dio_error_util.dart';
 import '../network/apis/home/home_api.dart';
 
 class HomeRepository {
@@ -32,28 +29,18 @@ class HomeRepository {
   Future<CategoryList> getCategoryGroup() async {
     try {
       final CategoryList categoryList = await _homeApi.getCategoryGroup();
-
-      debugPrint('categoryList: $categoryList');
-
       return categoryList;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
   Future<BannerList> getBannerList() async {
     try {
       final BannerList bannerList = await _homeApi.getBannerList();
-
-      debugPrint('bannerList: $bannerList');
-
       return bannerList;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -61,14 +48,9 @@ class HomeRepository {
     try {
       final FeatureProductList featureProductList =
           await _homeApi.getFeatureProductList();
-
-      debugPrint('featureProductList: $featureProductList');
-
       return featureProductList;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -77,14 +59,9 @@ class HomeRepository {
       final CategorieItems featureProductList =
           await _homeApi.getCategoryProductListByName(url);
 
-      debugPrint('featureProductList: $featureProductList');
-
       return featureProductList;
     } catch (e) {
-      debugPrint(e.toString());
-
       return CategorieItems(listingProduct: []);
-      //throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
     }
   }
 
@@ -93,8 +70,7 @@ class HomeRepository {
     try {
       await _homeApi.toggleWishList(toggleWishListRequest);
     } catch (e) {
-      debugPrint(e.toString());
-      //throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -103,13 +79,9 @@ class HomeRepository {
       final VerifyWishlist verifyWishlist =
           await _homeApi.verifyWishList(token);
 
-      debugPrint('verifyWishlist: $verifyWishlist');
-
       return verifyWishlist;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -122,9 +94,7 @@ class HomeRepository {
 
       return verifyWishlist;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -137,9 +107,7 @@ class HomeRepository {
 
       return wishListResponse;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -151,9 +119,7 @@ class HomeRepository {
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -167,8 +133,7 @@ class HomeRepository {
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -179,14 +144,14 @@ class HomeRepository {
     String claimType,
   ) async {
     try {
-      final cartResponse = await _homeApi.updateGift(token, id, deliveryAddress, claimType);
+      final cartResponse =
+          await _homeApi.updateGift(token, id, deliveryAddress, claimType);
 
       debugPrint('cartResponse: $cartResponse');
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -200,9 +165,7 @@ class HomeRepository {
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
 
@@ -216,8 +179,7 @@ class HomeRepository {
 
       return addressResponse;
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -229,9 +191,7 @@ class HomeRepository {
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -243,9 +203,7 @@ class HomeRepository {
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -257,8 +215,7 @@ class HomeRepository {
 
       return cartResponse;
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -269,10 +226,8 @@ class HomeRepository {
       debugPrint('walletBalance: $walletBalance');
 
       return walletBalance;
-
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -284,9 +239,7 @@ class HomeRepository {
 
       return orderId;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
 
@@ -300,25 +253,32 @@ class HomeRepository {
 
       return response;
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
-  Future<OrderOtpVerifyRequest> makeAnOrder(String token, String id, String deliveryAddress, String paymentType,bool canUseWallet,) async {
+  Future<OrderOtpVerifyRequest> makeAnOrder(
+    String token,
+    String id,
+    String deliveryAddress,
+    String paymentType,
+    bool canUseWallet,
+  ) async {
     try {
-      final requestId = await _homeApi.makeAnOrder(token, id, deliveryAddress, paymentType,canUseWallet);
+      final requestId = await _homeApi.makeAnOrder(
+          token, id, deliveryAddress, paymentType, canUseWallet);
 
       debugPrint('requestId: $requestId');
 
       return requestId;
     } catch (e) {
-      debugPrint(e.toString());
-
-      throw e;
+      rethrow;
     }
   }
-  Future<PincodeResponse> checkPinCode(String pincode, ) async {
+
+  Future<PincodeResponse> checkPinCode(
+    String pincode,
+  ) async {
     try {
       final requestId = await _homeApi.checkPinCode(pincode);
 
@@ -326,12 +286,12 @@ class HomeRepository {
 
       return requestId;
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
-  Future<OrderOtpVerifyRequest> eventPayment(Map<String, dynamic> studentEventRequest) async {
+  Future<OrderOtpVerifyRequest> eventPayment(
+      Map<String, dynamic> studentEventRequest) async {
     try {
       final requestId = await _homeApi.eventPayment(studentEventRequest);
 
@@ -339,39 +299,37 @@ class HomeRepository {
 
       return requestId;
     } catch (e) {
-      debugPrint(e.toString());
-      throw e;
+      rethrow;
     }
   }
 
   Future<String> savePaymentSuccess(
       String token, String orderId, String paymentId, String signature) async {
     try {
-      final requestId = await _homeApi.savePaymentSuccess(token, orderId, paymentId, signature);
+      final requestId = await _homeApi.savePaymentSuccess(
+          token, orderId, paymentId, signature);
 
       var result = requestId.toString();
       debugPrint('requestId: $result');
 
       return requestId.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
+
   Future<String> savePaymentSuccessEvent(
       String token, String orderId, String paymentId, String signature) async {
     try {
-      final requestId = await _homeApi.savePaymentSuccessEvent(token, orderId, paymentId, signature);
+      final requestId = await _homeApi.savePaymentSuccessEvent(
+          token, orderId, paymentId, signature);
 
       var result = requestId.toString();
       debugPrint('requestId: $result');
 
       return requestId.toString();
     } catch (e) {
-      debugPrint(e.toString());
-      throw CustomError(errMsg: DioErrorUtil.handleError(e as DioError));
+      rethrow;
     }
   }
-
-
 }

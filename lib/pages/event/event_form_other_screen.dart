@@ -34,7 +34,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
 
 
 
-  String _verticalGroupValue2 = "Drawing";
+ /* String _verticalGroupValue2 = "Drawing";
   final List<String> _status2 = [
     "Drawing",
     "Singing",
@@ -42,7 +42,16 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
     "Music",
     "Quiz",
     "Others"
+  ];*/
+  String _verticalGroupValue2 = "Reels Making";
+  final List<String> _status2 = [
+    "Meme Creation",
+    "Selfi",
+    "Contest",
+    "Short Videos",
+    "Health & Beauty Tips Video",
   ];
+
 
   // By defaut, the checkbox is unchecked and "agree" is "false"
   bool agree = false;
@@ -455,7 +464,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
                           ]),
 
                           const SizedBox(height: 15),
-                          TextFormField(
+                          /*TextFormField(
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: 'Mention your talent specifically',
@@ -463,7 +472,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
                             ),
                             validator: (value) => null,
                             controller: userOtherTalentController,
-                          ),
+                          ),*/
 
                         ],
                       ),
@@ -496,7 +505,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
                         ),
 
                         const MyGoogleText(
-                          text: 'Pay Rs:299 to Join Shopeein Talent Contest',
+                          text: 'Pay Rs:9 to Join Shopeein Online Contest',
                           fontSize: 14,
                           fontColor: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -516,7 +525,7 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
                               Padding(
                                 padding: EdgeInsets.all(12.0),
                                 child: ReadMoreText(
-                                  "To Join Shopeein Talent Contest You need to pay Rs:299 as entry fees. And the entry fees Rs:299 will be added in your Shopeein Wallet. Which can be utilized for Shopping Clothes. Groceries, Accessories, beauty Products etc in Shopeein APP (Ios/Android) or www.shopeein.com. The Paid Amount Rs:299 for Contest will not be refundable. It can be Used In WWW.SHOPEEIN.COM / SHOPEEIN APP for Purchasing Purpose Only. ",
+                                  "To Join Shopeein's Online Contest You need to pay Rs:9 as entry fees. And the entry fees Rs:9 will be added in your Shopeein Wallet. Which can be utilized for Shopping Clothes. Groceries, Accessories, beauty Products etc in Shopeein APP (Ios/Android) or www.shopeein.com. The Paid Amount Rs:9 for Contest will not be refundable. It can be Used In WWW.SHOPEEIN.COM / SHOPEEIN APP for Purchasing Purpose Only. ",
                                   trimLines: 2,
                                   colorClickableText: primaryColor,
                                   trimMode: TrimMode.Line,
@@ -594,7 +603,8 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
       final city = cityController.value.text;
       final pinCode = pinCodeController.value.text;
       final state = stateCodeController.value.text;
-      final otherTalent = userOtherTalentController.value.text;
+      //final otherTalent = userOtherTalentController.value.text;
+      const otherTalent = '';
 
       if(dob.isEmptyOrNull) {
         Fluttertoast.showToast(
@@ -657,7 +667,8 @@ class EventFormOtherScreenState extends State<EventFormOtherScreen> {
 
 
       final Map<String, dynamic> data = <String, dynamic>{};
-      data['pid'] = "pidWZEDjxL6EZfws";
+     // data['pid'] = "pidWZEDjxL6EZfws";
+      data['pid'] = "pidgRV6zfoq9aHAf";
       data['firstName'] = firstName;
       data['lastName'] = lastName;
       data['gender'] = _verticalGroupValue.toUpperCase();

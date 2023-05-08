@@ -10,6 +10,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:shopeein/models/wishlist/verifywishlist.dart';
 
 import '../constants/constants.dart';
+import '../data/exceptions/network_exceptions.dart';
 import '../data/repository/home_repository.dart';
 import '../data/sharedpref/shared_preference_helper.dart';
 import '../di/components/service_locator.dart';
@@ -18,7 +19,6 @@ import '../models/cart/CartRequest.dart';
 import '../models/feature/feature_productes.dart';
 import '../models/optionallist/optionallistmodel.dart';
 import '../models/wishlist/toggle_wishList_request.dart';
-import '../utils/device/custom_error.dart';
 import '../widgets/buttons.dart';
 import '../widgets/error_dialog.dart';
 import '../widgets/product_greed_view_widget.dart';
@@ -158,9 +158,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           await homeRepository.addUpdateDeleteCart(token, cartRequest);
 
       navigateLogin();
-    } on CustomError catch (e) {
-      errorDialog(context, e.errMsg);
+    } catch (e) {
+      if (e is CustomException) {
+        errorDialog(context, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
+
   }
 
   FutureOr<void> _addToCart(String token, CartRequest cartRequest) async {
@@ -177,8 +182,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           textColor: Colors.white,
           fontSize: 16.0);
       Navigator.pushNamed(context, CartScreen.routeName);
-    } on CustomError catch (e) {
-      errorDialog(context, e.errMsg);
+    } catch (e) {
+      if (e is CustomException) {
+        errorDialog(context, e.message);
+      } else {
+        debugPrint(e.toString());
+      }
     }
   }
 
@@ -216,39 +225,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           if (optAttrindex > 0) {
             final firstOptionValue = optAttr.attributeOptionValue?[0];
 
-            /* option2.add({
-              'name': optAttr.name,
-              'attributeValueId': firstOptionValue?.sId,
-              'sku': element.sku,
-              'inventory': element.inventory,
-              'attributeStyle': element.optionalAttributes?[0].attributeStyle ?? 'rectangle',
-              'label': firstAttriOptionValue?.displayName,
-              'attributeLabel': element.optionalAttributes?[0].displayName,
-              'media': element.media?.asMap(),
-
-            });*/
-
-            /* final size = element.optionalAttributes?[optAttrindex].attributeOptionValue?[0].displayName;
-
-            List<String> color1 = [];
-            List<String> size1 = [];
-
-            element.optionalAttributes?.forEach((sizeElement) {
-              if(sizeElement.displayName == 'Color') {
-                if(!color1.contains(sizeElement.attributeOptionValue?[0].displayName)){
-                  color1.add(sizeElement.attributeOptionValue?[0].displayName);
-                }
-              } else if(sizeElement.displayName == 'Size') {
-                if (!size1.contains(
-                    sizeElement.attributeOptionValue?[0].displayName)) {
-                  size1.add(sizeElement.attributeOptionValue?[0].displayName);
-                }
-              }
-            });
-
-            debugPrint(color1.toString());
-            debugPrint(size1.toString());*/
-
             final data = <String, String>{};
             data['type'] = element.media?[0].type;
             data['resourcePath'] = element.media?[0].resourcePath;
@@ -270,26 +246,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         });
       });
 
-      /* final option2Consolidate = {};
-      option2.forEach((item) {
-        if (!option2Consolidate.containsKey(item['attributeValueId'])) {
-          option2Consolidate[item['attributeValueId']] = {
-            ...item,
-            'sku': [item['sku']],
-          };
-        } else {
-          option2Consolidate[item['attributeValueId']]['sku'].add(item['sku']);
-        }
-      });*/
 
       return {
         'option1': List.from(availableCombination.values),
-        //'option2': List.from(option2Consolidate.values),
       };
     } catch (error) {
       return {
         'option1': [],
-        //'option2': [],
       };
     }
   }

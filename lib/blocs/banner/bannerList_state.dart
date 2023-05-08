@@ -2,48 +2,65 @@
 import 'package:equatable/equatable.dart';
 import 'package:shopeein/models/banner/banner.dart';
 
-import '../../utils/device/custom_error.dart';
-import '../../utils/dio/network_call_status_enum.dart';
-class BannerState extends Equatable {
 
-  final NetworkCallStatusEnum status;
+
+
+// Define states
+abstract class BannerState extends Equatable {
+  const BannerState();
+
+  @override
+  List<Object> get props => [];
+}
+
+class BannerInitial extends BannerState {
+  const BannerInitial();
+  factory BannerInitial.initial() {
+    return const BannerInitial();
+  }
+}
+
+class BannerLoading extends BannerState {
+  const BannerLoading();
+  @override
+  List<Object> get props => [];
+}
+
+class BannerLoaded extends BannerState {
+
   final BannerList bannerList;
-  final CustomError error;
 
-  const BannerState({
-    required this.status,
-    required this.bannerList,
-    required this.error,
-  });
+  const BannerLoaded({required this.bannerList});
 
-  factory BannerState.initial() {
-    return BannerState(
-      status: NetworkCallStatusEnum.initial,
-      bannerList: BannerList.initial(),
-      error: const CustomError(),
+
+  BannerState copyWith({
+    BannerList? categoryList,
+  }) {
+    return BannerLoaded(
+      bannerList: categoryList ?? bannerList,
     );
   }
 
   @override
-  List<Object> get props => [status, bannerList, error];
+  List<Object> get props => [bannerList];
 
   @override
   bool get stringify => true;
 
   @override
   String toString() {
-    return 'BannerState{status: $status, categoryList: $bannerList, error: $error}';
+    return 'BannerState{categoryList: $bannerList, }';
   }
 
-  BannerState copyWith({
-    NetworkCallStatusEnum? status,
-    BannerList? categoryList,
-    CustomError? error,
-  }) {
-    return BannerState(
-      status: status ?? this.status,
-      bannerList: categoryList ?? bannerList,
-      error: error ?? this.error,
-    );
-  }
 }
+
+class BannerError extends BannerState {
+  final String message;
+
+   const BannerError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+

@@ -136,6 +136,8 @@ class _Assets {
   String get talent_show => "assets/images/Talent_Show.png";
 
   String get success_bg => "assets/images/Success_Bg.png";
+
+  String get ots => "assets/images/onlinei.png";
 }
 
 class _Values {
