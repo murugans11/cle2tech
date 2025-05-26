@@ -1,21 +1,26 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter_bloc/flutter_bloc.dart'; // Added for Bloc
 import 'package:nb_utils/nb_utils.dart';
-import 'package:shopeein/models/login/login_response.dart';
+// The shopeein/models/... import will be removed when proper DTOs/Entities are used. For now, adjust path.
+import '../../../models/login/login_response.dart';
 
-import '../../constants/app_theme.dart';
-import '../../constants/constants.dart';
-import '../../data/exceptions/network_exceptions.dart';
-import '../../data/repository/login_repository.dart';
-import '../../di/components/service_locator.dart';
-import '../../models/login/RequestOtpResponse.dart';
-import '../../models/login/login_requst.dart';
-import '../../models/register/request_otp.dart';
+import '../../../constants/app_theme.dart';
+import '../../../constants/constants.dart';
+import '../../../data/exceptions/network_exceptions.dart';
+import '../../../data/repository/login_repository.dart'; // This will be removed when use cases are implemented
+import '../../../di/components/service_locator.dart';
+import '../../../models/login/RequestOtpResponse.dart'; // To be replaced
+import '../../../models/login/login_requst.dart'; // To be replaced by domain/data layer objects
+import '../../../models/register/request_otp.dart'; // To be replaced
 
-import '../../widgets/buttons.dart';
-import '../../widgets/error_dialog.dart';
+import '../../../widgets/buttons.dart';
+import '../../../widgets/error_dialog.dart';
 import 'otp_auth_screen.dart';
+import '../blocs/login_bloc.dart'; // New import
+import '../blocs/auth_bloc.dart';   // New import
+// import '../../../domain/entities/auth/auth_credentials.dart'; // Example if directly using domain entities
 
 class LogInScreen extends StatefulWidget {
   static const String routeName = "/LogInScreen";

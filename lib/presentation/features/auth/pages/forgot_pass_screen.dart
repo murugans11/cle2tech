@@ -2,8 +2,8 @@ import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 
 import 'package:nb_utils/nb_utils.dart';
 
-import '../../constants/constants.dart';
-import '../../widgets/buttons.dart';
+import '../../../constants/constants.dart';
+import '../../../widgets/buttons.dart';
 import 'otp_auth_screen.dart';
 
 class ForgotPassScreen extends StatefulWidget {

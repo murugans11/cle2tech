@@ -1,16 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
-import 'package:shopeein/pages/auth_screen/sign_up.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../pages/sign_up.dart'; // Corrected path for SignUp page
 
-import '../../constants/constants.dart';
-import '../../data/exceptions/network_exceptions.dart';
-import '../../data/repository/login_repository.dart';
-import '../../di/components/service_locator.dart';
-import '../../models/login/OtpVerifyRequest.dart';
-import '../../models/login/login_response.dart';
-import '../../models/register/request_otp.dart';
-import '../../widgets/error_dialog.dart';
+import '../../../constants/constants.dart';
+import '../../../data/exceptions/network_exceptions.dart'; // To be removed later
+import '../../../data/repository/login_repository.dart'; // To be removed later
+import '../../../di/components/service_locator.dart';
+import '../../../models/login/OtpVerifyRequest.dart'; // To be replaced
+import '../../../models/login/login_response.dart'; // To be replaced
+import '../../../models/register/request_otp.dart'; // To be replaced
+import '../../../widgets/error_dialog.dart';
+import '../blocs/otp_bloc.dart'; // Corrected path for OtpBloc
 
 class OtpForm extends StatefulWidget {
 
