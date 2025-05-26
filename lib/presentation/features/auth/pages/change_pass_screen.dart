@@ -3,16 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:nb_utils/nb_utils.dart';
 
-import '../../constants/app_theme.dart';
-import '../../constants/constants.dart';
-import '../../data/exceptions/network_exceptions.dart';
-import '../../data/repository/login_repository.dart';
-import '../../di/components/service_locator.dart';
+import '../../../constants/app_theme.dart';
+import '../../../constants/constants.dart';
+import '../../../data/exceptions/network_exceptions.dart';
+import '../../../data/repository/login_repository.dart';
+import '../../../di/components/service_locator.dart';
 
 
-import '../../widgets/buttons.dart';
+import '../../../widgets/buttons.dart';
 
-import '../../widgets/error_dialog.dart';
+import '../../../widgets/error_dialog.dart';
 
 class ChangePassScreen extends StatefulWidget {
   static const String routeName = "/ChangePassScreen";

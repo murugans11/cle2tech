@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter_bloc/flutter_bloc.dart'; // Added for Bloc
 
-
-import '../../constants/constants.dart';
-import '../../models/register/request_otp.dart';
-import 'otp_test.dart';
+import '../../../constants/constants.dart';
+import '../../../models/register/request_otp.dart'; // To be replaced by domain/data layer objects
+import '../widgets/otp_form.dart'; // Corrected import for OtpForm
+import '../blocs/otp_bloc.dart';   // New import
+import '../blocs/auth_bloc.dart';  // New import
+// import '../../../domain/entities/auth/auth_credentials.dart'; // Example if directly using domain entities
 
 class OtpAuthScreen extends StatefulWidget {
 

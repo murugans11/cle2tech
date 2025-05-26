@@ -1,20 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
+import 'package:flutter_bloc/flutter_bloc.dart'; // Added for Bloc
 import 'package:nb_utils/nb_utils.dart';
 
-import '../../constants/app_theme.dart';
-import '../../constants/constants.dart';
-import '../../data/exceptions/network_exceptions.dart';
-import '../../data/repository/login_repository.dart';
-import '../../di/components/service_locator.dart';
-import '../../models/login/login_response.dart';
-import '../../models/register/RegistrationRequest.dart';
-import '../../models/register/request_otp.dart';
-import '../../widgets/buttons.dart';
+import '../../../constants/app_theme.dart';
+import '../../../constants/constants.dart';
+import '../../../data/exceptions/network_exceptions.dart'; // To be removed
+import '../../../data/repository/login_repository.dart'; // To be removed
+import '../../../di/components/service_locator.dart';
+import '../../../models/login/login_response.dart'; // To be replaced
+import '../../../models/register/RegistrationRequest.dart'; // To be replaced
+import '../../../models/register/request_otp.dart'; // To be replaced
+import '../../../widgets/buttons.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 
-import '../../widgets/error_dialog.dart';
+import '../../../widgets/error_dialog.dart';
+import '../blocs/signup_bloc.dart'; // New import
+import '../blocs/auth_bloc.dart';   // New import
+// import '../../../domain/entities/auth/auth_credentials.dart'; // Example
 
 class SignUp extends StatefulWidget {
 
