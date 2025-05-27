@@ -17,4 +17,20 @@ class OtpRequestDto with _$OtpRequestDto {
   }) = _OtpRequestDto;
 
   factory OtpRequestDto.fromJson(Map<String, dynamic> json) => _$OtpRequestDtoFromJson(json);
+
+  /*
+  // Assuming import '../../../domain/entities/auth/auth_credentials.dart'; // Or just take a String phoneNumber
+
+  static OtpRequestDto fromDomain(AuthCredentials credentials) {
+    // This relies on AuthCredentials having an accessible phoneNumber property.
+    throw UnimplementedError('fromDomain() cannot be implemented without generated Freezed parts for AuthCredentials. Phone: ${credentials.phoneNumber}');
+    // Hypothetical example (would error without .freezed parts):
+    // return OtpRequestDto(phoneNumber: credentials.phoneNumber ?? '');
+  }
+
+  // Simpler alternative if only phone number string is passed from domain layer:
+  // static OtpRequestDto fromPhoneNumber(String phoneNumber) {
+  //   return OtpRequestDto(phoneNumber: phoneNumber);
+  // }
+  */
 }

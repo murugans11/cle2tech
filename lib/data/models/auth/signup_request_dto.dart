@@ -24,4 +24,23 @@ class SignUpRequestDto with _$SignUpRequestDto {
   }) = _SignUpRequestDto;
 
   factory SignUpRequestDto.fromJson(Map<String, dynamic> json) => _$SignUpRequestDtoFromJson(json);
+
+  /*
+  // Assuming import '../../../domain/entities/auth/auth_credentials.dart';
+  // Or a more specific domain entity if User/AuthCredentials don't directly map, e.g., SignUpParams.
+  // For this example, let's assume we map from a combination of User and AuthCredentials.
+
+  static SignUpRequestDto fromDomain(AuthCredentials credentials, {String? name}) {
+    // This relies on AuthCredentials and potentially User having accessible properties.
+    // The 'name' might come from a User object or be passed separately.
+    throw UnimplementedError('fromDomain() cannot be implemented without generated Freezed parts. Email: ${credentials.email}, Phone: ${credentials.phoneNumber}');
+    // Hypothetical example (would error without .freezed parts):
+    // return SignUpRequestDto(
+    //   name: name ?? '', // Or from a User entity if available
+    //   email: credentials.email ?? '',
+    //   password: credentials.password ?? '',
+    //   phoneNumber: credentials.phoneNumber,
+    // );
+  }
+  */
 }

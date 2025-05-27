@@ -18,4 +18,17 @@ class LoginRequestDto with _$LoginRequestDto {
   }) = _LoginRequestDto;
 
   factory LoginRequestDto.fromJson(Map<String, dynamic> json) => _$LoginRequestDtoFromJson(json);
+
+  /*
+  // Assuming import '../../../domain/entities/auth/auth_credentials.dart';
+
+  static LoginRequestDto fromDomain(AuthCredentials credentials) {
+    // This relies on AuthCredentials having accessible properties (which are part of .freezed.dart).
+    // It also assumes AuthCredentials has a clear way to provide a single 'loginId'.
+    // For example, if AuthCredentials has separate email and phoneNumber, logic is needed here.
+    throw UnimplementedError('fromDomain() cannot be implemented without generated Freezed parts for AuthCredentials. Credentials: ${credentials}');
+    // Hypothetical example (would error without .freezed parts and assuming credentials.email is the loginId):
+    // return LoginRequestDto(loginId: credentials.email ?? credentials.phoneNumber ?? '', password: credentials.password ?? '');
+  }
+  */
 }
