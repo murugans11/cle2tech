@@ -26,4 +26,18 @@ class UserResponseDto with _$UserResponseDto {
   }) = _UserResponseDto;
 
   factory UserResponseDto.fromJson(Map<String, dynamic> json) => _$UserResponseDtoFromJson(json);
+
+  /*
+  // Assuming import '../../../domain/entities/auth/user.dart';
+
+  User toDomain() {
+    // This conversion relies on the actual structure of User and UserResponseDto
+    // and potentially on User.fromJson if User itself has complex fields.
+    // Since .freezed.dart files are not generated, direct instantiation might fail
+    // if User has factory constructors or specific requirements from Freezed.
+    throw UnimplementedError('toDomain() cannot be implemented without generated Freezed parts for User and UserResponseDto. Expected fields: id=$id, name=$name, email=$email');
+    // Hypothetical example (would error without .freezed parts):
+    // return User(id: id, name: name ?? '', email: email ?? '', phoneNumber: phoneNumber, profileImageUrl: profilePicUrl);
+  }
+  */
 }

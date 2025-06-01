@@ -21,4 +21,24 @@ class AuthResponseDto with _$AuthResponseDto {
   }) = _AuthResponseDto;
 
   factory AuthResponseDto.fromJson(Map<String, dynamic> json) => _$AuthResponseDtoFromJson(json);
+
+  /*
+  // Assuming import '../../../domain/entities/auth/user.dart'; // If mapping directly to User
+  // Or a custom domain result object like:
+  // class AuthResult {
+  //   final User? user;
+  //   final String token;
+  //   AuthResult(this.user, this.token);
+  // }
+
+  // Example: Mapping to a tuple or simple class if not directly to User
+  // For simplicity, let's assume a method that would return the domain User and token.
+  // A dedicated domain AuthResult class would be cleaner.
+  (User?, String) toDomain() {
+    // This relies on UserResponseDto.toDomain() and generated parts for both DTOs and User.
+    throw UnimplementedError('toDomain() cannot be implemented without generated Freezed parts. Token: $token, User DTO: ${user}');
+    // Hypothetical example (would error without .freezed parts):
+    // return (user?.toDomain(), token);
+  }
+  */
 }
