@@ -1,12 +1,12 @@
 class BannerGroup {
   String resourcePath;
   String? bannerType;
-  String? id;
+  String? link;
 
   BannerGroup({
     required this.resourcePath,
     this.bannerType,
-    this.id,
+    this.link,
   });
 
   factory BannerGroup.fromJson(Map<String, dynamic> map) {
@@ -23,7 +23,7 @@ class BannerGroup {
 
     return BannerGroup(
       bannerType: map['bannerType'] as String,
-      id:/* map['_id'] as String*/ '',
+      link: map['link'] as String ,
       resourcePath: imageURL,
     );
   }

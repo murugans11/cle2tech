@@ -20,9 +20,10 @@ class BannerList {
     if (categoriesGroupMap['banner'] != null) {
       List<dynamic> categoryGroupItem = categoriesGroupMap['banner'];
       for (var element in categoryGroupItem) {
-        if (element['bannerType'] == "mobile") {
+       /* if (element['bannerType'] == "mobile") {
           post.add(BannerGroup.fromJson(element));
-        }
+        }*/
+        post.add(BannerGroup.fromJson(element));
       }
     }
     return BannerList(

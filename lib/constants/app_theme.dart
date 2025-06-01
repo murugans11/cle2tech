@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:google_fonts/google_fonts.dart';
 
 class _TextStyles {
@@ -109,7 +109,9 @@ class _Colors {
 
 class _Assets {
   // splash screen assets
-  String get logo => "assets/icons/ic_appicon.png";
+  String get logo => "assets/icons/shopeein.png";
+  String get logo1 => "assets/icons/Launching_Icon_App.png";
+  String get logo2 => "assets/icons/Logo2.png";
 
   // login screen assets
 
@@ -124,6 +126,18 @@ class _Assets {
   String get wishlist => "assets/images/wishlist.png";
 
   String get fourHrDelivery => "assets/images/4HrDelivery.png";
+
+  String get gift1 => "assets/images/gift1.png";
+
+  String get gift2 => "assets/images/gift2.png";
+
+  String get wallet_Img => "assets/images/wallet_Img.png";
+
+  String get talent_show => "assets/images/Talent_Show.png";
+
+  String get success_bg => "assets/images/Success_Bg.png";
+
+  String get ots => "assets/images/onlinei.png";
 }
 
 class _Values {
@@ -139,7 +153,11 @@ class _Values {
 
   String get hrDelivery => "4Hr Delivery";
 
+  String get cart => "Cart";
+
   String get notifications => "Notifications";
+
+  String get profile => "Profile";
 }
 
 class AppTheme extends InheritedWidget {

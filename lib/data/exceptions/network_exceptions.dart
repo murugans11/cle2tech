@@ -1,11 +1,21 @@
-class NetworkException implements Exception {
-  String? message;
-  int? statusCode;
 
-  NetworkException({this.message, this.statusCode});
+import 'package:equatable/equatable.dart';
+
+class CustomException  extends Equatable implements Exception  {
+  final String message;
+  final int? statusCode;
+
+  const CustomException({required this.message, this.statusCode});
+
+  @override
+  String toString() {
+    return 'CustomException: statusCode: $statusCode, message: $message';
+  }
+
+  @override
+  List<Object?> get props => [message,statusCode];
+
+  @override
+  bool get stringify => true;
 }
 
-class AuthException extends NetworkException {
-  AuthException({message, statusCode})
-      : super(message: message, statusCode: statusCode);
-}

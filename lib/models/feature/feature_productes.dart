@@ -223,7 +223,7 @@ class KeyDetails {
     productSubTitle = json['productSubTitle'];
     slug = json['slug'];
     description = json['description'];
-    highlights = json['highlights'].cast<String>();
+    highlights = json['highlights'];
     isCashOnDelivery = json['isCashOnDelivery'];
     hasVariant = json['hasVariant'];
     if (json['variant'] != null) {
@@ -360,3 +360,16 @@ class FeatureProductList {
   factory FeatureProductList.initial() => FeatureProductList(
       status: -1, message: '', featureProduct: [], listingProduct: []);
 }
+
+
+class ListingItem{
+  List<ListingProduct> listingProduct;
+  String title;
+
+  ListingItem({
+    required this.listingProduct,
+    required this.title,
+  });
+}
+
+

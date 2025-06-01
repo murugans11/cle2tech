@@ -1,14 +1,18 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'hide ModalBottomSheetRoute;
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shopeein/blocs/banner/bannarList_bloc.dart';
 
-import 'blocs/category/categoryList_bloc.dart';
+
+import 'blocs/category_groupe/categoryList_bloc.dart';
 import 'blocs/featureproduct/feature_product_list_bloc.dart';
 import 'constants/app_theme.dart';
 import 'constants/strings.dart';
+import 'cubit/cart/cart_list_response_cubit.dart';
+
+import 'cubit/wishlist/wish_list_response_cubit.dart';
 import 'data/repository/home_repository.dart';
 import 'di/components/service_locator.dart';
 import 'utils/routes/routes.dart' as Router;
@@ -50,10 +54,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<CategoriesBloc>(
-            create: (context) =>
-                CategoriesBloc(homeRepository: context.read<HomeRepository>()),
-          ),
+
           BlocProvider<BannerBloc>(
             create: (context) =>
                 BannerBloc(homeRepository: context.read<HomeRepository>()),
@@ -62,6 +63,28 @@ class MyApp extends StatelessWidget {
             create: (context) => FeatureProductListBloc(
                 homeRepository: context.read<HomeRepository>()),
           ),
+
+          BlocProvider<CategoriesBloc>(
+            create: (context) =>
+                CategoriesBloc(homeRepository: context.read<HomeRepository>()),
+          ),
+
+          BlocProvider<WishListResponseCubit>(
+            create: (context) => WishListResponseCubit(
+                homeRepository: context.read<HomeRepository>()),
+          ),
+
+          BlocProvider<CartListResponseCubit>(
+            create: (context) => CartListResponseCubit(
+                homeRepository: context.read<HomeRepository>()),
+          ),
+
+         /* BlocProvider<PaymentSuccessBloc>(
+            create: (context) => PaymentSuccessBloc(
+                homeRepository: context.read<HomeRepository>()),
+          ),
+*/
+
         ],
         child: AppTheme(
           child: Builder(builder: (context) {

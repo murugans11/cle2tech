@@ -4,6 +4,8 @@ class CategoriesGroup {
   String? menuType;
   String? groupName;
   String? groupId;
+  String? path;
+  dynamic category;
 
   CategoriesGroup({
     required this.image,
@@ -11,6 +13,8 @@ class CategoriesGroup {
     this.menuType,
     this.groupName,
     this.groupId,
+    this.category,
+    this.path,
   });
 
   factory CategoriesGroup.fromJson(Map<String, dynamic> map) {
@@ -27,9 +31,13 @@ class CategoriesGroup {
 
     return CategoriesGroup(
         title: map['title'] as String,
+        path: map['path'] as String,
         menuType: map['menuType'] as String,
         groupName: map['groupName'] as String,
         groupId: map['groupId'] as String,
-        image: imageURL);
+        image: imageURL,
+        category: map['category']);
   }
 }
+
+

@@ -1,45 +1,67 @@
 part of 'feature_product_list_bloc.dart';
 
-class FeatureProductListState extends Equatable {
 
-  final NetworkCallStatusEnum status;
-  final FeatureProductList featureProductList;
-  final CustomError error;
 
-  const FeatureProductListState({
-    required this.status,
-    required this.featureProductList,
-    required this.error,
-  });
-
-  factory FeatureProductListState.initial() {
-    return FeatureProductListState(
-      status: NetworkCallStatusEnum.initial,
-      featureProductList: FeatureProductList.initial(),
-      error: CustomError(),
-    );
-  }
+// Define states
+abstract class FeatureProductListState extends Equatable {
+  const FeatureProductListState();
 
   @override
-  List<Object> get props => [status, featureProductList, error];
+  List<Object> get props => [];
+}
+
+class FeatureProductListInitial extends FeatureProductListState {
+  const FeatureProductListInitial();
+  factory FeatureProductListInitial.initial() {
+    return FeatureProductListInitial();
+  }
+}
+
+class FeatureProductListLoading extends FeatureProductListState {
+  const FeatureProductListLoading();
+  @override
+  List<Object> get props => [];
+}
+
+class FeatureProductListLoaded extends FeatureProductListState {
+
+  final FeatureProductList featureProductList;
+
+
+  const FeatureProductListLoaded({
+
+    required this.featureProductList,
+
+  });
+
+  @override
+  List<Object> get props => [featureProductList];
 
   @override
   bool get stringify => true;
 
   @override
   String toString() {
-    return 'FeatureProductListState{status: $status, listingProducts: $featureProductList, error: $error}';
+    return 'FeatureProductListState{status:  listingProducts: $featureProductList, }';
   }
 
   FeatureProductListState copyWith({
-    NetworkCallStatusEnum? status,
     FeatureProductList? featureProductLists,
-    CustomError? error,
+
   }) {
-    return FeatureProductListState(
-      status: status ?? this.status,
+    return FeatureProductListLoaded(
       featureProductList: featureProductLists ?? featureProductList,
-      error: error ?? this.error,
     );
   }
+
 }
+
+class FeatureProductListError extends FeatureProductListState {
+  final String message;
+
+  const FeatureProductListError({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+

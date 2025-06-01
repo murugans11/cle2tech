@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../data/exceptions/network_exceptions.dart';
 import '../../data/repository/home_repository.dart';
 import '../../models/feature/feature_productes.dart';
-import '../../utils/device/custom_error.dart';
 import '../../utils/dio/network_call_status_enum.dart';
 
 part 'feature_product_list_event.dart';
@@ -18,25 +18,40 @@ class FeatureProductListBloc
 
   FeatureProductListBloc({
     required this.homeRepository,
-  }) : super(FeatureProductListState.initial()) {
-    on<FetchFeatureProductItemsEvent>(_fetchFeatureProduct);
+  }) : super(FeatureProductListInitial.initial()) {
+    on<FeatureProductListEvent>(_fetchFeatureProduct);
   }
 
   FutureOr<void> _fetchFeatureProduct(
     FeatureProductListEvent event,
     Emitter<FeatureProductListState> emit,
   ) async {
-    emit(state.copyWith(status: NetworkCallStatusEnum.loading));
+    if (event is FetchFeatureProductItemsEvent) {
+      if (state is FeatureProductListLoaded &&
+          (state as FeatureProductListLoaded)
+                  .featureProductList
+                  .featureProduct
+                  ?.length ==
+              0) {
+        emit((state as FeatureProductListLoaded).copyWith(
+            featureProductLists:
+                (state as FeatureProductListLoaded).featureProductList));
+        return;
+      }
 
-    try {
-      final FeatureProductList featureProductList =
-          await homeRepository.getFeatureProtectList();
+      emit(const FeatureProductListLoading());
 
-      emit(state.copyWith(
-          status: NetworkCallStatusEnum.loaded,
-          featureProductLists: featureProductList));
-    } on CustomError catch (e) {
-      emit(state.copyWith(status: NetworkCallStatusEnum.error, error: e));
+      try {
+        final FeatureProductList featureProductList =
+            await homeRepository.getFeatureProtectList();
+        emit(FeatureProductListLoaded(featureProductList: featureProductList));
+      } catch (e) {
+        if (e is CustomException) {
+          emit(FeatureProductListError(message: e.toString()));
+        } else {
+          emit(FeatureProductListError(message: 'Unknown error'));
+        }
+      }
     }
   }
 }
